@@ -1,153 +1,224 @@
-// ====================== EMAIL STORAGE ======================
+// ====================== GLOBAL VARIABLES ======================
 let emails = JSON.parse(localStorage.getItem('emails') || '[]');
-const emailsContainer = document.querySelector('.emails');
+let currentFolder = 'inbox';
+let currentUserEmail = localStorage.getItem('userEmail');
+let currentSelectedEmail = null;
+
+// ====================== DOM ELEMENTS ======================
+const emailsContainer = document.getElementById('emailsList');
 const readerTitle = document.getElementById('readerTitle');
 const readerText = document.getElementById('readerText');
-const readerFiles = document.getElementById('readerFiles');
+const readerSender = document.getElementById('readerSender');
+const readerDate = document.getElementById('readerDate');
+const attachmentsList = document.getElementById('attachmentsList');
+const userEmailElement = document.getElementById('userEmail');
+const currentFolderElement = document.getElementById('currentFolder');
+const emptyTrashBtn = document.getElementById('emptyTrashBtn');
+const deleteEmailBtn = document.getElementById('deleteEmailBtn');
 
-function renderEmails(folder='inbox'){
-  emailsContainer.innerHTML = '';
-  emails
-    .filter(e => e.folder === folder)
-    .forEach((mail, i) => {
-      const div = document.createElement('div');
-      div.className = 'email' + (mail.unread ? ' unread' : '');
-      div.innerHTML = `<div class="avatar">${mail.title[0] || 'M'}</div><div class="title">${mail.title}</div>`;
-      div.onclick = () => openMailByFolder(i, folder);
-      emailsContainer.appendChild(div);
+// ====================== INITIALIZATION ======================
+document.addEventListener('DOMContentLoaded', initApp);
+
+function initApp() {
+    // Initialize user email
+    if (!currentUserEmail) {
+        setTimeout(() => {
+            showEmailPrompt();
+        }, 500);
+    } else {
+        userEmailElement.textContent = currentUserEmail;
+    }
+
+    // Initialize event listeners
+    initEventListeners();
+    
+    // Initialize theme
+    initTheme();
+    
+    // Initialize language
+    initLanguage();
+    
+    // Render initial emails
+    renderEmails('inbox');
+    
+    // Setup mobile menu
+    setupMobileMenu();
+}
+
+// ====================== USER EMAIL SETUP ======================
+function showEmailPrompt() {
+    const modal = document.getElementById('settingsModal');
+    const emailInput = document.getElementById('editEmail');
+    
+    emailInput.value = '';
+    modal.style.display = 'flex';
+    
+    document.getElementById('saveSettings').onclick = function() {
+        const email = emailInput.value.trim();
+        if (email && validateEmail(email)) {
+            currentUserEmail = email;
+            localStorage.setItem('userEmail', email);
+            userEmailElement.textContent = email;
+            modal.style.display = 'none';
+            showNotification('Email saved successfully!');
+        } else {
+            alert('Please enter a valid email address');
+        }
+    };
+}
+
+function validateEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+}
+
+// ====================== EMAIL STORAGE & RENDERING ======================
+function renderEmails(folder = 'inbox') {
+    currentFolder = folder;
+    emailsContainer.innerHTML = '';
+    currentFolderElement.textContent = getFolderName(folder);
+    
+    const filteredEmails = emails.filter(email => email.folder === folder);
+    
+    if (filteredEmails.length === 0) {
+        emailsContainer.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-inbox" style="font-size: 3rem; color: var(--text-secondary); margin-bottom: 15px;"></i>
+                <h3>No emails found</h3>
+                <p>${folder === 'inbox' ? 'Your inbox is empty' : 'No emails in this folder'}</p>
+            </div>
+        `;
+    } else {
+        filteredEmails.forEach((email, index) => {
+            const emailElement = createEmailElement(email, index);
+            emailsContainer.appendChild(emailElement);
+        });
+    }
+    
+    // Show/hide empty trash button
+    emptyTrashBtn.style.display = folder === 'trash' ? 'flex' : 'none';
+    
+    // Reset reader
+    resetReader();
+}
+
+function createEmailElement(email, index) {
+    const div = document.createElement('div');
+    div.className = `email ${email.unread ? 'unread' : ''}`;
+    
+    const avatarColor = stringToColor(email.sender || currentUserEmail);
+    const avatarLetter = (email.sender || currentUserEmail).charAt(0).toUpperCase();
+    const date = formatDate(email.date);
+    const preview = email.text.substring(0, 60) + (email.text.length > 60 ? '...' : '');
+    
+    div.innerHTML = `
+        <div class="email-avatar" style="background: ${avatarColor}">${avatarLetter}</div>
+        <div class="email-content">
+            <div class="email-header">
+                <div class="email-sender">${email.sender || currentUserEmail}</div>
+                <div class="email-date">${date}</div>
+            </div>
+            <div class="email-subject">${email.subject || '(No Subject)'}</div>
+            <div class="email-preview">${preview}</div>
+        </div>
+        <div class="email-actions">
+            <button class="delete-btn" onclick="deleteEmail(${email.id}, event)">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    `;
+    
+    div.onclick = (e) => {
+        if (!e.target.closest('.delete-btn')) {
+            openEmail(email.id);
+            // Remove unread status
+            if (email.unread) {
+                email.unread = false;
+                saveEmails();
+            }
+        }
+    };
+    
+    return div;
+}
+
+function openEmail(emailId) {
+    const email = emails.find(e => e.id === emailId);
+    if (!email) return;
+    
+    currentSelectedEmail = emailId;
+    
+    readerTitle.textContent = email.subject || '(No Subject)';
+    readerSender.textContent = `From: ${email.sender || currentUserEmail}`;
+    readerDate.textContent = `Date: ${formatDate(email.date, true)}`;
+    readerText.textContent = email.text;
+    
+    renderAttachments(email.attachments || []);
+    
+    // Show delete button
+    deleteEmailBtn.style.display = 'flex';
+    
+    // Scroll to reader on mobile
+    if (window.innerWidth <= 768) {
+        document.querySelector('.email-reader').classList.add('active');
+        document.querySelector('.emails').style.display = 'none';
+    }
+}
+
+function renderAttachments(attachments) {
+    attachmentsList.innerHTML = '';
+    
+    if (attachments.length === 0) {
+        attachmentsList.innerHTML = '<p style="color: var(--text-secondary);">No attachments</p>';
+        return;
+    }
+    
+    attachments.forEach((file, index) => {
+        const div = document.createElement('div');
+        div.className = 'attachment-item';
+        
+        const size = formatFileSize(file.size);
+        const isImage = file.type.startsWith('image/');
+        
+        div.innerHTML = `
+            <div class="attachment-info">
+                <div class="attachment-icon">
+                    <i class="fas fa-${getFileIcon(file.type)}"></i>
+                </div>
+                <div>
+                    <div class="attachment-name">${file.name}</div>
+                    <div class="attachment-size">${size}</div>
+                </div>
+            </div>
+            <div class="attachment-actions">
+                ${isImage ? `
+                    <button class="attachment-btn view" onclick="previewImage('${file.data}')">
+                        <i class="fas fa-eye"></i> View
+                    </button>
+                ` : ''}
+                <button class="attachment-btn" onclick="downloadFile('${file.data}', '${file.name}')">
+                    <i class="fas fa-download"></i> Download
+                </button>
+            </div>
+        `;
+        
+        attachmentsList.appendChild(div);
     });
 }
 
-function openMailByFolder(index, folder){
-  const filtered = emails.filter(e => e.folder === folder);
-  const mail = filtered[index];
-  readerTitle.textContent = mail.title;
-  readerText.textContent = mail.text;
-  readerFiles.innerHTML = '';
-  if(mail.files){
-    mail.files.forEach(f=>{
-      const a = document.createElement('a');
-      a.textContent = f.name;
-      a.href = f.data;
-      a.download = f.name;
-      a.className = 'file-link';
-      readerFiles.appendChild(a);
-    });
-  }
-  mail.unread = false;
-  saveEmails();
-  renderEmails(folder);
+function resetReader() {
+    readerTitle.textContent = 'Select an email';
+    readerSender.textContent = '';
+    readerDate.textContent = '';
+    readerText.textContent = 'Select an email from the list to view its contents.';
+    attachmentsList.innerHTML = '';
+    deleteEmailBtn.style.display = 'none';
+    currentSelectedEmail = null;
 }
 
-function saveEmails(){ localStorage.setItem('emails', JSON.stringify(emails)); }
-
-// ====================== USER EMAIL ======================
-let email = localStorage.getItem('email');
-if(!email){
-  email = prompt('Enter email');
-  if(!email) email = 'user@example.com';
-  localStorage.setItem('email', email);
-}
-document.getElementById('userEmail').textContent = email;
-
-// ====================== MODAL ======================
-const modal = document.getElementById('modal');
-const composeBtn = document.getElementById('composeBtn');
-const filePreview = document.getElementById('filePreview');
-const mailFile = document.getElementById('mailFile');
-
-composeBtn.onclick = () => {
-  modal.style.display = 'flex';
-  filePreview.innerHTML = '';
-  mailFile.value = '';
-};
-
-function closeModal(){ modal.style.display = 'none'; }
-
-// ====================== FILE PREVIEW ======================
-mailFile.onchange = () => {
-  filePreview.innerHTML = '';
-  for(let f of mailFile.files){
-    const p = document.createElement('div');
-    p.textContent = f.name;
-    filePreview.appendChild(p);
-  }
-};
-
-// ====================== SEND EMAIL ======================
-document.getElementById('sendMail').onclick = async ()=>{
-  const to = document.getElementById('mailTo').value.trim();
-  const subject = document.getElementById('mailSubject').value.trim();
-  const text = document.getElementById('mailText').value.trim();
-
-  if(!to){ alert('Please enter recipient email'); return; }
-
-  const files = [];
-  for(let f of mailFile.files){
-    const data = await fileToDataURL(f);
-    files.push({name:f.name, data});
-  }
-
-  emails.push({title:subject || '(No Subject)', text, folder:'sent', unread:false, files});
-  saveEmails();
-  renderEmails('sent');
-  closeModal();
-};
-
-function fileToDataURL(file){
-  return new Promise(res=>{
-    const reader = new FileReader();
-    reader.onload = e=>res(e.target.result);
-    reader.readAsDataURL(file);
-  });
-}
-
-// ====================== THEME ======================
-const app = document.getElementById('app');
-const themeToggle = document.getElementById('themeToggle');
-const savedTheme = localStorage.getItem('theme') || 'dark';
-
-if(savedTheme === 'light') app.classList.add('light');
-else app.classList.remove('light');
-
-themeToggle.textContent = app.classList.contains('light') ? '🌙' : '☀️';
-
-themeToggle.onclick = () => {
-  app.classList.toggle('light');
-  const current = app.classList.contains('light') ? 'light' : 'dark';
-  localStorage.setItem('theme', current);
-  themeToggle.textContent = current === 'light' ? '🌙' : '☀️';
-};
-
-// ====================== MENU ======================
-document.querySelectorAll('.menu-item').forEach(item=>{
-  item.onclick = ()=>{
-    document.querySelectorAll('.menu-item').forEach(i=>i.classList.remove('active'));
-    item.classList.add('active');
-    renderEmails(item.dataset.folder);
-  };
-});
-
-// ====================== LANGUAGE ======================
-const dict = {
-  ua:{inbox:'Вхідні',sent:'Надіслані',drafts:'Чернетки',spam:'Спам',newMail:'Новий лист'},
-  en:{inbox:'Inbox',sent:'Sent',drafts:'Drafts',spam:'Spam',newMail:'New mail'},
-  de:{inbox:'Posteingang',sent:'Gesendet',drafts:'Entwürfe',spam:'Spam',newMail:'Neue Mail'},
-  ru:{inbox:'Входящие',sent:'Отправленные',drafts:'Черновики',spam:'Спам',newMail:'Новое письмо'}
-};
-const langSelect = document.getElementById('langSelect');
-const savedLang = localStorage.getItem('lang') || 'ua';
-langSelect.value = savedLang;
-setLang(savedLang);
-langSelect.onchange = ()=>{
-  localStorage.setItem('lang', langSelect.value);
-  setLang(langSelect.value);
-};
-function setLang(l){
-  document.querySelectorAll('[data-i18n]').forEach(el=>{
-    if(dict[l][el.dataset.i18n]) el.textContent = dict[l][el.dataset.i18n];
-  });
-}
-
-// ====================== INITIAL ======================
-renderEmails();
+// ====================== EMAIL OPERATIONS ======================
+function deleteEmail(emailId, event) {
+    if (event) event.stopPropagation();
+    
+    if (confirm('Are you sure you want to delete this email?')) {
+        const emailIndex = emails.findIndex(e => e.id === emailId);
