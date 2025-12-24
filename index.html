@@ -1,14 +1,4 @@
-<!DOCTYPE html>
-<html lang="uk">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Inbox Pro</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
 <div class="app" id="app">
-
   <header class="top">
     <h1>📬 Inbox Pro</h1>
     <div class="top-actions">
@@ -18,44 +8,23 @@
   </header>
 
   <div class="main">
-
     <aside class="sidebar">
       <button class="compose-btn" id="composeBtn">✉ New</button>
-
-      <div class="menu-item active" data-folder="inbox" data-i18n="inbox">📥 Inbox</div>
-      <div class="menu-item" data-folder="sent" data-i18n="sent">📤 Sent</div>
-      <div class="menu-item" data-folder="drafts" data-i18n="drafts">📝 Drafts</div>
-      <div class="menu-item" data-folder="spam" data-i18n="spam">🚫 Spam</div>
+      <div class="menu-item active" data-folder="inbox">📥 <span data-i18n="inbox">Inbox</span></div>
+      <div class="menu-item" data-folder="sent">📤 <span data-i18n="sent">Sent</span></div>
+      <div class="menu-item" data-folder="drafts">📝 <span data-i18n="drafts">Drafts</span></div>
+      <div class="menu-item" data-folder="spam">🚫 <span data-i18n="spam">Spam</span></div>
     </aside>
 
     <section class="content">
-
-      <div class="emails">
-
-        <div class="email unread" data-folder="inbox" data-title="Mama" data-text="Привіт, як справи?">
-          <div class="avatar">M</div>
-          <div class="title">Mama</div>
-        </div>
-
-        <div class="email" data-folder="sent" data-title="Admin" data-text="Ваш акаунт створено">
-          <div class="avatar">A</div>
-          <div class="title">Admin</div>
-        </div>
-
-        <div class="email unread" data-folder="spam" data-title="Spam bot" data-text="You won 1 000 000$">
-          <div class="avatar">S</div>
-          <div class="title">Spam bot</div>
-        </div>
-
-      </div>
+      <div class="emails"></div>
 
       <div class="reader" id="reader">
         <h2 id="readerTitle"></h2>
         <p id="readerText"></p>
+        <div id="readerFiles"></div>
       </div>
-
     </section>
-
   </div>
 
   <div class="lang">
@@ -66,20 +35,18 @@
       <option value="ru">RU</option>
     </select>
   </div>
-
 </div>
 
 <!-- MODAL -->
 <div class="modal" id="modal">
   <div class="modal-box">
     <h3 data-i18n="newMail">New mail</h3>
-    <input placeholder="To">
-    <input placeholder="Subject">
-    <textarea placeholder="Message"></textarea>
+    <input placeholder="To" id="mailTo">
+    <input placeholder="Subject" id="mailSubject">
+    <textarea placeholder="Message" id="mailText"></textarea>
+    <input type="file" id="mailFile" multiple>
+    <div class="file-preview" id="filePreview"></div>
+    <button id="sendMail">Send</button>
     <button onclick="closeModal()">Close</button>
   </div>
 </div>
-
-<script src="script.js"></script>
-</body>
-</html>
