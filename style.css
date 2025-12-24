@@ -1,0 +1,37 @@
+:root {
+  --bg: #0f1117;
+  --panel: #1c1f26;
+  --text: #fff;
+  --accent: #667eea;
+}
+.light {
+  --bg: #f4f4f4;
+  --panel: #ffffff;
+  --text: #000;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: Arial, sans-serif; transition: 0.3s; }
+.app { max-width: 1200px; margin: auto; }
+.top { display: flex; justify-content: space-between; padding: 15px; background: var(--panel); border-radius: 12px; transition: 0.3s; }
+.main { display: flex; gap: 15px; padding: 15px; }
+.sidebar { width: 220px; background: var(--panel); border-radius: 12px; padding: 15px; }
+.compose-btn { width: 100%; padding: 10px; margin-bottom: 15px; background: var(--accent); border: none; color: white; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+.compose-btn:hover { opacity: 0.8; }
+.menu-item { padding: 10px; cursor: pointer; border-radius: 8px; transition: 0.2s; }
+.menu-item.active { background: var(--accent); color: #fff; }
+.menu-item:hover { background: rgba(102,126,234,0.2); }
+.content { flex: 1; display: flex; gap: 15px; }
+.emails, .reader { background: var(--panel); border-radius: 12px; padding: 15px; flex: 1; overflow-y: auto; max-height: 600px; transition: 0.3s; }
+.email { display: flex; gap: 10px; padding: 10px; cursor: pointer; transition: 0.2s; border-radius: 8px; opacity: 0; transform: translateY(10px); animation: fadeIn 0.3s forwards; }
+.email:hover { background: rgba(102,126,234,0.1); }
+.email.unread { background: rgba(102,126,234,0.2); }
+.avatar { width: 32px; height: 32px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+.modal { position: fixed; inset: 0; display: none; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; transition: 0.3s; }
+.modal-box { background: var(--panel); padding: 20px; border-radius: 12px; width: 300px; display: flex; flex-direction: column; gap: 10px; transition: 0.3s; }
+.modal-box input, .modal-box textarea { width: 100%; padding: 8px; }
+.lang { position: fixed; bottom: 10px; right: 10px; }
+a.file-link { color: var(--accent); display: block; margin-top: 5px; cursor: pointer; text-decoration: underline; }
+.file-preview { display: flex; flex-direction: column; gap: 5px; margin-bottom: 5px; font-size: 14px; }
+
+/* Animations */
+@keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
