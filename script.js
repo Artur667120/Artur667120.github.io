@@ -7,17 +7,20 @@ const readerFiles = document.getElementById('readerFiles');
 
 function renderEmails(folder='inbox'){
   emailsContainer.innerHTML = '';
-  emails.filter(e => e.folder === folder).forEach((mail,i)=>{
-    const div = document.createElement('div');
-    div.className = 'email' + (mail.unread ? ' unread' : '');
-    div.innerHTML = `<div class="avatar">${mail.title[0]}</div><div class="title">${mail.title}</div>`;
-    div.onclick = () => openMail(i);
-    emailsContainer.appendChild(div);
-  });
+  emails
+    .filter(e => e.folder === folder)
+    .forEach((mail, i) => {
+      const div = document.createElement('div');
+      div.className = 'email' + (mail.unread ? ' unread' : '');
+      div.innerHTML = `<div class="avatar">${mail.title[0] || 'M'}</div><div class="title">${mail.title}</div>`;
+      div.onclick = () => openMailByFolder(i, folder);
+      emailsContainer.appendChild(div);
+    });
 }
 
-function openMail(index){
-  const mail = emails[index];
+function openMailByFolder(index, folder){
+  const filtered = emails.filter(e => e.folder === folder);
+  const mail = filtered[index];
   readerTitle.textContent = mail.title;
   readerText.textContent = mail.text;
   readerFiles.innerHTML = '';
@@ -33,14 +36,18 @@ function openMail(index){
   }
   mail.unread = false;
   saveEmails();
-  renderEmails(document.querySelector('.menu-item.active').dataset.folder);
+  renderEmails(folder);
 }
 
 function saveEmails(){ localStorage.setItem('emails', JSON.stringify(emails)); }
 
 // ====================== USER EMAIL ======================
 let email = localStorage.getItem('email');
-if(!email){ email = prompt('Enter email'); localStorage.setItem('email', email); }
+if(!email){
+  email = prompt('Enter email');
+  if(!email) email = 'user@example.com';
+  localStorage.setItem('email', email);
+}
 document.getElementById('userEmail').textContent = email;
 
 // ====================== MODAL ======================
@@ -69,9 +76,11 @@ mailFile.onchange = () => {
 
 // ====================== SEND EMAIL ======================
 document.getElementById('sendMail').onclick = async ()=>{
-  const to = document.getElementById('mailTo').value;
-  const subject = document.getElementById('mailSubject').value;
-  const text = document.getElementById('mailText').value;
+  const to = document.getElementById('mailTo').value.trim();
+  const subject = document.getElementById('mailSubject').value.trim();
+  const text = document.getElementById('mailText').value.trim();
+
+  if(!to){ alert('Please enter recipient email'); return; }
 
   const files = [];
   for(let f of mailFile.files){
@@ -79,7 +88,7 @@ document.getElementById('sendMail').onclick = async ()=>{
     files.push({name:f.name, data});
   }
 
-  emails.push({title:to, text, folder:'sent', unread:false, files});
+  emails.push({title:subject || '(No Subject)', text, folder:'sent', unread:false, files});
   saveEmails();
   renderEmails('sent');
   closeModal();
@@ -98,17 +107,11 @@ const app = document.getElementById('app');
 const themeToggle = document.getElementById('themeToggle');
 const savedTheme = localStorage.getItem('theme') || 'dark';
 
-// Встановлюємо тему при завантаженні
-if(savedTheme === 'light') {
-  app.classList.add('light');
-} else {
-  app.classList.remove('light');
-}
+if(savedTheme === 'light') app.classList.add('light');
+else app.classList.remove('light');
 
-// Встановлюємо іконку при завантаженні
 themeToggle.textContent = app.classList.contains('light') ? '🌙' : '☀️';
 
-// Кнопка перемикання
 themeToggle.onclick = () => {
   app.classList.toggle('light');
   const current = app.classList.contains('light') ? 'light' : 'dark';
@@ -126,23 +129,23 @@ document.querySelectorAll('.menu-item').forEach(item=>{
 });
 
 // ====================== LANGUAGE ======================
-const dict={
+const dict = {
   ua:{inbox:'Вхідні',sent:'Надіслані',drafts:'Чернетки',spam:'Спам',newMail:'Новий лист'},
   en:{inbox:'Inbox',sent:'Sent',drafts:'Drafts',spam:'Spam',newMail:'New mail'},
   de:{inbox:'Posteingang',sent:'Gesendet',drafts:'Entwürfe',spam:'Spam',newMail:'Neue Mail'},
   ru:{inbox:'Входящие',sent:'Отправленные',drafts:'Черновики',spam:'Спам',newMail:'Новое письмо'}
 };
-const langSelect=document.getElementById('langSelect');
+const langSelect = document.getElementById('langSelect');
 const savedLang = localStorage.getItem('lang') || 'ua';
-langSelect.value=savedLang;
+langSelect.value = savedLang;
 setLang(savedLang);
-langSelect.onchange=()=>{
+langSelect.onchange = ()=>{
   localStorage.setItem('lang', langSelect.value);
   setLang(langSelect.value);
 };
 function setLang(l){
   document.querySelectorAll('[data-i18n]').forEach(el=>{
-    el.textContent=dict[l][el.dataset.i18n];
+    if(dict[l][el.dataset.i18n]) el.textContent = dict[l][el.dataset.i18n];
   });
 }
 
