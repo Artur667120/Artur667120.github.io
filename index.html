@@ -1,0 +1,52 @@
+<div class="app" id="app">
+  <header class="top">
+    <h1>📬 Inbox Pro</h1>
+    <div class="top-actions">
+      <button id="themeToggle">🌙</button>
+      <span id="userEmail"></span>
+    </div>
+  </header>
+
+  <div class="main">
+    <aside class="sidebar">
+      <button class="compose-btn" id="composeBtn">✉ New</button>
+      <div class="menu-item active" data-folder="inbox">📥 <span data-i18n="inbox">Inbox</span></div>
+      <div class="menu-item" data-folder="sent">📤 <span data-i18n="sent">Sent</span></div>
+      <div class="menu-item" data-folder="drafts">📝 <span data-i18n="drafts">Drafts</span></div>
+      <div class="menu-item" data-folder="spam">🚫 <span data-i18n="spam">Spam</span></div>
+    </aside>
+
+    <section class="content">
+      <div class="emails"></div>
+
+      <div class="reader" id="reader">
+        <h2 id="readerTitle"></h2>
+        <p id="readerText"></p>
+        <div id="readerFiles"></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="lang">
+    <select id="langSelect">
+      <option value="ua">UA</option>
+      <option value="en">EN</option>
+      <option value="de">DE</option>
+      <option value="ru">RU</option>
+    </select>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <h3 data-i18n="newMail">New mail</h3>
+    <input placeholder="To" id="mailTo">
+    <input placeholder="Subject" id="mailSubject">
+    <textarea placeholder="Message" id="mailText"></textarea>
+    <input type="file" id="mailFile" multiple>
+    <div class="file-preview" id="filePreview"></div>
+    <button id="sendMail">Send</button>
+    <button onclick="closeModal()">Close</button>
+  </div>
+</div>
