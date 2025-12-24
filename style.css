@@ -6,7 +6,10 @@
   --accent: #667eea;
   --accent-hover: #5a67d8;
   --danger: #ef4444;
+  --danger-hover: #dc2626;
   --success: #10b981;
+  --success-hover: #059669;
+  --warning: #f59e0b;
   --border: #2d2d3a;
   --shadow: rgba(0, 0, 0, 0.3);
   --unread-bg: rgba(102, 126, 234, 0.15);
@@ -21,7 +24,10 @@
   --accent: #4f46e5;
   --accent-hover: #4338ca;
   --danger: #dc2626;
+  --danger-hover: #b91c1c;
   --success: #059669;
+  --success-hover: #047857;
+  --warning: #d97706;
   --border: #e2e8f0;
   --shadow: rgba(0, 0, 0, 0.1);
   --unread-bg: rgba(79, 70, 229, 0.1);
@@ -44,6 +50,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 .app {
@@ -77,6 +84,12 @@ body {
   cursor: pointer;
   padding: 8px;
   border-radius: 8px;
+  transition: var(--transition);
+}
+
+.menu-toggle:hover {
+  background: var(--accent);
+  color: white;
 }
 
 .top h1 {
@@ -116,6 +129,7 @@ body {
   background: rgba(0, 0, 0, 0.1);
   padding: 6px 12px;
   border-radius: 20px;
+  border: 1px solid var(--border);
 }
 
 .settings-btn {
@@ -135,6 +149,7 @@ body {
 .settings-btn:hover {
   background: var(--accent);
   color: white;
+  border-color: var(--accent);
 }
 
 /* MAIN LAYOUT */
@@ -195,6 +210,7 @@ body {
   border-radius: 8px;
   transition: var(--transition);
   color: var(--text-secondary);
+  position: relative;
 }
 
 .menu-item:hover {
@@ -211,6 +227,15 @@ body {
 .menu-item i {
   width: 20px;
   text-align: center;
+}
+
+.badge {
+  background: var(--danger);
+  color: white;
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-left: auto;
 }
 
 /* CONTENT */
@@ -248,7 +273,7 @@ body {
 }
 
 .delete-folder-btn:hover {
-  background: #dc2626;
+  background: var(--danger-hover);
   transform: scale(1.05);
 }
 
@@ -271,6 +296,24 @@ body {
   flex-direction: column;
   gap: 10px;
   max-height: calc(100vh - 200px);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-secondary);
+}
+
+.empty-state i {
+  font-size: 3rem;
+  margin-bottom: 15px;
+  display: block;
+}
+
+.empty-state h3 {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  color: var(--text);
 }
 
 .email {
@@ -396,18 +439,35 @@ body {
 
 .reader-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 15px;
   margin-bottom: 15px;
   padding-bottom: 15px;
   border-bottom: 1px solid var(--border);
+}
+
+.back-to-list {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 5px;
+  transition: var(--transition);
+}
+
+.back-to-list:hover {
+  background: var(--accent);
+  color: white;
 }
 
 .reader-header h2 {
   font-size: 1.5rem;
   font-weight: 600;
   flex: 1;
-  margin-right: 15px;
+  margin: 0;
 }
 
 .delete-email-btn {
@@ -425,7 +485,7 @@ body {
 }
 
 .delete-email-btn:hover {
-  background: #dc2626;
+  background: var(--danger-hover);
   transform: scale(1.1);
 }
 
@@ -436,6 +496,8 @@ body {
   margin-bottom: 25px;
   color: var(--text-secondary);
   font-size: 0.9rem;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .reader-body {
@@ -446,6 +508,7 @@ body {
   line-height: 1.6;
   margin-bottom: 25px;
   white-space: pre-wrap;
+  font-size: 1rem;
 }
 
 .reader-attachments {
@@ -460,6 +523,7 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
+  color: var(--text);
 }
 
 .attachments-list {
@@ -476,6 +540,11 @@ body {
   background: var(--bg);
   border-radius: 8px;
   border: 1px solid var(--border);
+  transition: var(--transition);
+}
+
+.attachment-item:hover {
+  border-color: var(--accent);
 }
 
 .attachment-info {
@@ -483,16 +552,21 @@ body {
   align-items: center;
   gap: 12px;
   flex: 1;
+  min-width: 0;
 }
 
 .attachment-icon {
   font-size: 1.2rem;
   color: var(--accent);
+  flex-shrink: 0;
 }
 
 .attachment-name {
   font-weight: 500;
   font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .attachment-size {
@@ -503,6 +577,7 @@ body {
 .attachment-actions {
   display: flex;
   gap: 10px;
+  flex-shrink: 0;
 }
 
 .attachment-btn {
@@ -517,6 +592,7 @@ body {
   display: flex;
   align-items: center;
   gap: 5px;
+  white-space: nowrap;
 }
 
 .attachment-btn:hover {
@@ -528,7 +604,7 @@ body {
 }
 
 .attachment-btn.view:hover {
-  background: #0da271;
+  background: var(--success-hover);
 }
 
 /* MODALS */
@@ -586,7 +662,8 @@ body {
 }
 
 .modal-box input,
-.modal-box textarea {
+.modal-box textarea,
+.modal-box select {
   width: 100%;
   padding: 12px 15px;
   border: 1px solid var(--border);
@@ -598,7 +675,8 @@ body {
 }
 
 .modal-box input:focus,
-.modal-box textarea:focus {
+.modal-box textarea:focus,
+.modal-box select:focus {
   outline: none;
   border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
@@ -615,6 +693,8 @@ body {
   cursor: pointer;
   transition: var(--transition);
   font-weight: 500;
+  width: 100%;
+  justify-content: center;
 }
 
 .file-upload-label:hover {
@@ -637,6 +717,7 @@ body {
   background: var(--bg);
   border-radius: 6px;
   font-size: 0.9rem;
+  border: 1px solid var(--border);
 }
 
 .modal-actions {
@@ -655,6 +736,10 @@ body {
   font-weight: 500;
   transition: var(--transition);
   flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .btn-primary:hover {
@@ -672,6 +757,10 @@ body {
   font-weight: 500;
   transition: var(--transition);
   flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .btn-secondary:hover {
@@ -682,6 +771,7 @@ body {
   font-size: 0.85rem;
   color: var(--text-secondary);
   margin-top: 5px;
+  font-style: italic;
 }
 
 /* IMAGE MODAL */
@@ -708,6 +798,11 @@ body {
   font-size: 1.5rem;
   cursor: pointer;
   padding: 5px;
+  transition: var(--transition);
+}
+
+.close-image:hover {
+  color: var(--danger);
 }
 
 .image-container {
@@ -723,6 +818,7 @@ body {
   max-width: 100%;
   max-height: 70vh;
   border-radius: 8px;
+  object-fit: contain;
 }
 
 /* LANGUAGE SELECTOR */
@@ -741,11 +837,32 @@ body {
   border: 1px solid var(--border);
   cursor: pointer;
   transition: var(--transition);
+  font-size: 0.9rem;
 }
 
 #langSelect:focus {
   outline: none;
   border-color: var(--accent);
+}
+
+/* TOAST NOTIFICATION */
+.toast {
+  position: fixed;
+  bottom: 70px;
+  right: 20px;
+  background: var(--accent);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  transform: translateX(150%);
+  transition: transform 0.3s ease;
+  max-width: 300px;
+}
+
+.toast.show {
+  transform: translateX(0);
 }
 
 /* ANIMATIONS */
@@ -766,6 +883,9 @@ body {
     border-radius: 0;
     margin: 0;
     padding: 15px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
   }
   
   .menu-toggle {
@@ -774,6 +894,19 @@ body {
   
   .top h1 {
     font-size: 1.2rem;
+  }
+  
+  .top-actions {
+    gap: 10px;
+  }
+  
+  .user-email {
+    font-size: 0.8rem;
+    padding: 4px 8px;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   
   .main {
@@ -789,6 +922,8 @@ body {
     z-index: 1000;
     border-radius: 0;
     transition: left 0.3s ease;
+    width: 250px;
+    padding-top: 70px;
   }
   
   .sidebar.active {
@@ -804,13 +939,13 @@ body {
     height: auto;
   }
   
-  .emails,
-  .email-reader {
-    max-height: none;
-    height: auto;
+  .emails {
+    max-height: 50vh;
+    display: block;
   }
   
   .email-reader {
+    max-height: 50vh;
     display: none;
   }
   
@@ -818,35 +953,55 @@ body {
     display: flex;
   }
   
+  .back-to-list {
+    display: block;
+  }
+  
+  .reader-header h2 {
+    font-size: 1.2rem;
+  }
+  
   .modal-box {
-    margin: 20px;
+    margin: 10px;
     padding: 20px;
+    max-width: 100%;
   }
   
   .lang {
     bottom: 10px;
     right: 10px;
   }
+  
+  .toast {
+    bottom: 60px;
+    right: 10px;
+    left: 10px;
+    max-width: none;
+  }
 }
 
 @media (max-width: 480px) {
-  .top-actions {
-    gap: 10px;
-  }
-  
-  .user-email {
-    font-size: 0.8rem;
-    padding: 4px 8px;
-  }
-  
   .email-header {
     flex-direction: column;
     gap: 5px;
   }
   
-  .modal-box {
-    margin: 10px;
-    padding: 15px;
+  .email-date {
+    align-self: flex-start;
+  }
+  
+  .attachment-item {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  
+  .attachment-actions {
+    align-self: flex-end;
+  }
+  
+  .modal-actions {
+    flex-direction: column;
   }
 }
 
@@ -859,12 +1014,20 @@ body:not(.light) .attachment-item {
   background: #0f1117;
 }
 
+body:not(.light) .reader-attachments {
+  background: rgba(0, 0, 0, 0.1);
+}
+
 /* LIGHT THEME OVERRIDES */
 .light .user-email {
   background: #f1f5f9;
 }
 
 .light .reader-attachments {
+  background: #f8fafc;
+}
+
+.light .attachment-item {
   background: #f8fafc;
 }
 
