@@ -1,133 +1,75 @@
-:root {
-  --bg: #0f1117;
-  --panel: #1c1f26;
-  --text: #fff;
-  --accent: #667eea;
+// EMAIL
+let email = localStorage.getItem('email');
+const userEmail = document.getElementById('userEmail');
+if (!email) {
+  email = prompt('Enter email');
+  localStorage.setItem('email', email);
+}
+userEmail.textContent = email;
+
+// OPEN MAIL
+const readerTitle = document.getElementById('readerTitle');
+const readerText = document.getElementById('readerText');
+document.querySelectorAll('.email').forEach(mail => {
+  mail.onclick = () => {
+    readerTitle.textContent = mail.dataset.title;
+    readerText.textContent = mail.dataset.text;
+    mail.classList.remove('unread');
+  };
+});
+
+// MODAL
+const composeBtn = document.getElementById('composeBtn');
+const modal = document.getElementById('modal');
+
+composeBtn.onclick = () => modal.style.display = 'flex';
+function closeModal() {
+  modal.style.display = 'none';
 }
 
-.light {
-  --bg: #f4f4f4;
-  --panel: #ffffff;
-  --text: #000;
-}
+// THEME
+const app = document.getElementById('app');
+const themeToggle = document.getElementById('themeToggle');
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme === 'light') app.classList.add('light');
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+themeToggle.onclick = () => {
+  app.classList.toggle('light');
+  localStorage.setItem('theme', app.classList.contains('light') ? 'light' : 'dark');
+};
 
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: Arial, sans-serif;
-}
+// MENU
+document.querySelectorAll('.menu-item').forEach(item => {
+  item.onclick = () => {
+    document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+    item.classList.add('active');
+    const f = item.dataset.folder;
+    document.querySelectorAll('.email').forEach(m => {
+      m.style.display = m.dataset.folder === f ? 'flex' : 'none';
+    });
+  };
+});
 
-.app {
-  max-width: 1200px;
-  margin: auto;
-}
+// LANG
+const dict = {
+  ua: { inbox:'Вхідні', sent:'Надіслані', drafts:'Чернетки', spam:'Спам', newMail:'Новий лист' },
+  en: { inbox:'Inbox', sent:'Sent', drafts:'Drafts', spam:'Spam', newMail:'New mail' },
+  de: { inbox:'Posteingang', sent:'Gesendet', drafts:'Entwürfe', spam:'Spam', newMail:'Neue Mail' },
+  ru: { inbox:'Входящие', sent:'Отправленные', drafts:'Черновики', spam:'Спам', newMail:'Новое письмо' }
+};
 
-.top {
-  display: flex;
-  justify-content: space-between;
-  padding: 15px;
-  background: var(--panel);
-}
+const langSelect = document.getElementById('langSelect');
+const savedLang = localStorage.getItem('lang') || 'ua';
+langSelect.value = savedLang;
+setLang(savedLang);
 
-.main {
-  display: flex;
-  gap: 15px;
-  padding: 15px;
-}
+langSelect.onchange = () => {
+  localStorage.setItem('lang', langSelect.value);
+  setLang(langSelect.value);
+};
 
-.sidebar {
-  width: 220px;
-  background: var(--panel);
-  border-radius: 12px;
-  padding: 15px;
-}
-
-.compose-btn {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 15px;
-  background: var(--accent);
-  border: none;
-  color: white;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.menu-item {
-  padding: 10px;
-  cursor: pointer;
-  border-radius: 8px;
-}
-
-.menu-item.active {
-  background: var(--accent);
-}
-
-.content {
-  flex: 1;
-  display: flex;
-  gap: 15px;
-}
-
-.emails, .reader {
-  background: var(--panel);
-  border-radius: 12px;
-  padding: 15px;
-  flex: 1;
-}
-
-.email {
-  display: flex;
-  gap: 10px;
-  padding: 10px;
-  cursor: pointer;
-}
-
-.email.unread {
-  background: rgba(102,126,234,0.2);
-}
-
-.avatar {
-  width: 32px;
-  height: 32px;
-  background: var(--accent);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.modal {
-  position: fixed;
-  inset: 0;
-  display: none;
-  background: rgba(0,0,0,0.5);
-  justify-content: center;
-  align-items: center;
-}
-
-.modal-box {
-  background: var(--panel);
-  padding: 20px;
-  border-radius: 12px;
-  width: 300px;
-}
-
-.modal-box input,
-.modal-box textarea {
-  width: 100%;
-  margin-bottom: 10px;
-  padding: 8px;
-}
-
-.lang {
-  position: fixed;
-  bottom: 10px;
-  right: 10px;
+function setLang(l) {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    el.textContent = dict[l][el.dataset.i18n];
+  });
 }
