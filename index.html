@@ -12,19 +12,6 @@
 <script type="module" src="storage-service.js"></script>
 <script type="module" src="utils.js"></script>
     
-        // Ініціалізація Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        // Зберігаємо в глобальній змінній для доступу з script.js
-        window.firebaseApp = app;
-        window.firebaseAuth = auth;
-        window.firebaseFirestore = db;
-        
-        console.log("✅ Firebase завантажено!");
-    </script>
-    
     <!-- EmailJS -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     
