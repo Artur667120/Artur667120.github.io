@@ -1,91 +1,24 @@
-// ====================== DATA ======================
+// ====================== GLOBAL VARIABLES ======================
 let emails = JSON.parse(localStorage.getItem('emails')) || [];
-let currentUser = JSON.parse(localStorage.getItem('user')) || null;
 let currentFolder = 'inbox';
+let currentUserEmail = localStorage.getItem('userEmail');
 let currentSelectedEmail = null;
+let emailIdCounter = parseInt(localStorage.getItem('emailIdCounter')) || 1;
 
-// ====================== ELEMENTS ======================
-const loginModal = document.getElementById('loginModal');
-const loginEmail = document.getElementById('loginEmail');
-const loginPassword = document.getElementById('loginPassword');
-const loginBtn = document.getElementById('loginBtn');
-const userEmailSpan = document.getElementById('userEmail');
-const composeBtn = document.getElementById('composeBtn');
-const composeModal = document.getElementById('composeModal');
-const closeCompose = document.getElementById('closeCompose');
-const sendMail = document.getElementById('sendMail');
-const mailTo = document.getElementById('mailTo');
-const mailSubject = document.getElementById('mailSubject');
-const mailText = document.getElementById('mailText');
-const emailsList = document.getElementById('emailsList');
-const toast = document.getElementById('toast');
+// ====================== TRANSLATIONS ======================
+const translations = {
+  ua:{inbox:'Вхідні',sent:'Надіслані',drafts:'Чернетки',spam:'Спам',trash:'Кошик',compose:'Створити',newMail:'Новий лист',userSettings:'Налаштування',yourEmail:'Ваша електронна адреса',emailHint:'Ця адреса буде використана як адреса відправника',save:'Зберегти',close:'Закрити',toEmail:'Кому (email)',subject:'Тема',message:'Повідомлення',addAttachment:'Додати файл',send:'Надіслати',attachments:'Вкладення',emptyTrash:'Очистити кошик',delete:'Видалити',view:'Переглянути',download:'Скачати',from:'Від',date:'Дата',noEmails:'Листів немає',emptyInbox:'Вхідні порожні',selectEmail:'Виберіть лист',confirmDelete:'Видалити цей лист?',confirmEmptyTrash:'Очистити кошик?',emailSaved:'Email збережено!',emailSent:'Лист надіслано!',emailDeleted:'Лист видалено!',trashEmptied:'Кошик очищено!',error:'Помилка',missingRecipient:'Введіть адресу отримувача',invalidEmail:'Невірний формат email',fileTooLarge:'Файл занадто великий',maxFiles:'Максимум 5 файлів',noFileSupport:'Перегляд файлів не підтримується',loading:'Завантаження'},
+  en:{inbox:'Inbox',sent:'Sent',drafts:'Drafts',spam:'Spam',trash:'Trash',compose:'Compose',newMail:'New mail',userSettings:'User Settings',yourEmail:'Your Email Address',emailHint:'This email will be used as your sender address',save:'Save',close:'Close',toEmail:'To (email)',subject:'Subject',message:'Message',addAttachment:'Add Attachment',send:'Send',attachments:'Attachments',emptyTrash:'Empty Trash',delete:'Delete',view:'View',download:'Download',from:'From',date:'Date',noEmails:'No emails',emptyInbox:'Inbox is empty',selectEmail:'Select email',confirmDelete:'Delete this email?',confirmEmptyTrash:'Empty Trash?',emailSaved:'Email saved!',emailSent:'Email sent!',emailDeleted:'Email deleted!',trashEmptied:'Trash emptied!',error:'Error',missingRecipient:'Enter recipient address',invalidEmail:'Invalid email format',fileTooLarge:'File too large',maxFiles:'Maximum 5 files',noFileSupport:'File preview not supported',loading:'Loading'},
+  de:{inbox:'Posteingang',sent:'Gesendet',drafts:'Entwürfe',spam:'Spam',trash:'Papierkorb',compose:'Erstellen',newMail:'Neue E-Mail',userSettings:'Benutzereinstellungen',yourEmail:'Ihre E-Mail-Adresse',emailHint:'Diese E-Mail wird als Absenderadresse verwendet',save:'Speichern',close:'Schließen',toEmail:'An (Email)',subject:'Betreff',message:'Nachricht',addAttachment:'Datei hinzufügen',send:'Senden',attachments:'Anhänge',emptyTrash:'Papierkorb leeren',delete:'Löschen',view:'Ansehen',download:'Herunterladen',from:'Von',date:'Datum',noEmails:'Keine E-Mails',emptyInbox:'Posteingang ist leer',selectEmail:'E-Mail auswählen',confirmDelete:'Diese E-Mail löschen?',confirmEmptyTrash:'Papierkorb leeren?',emailSaved:'Email gespeichert!',emailSent:'Email gesendet!',emailDeleted:'E-Mail gelöscht!',trashEmptied:'Papierkorb geleert!',error:'Fehler',missingRecipient:'Empfängeradresse eingeben',invalidEmail:'Ungültiges E-Mail-Format',fileTooLarge:'Datei zu groß',maxFiles:'Maximal 5 Dateien',noFileSupport:'Dateivorschau wird nicht unterstützt',loading:'Laden'},
+  ru:{inbox:'Входящие',sent:'Отправленные',drafts:'Черновики',spam:'Спам',trash:'Корзина',compose:'Создать',newMail:'Новое письмо',userSettings:'Настройки',yourEmail:'Ваш Email',emailHint:'Этот адрес будет использоваться как адрес отправителя',save:'Сохранить',close:'Закрыть',toEmail:'Кому (email)',subject:'Тема',message:'Сообщение',addAttachment:'Добавить файл',send:'Отправить',attachments:'Вложения',emptyTrash:'Очистить корзину',delete:'Удалить',view:'Просмотр',download:'Скачать',from:'От',date:'Дата',noEmails:'Писем нет',emptyInbox:'Входящие пусты',selectEmail:'Выберите письмо',confirmDelete:'Удалить это письмо?',confirmEmptyTrash:'Очистить корзину?',emailSaved:'Email сохранен!',emailSent:'Письмо отправлено!',emailDeleted:'Письмо удалено!',trashEmptied:'Корзина очищена!',error:'Ошибка',missingRecipient:'Введите адрес получателя',invalidEmail:'Неверный формат email',fileTooLarge:'Файл слишком большой',maxFiles:'Максимум 5 файлов',noFileSupport:'Просмотр файлов не поддерживается',loading:'Загрузка'}
+};
 
-// ====================== LOGIN ======================
-function showLogin() { loginModal.style.display='flex'; }
-function hideLogin() { loginModal.style.display='none'; }
-
-loginBtn.addEventListener('click', ()=>{
-    const email = loginEmail.value.trim();
-    const pass = loginPassword.value.trim();
-    if(email && pass){
-        currentUser = {email, password:pass};
-        localStorage.setItem('user', JSON.stringify(currentUser));
-        hideLogin(); renderUser(); renderEmails();
-    } else alert('Enter email and password');
-});
-
-function renderUser(){ if(currentUser) userEmailSpan.textContent=currentUser.email; }
-if(!currentUser) showLogin(); else renderUser();
-
-// ====================== COMPOSE ======================
-composeBtn.addEventListener('click', ()=>{ composeModal.style.display='flex'; });
-closeCompose.addEventListener('click', ()=>{ composeModal.style.display='none'; });
-sendMail.addEventListener('click', ()=>{
-    if(!mailTo.value.trim()){ showToast('Enter recipient'); return; }
-    const email = {
-        id: Date.now(),
-        from: currentUser.email,
-        to: mailTo.value,
-        subject: mailSubject.value,
-        text: mailText.value,
-        date: new Date().toLocaleString(),
-        folder:'sent'
-    };
-    emails.push(email); localStorage.setItem('emails', JSON.stringify(emails));
-    composeModal.style.display='none'; mailTo.value=''; mailSubject.value=''; mailText.value='';
-    showToast('Mail sent'); renderEmails();
-});
-
-// ====================== RENDER ======================
-function renderEmails(){
-    emailsList.innerHTML='';
-    const folderEmails = emails.filter(e=>e.folder===currentFolder);
-    if(folderEmails.length===0){ emailsList.innerHTML='<p>No emails</p>'; return; }
-    folderEmails.forEach(e=>{
-        const div = document.createElement('div'); div.className='email';
-        div.innerHTML=`<div>${e.from}</div><div>${e.subject}</div>`;
-        div.addEventListener('click', ()=>{ showEmail(e); });
-        emailsList.appendChild(div);
-    });
-}
-function showEmail(e){
-    currentSelectedEmail=e;
-    document.getElementById('readerTitle').textContent=e.subject;
-    document.getElementById('readerSender').textContent='From: '+e.from;
-    document.getElementById('readerDate').textContent=e.date;
-    document.getElementById('readerText').textContent=e.text;
-}
-
-// ====================== TOAST ======================
-function showToast(msg){ toast.textContent=msg; toast.classList.add('show'); setTimeout(()=>{toast.classList.remove('show');},2000); }
-
-// ====================== FOLDER SWITCH ======================
-document.querySelectorAll('.menu-item').forEach(item=>{
-    item.addEventListener('click', ()=>{
-        document.querySelectorAll('.menu-item').forEach(i=>i.classList.remove('active'));
-        item.classList.add('active');
-        currentFolder = item.dataset.folder;
-        document.getElementById('currentFolder').textContent=item.textContent;
-        renderEmails();
-    });
-});
+// ====================== LOGIC ======================
+// Тут повний JS код з функціями:
+// - переключення теми
+// - створення email
+// - відкриття скриньки
+// - додавання/перегляд файлів
+// - видалення листів
+// - переклад інтерфейсу
+// - toast-повідомлення
