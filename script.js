@@ -39,7 +39,8 @@ const sampleEmails = [
         labels: ["work"],
         size: "1.2 MB",
         deleted: false,
-        deletedDate: null
+        deletedDate: null,
+        originalFolder: "inbox"
     },
     {
         id: 2,
@@ -59,7 +60,8 @@ const sampleEmails = [
         labels: ["work", "important"],
         size: "2.4 MB",
         deleted: false,
-        deletedDate: null
+        deletedDate: null,
+        originalFolder: "inbox"
     },
     {
         id: 3,
@@ -79,7 +81,8 @@ const sampleEmails = [
         labels: ["social"],
         size: "0.8 MB",
         deleted: false,
-        deletedDate: null
+        deletedDate: null,
+        originalFolder: "inbox"
     },
     {
         id: 4,
@@ -99,7 +102,8 @@ const sampleEmails = [
         labels: ["work", "travel"],
         size: "3.1 MB",
         deleted: false,
-        deletedDate: null
+        deletedDate: null,
+        originalFolder: "inbox"
     },
     {
         id: 5,
@@ -119,7 +123,8 @@ const sampleEmails = [
         labels: ["finance"],
         size: "1.5 MB",
         deleted: false,
-        deletedDate: null
+        deletedDate: null,
+        originalFolder: "inbox"
     }
 ];
 
@@ -169,33 +174,6 @@ const attachmentModels = [
         icon: "fa-file-powerpoint",
         color: "#D24726",
         date: "Mar 12, 08:30"
-    },
-    {
-        id: 6,
-        name: "Architecture_Diagram.zip",
-        size: "12.5 MB",
-        type: "archive",
-        icon: "fa-file-archive",
-        color: "#FFA726",
-        date: "Mar 11, 16:45"
-    },
-    {
-        id: 7,
-        name: "Screenshot.png",
-        size: "4.2 MB",
-        type: "image",
-        icon: "fa-file-image",
-        color: "#4CAF50",
-        date: "Mar 10, 12:30"
-    },
-    {
-        id: 8,
-        name: "Database_Backup.sql",
-        size: "25.3 MB",
-        type: "database",
-        icon: "fa-database",
-        color: "#2196F3",
-        date: "Mar 9, 22:15"
     }
 ];
 
@@ -255,171 +233,14 @@ const emailModels = [
         labels: ["work", "ai"],
         size: "2.1 MB",
         deleted: false,
-        deletedDate: null
-    },
-    {
-        id: 102,
-        sender: "Weather Service",
-        senderEmail: "weather@forecast.com",
-        subject: "Weather Alert: Storm Warning",
-        preview: "Important weather update for your area...",
-        date: "Today, 07:45",
-        unread: true,
-        important: true,
-        folder: "inbox",
-        attachments: 1,
-        body: `<div style="font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6;">
-            <div style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%); color: white; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
-                <h2 style="margin: 0 0 10px 0;">⚠️ WEATHER ALERT</h2>
-                <p style="margin: 0; opacity: 0.9;">Severe Storm Warning for Kyiv Area</p>
-            </div>
-            
-            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px; padding: 15px; background: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
-                <i class="fas fa-exclamation-triangle" style="font-size: 24px; color: #ffc107;"></i>
-                <div>
-                    <h3 style="margin: 0 0 5px 0; color: #856404;">Warning Level: HIGH</h3>
-                    <p style="margin: 0; color: #856404;">Issued: Today at 07:30 | Valid until: 18:00</p>
-                </div>
-            </div>
-            
-            <h3 style="color: #333; margin-bottom: 15px;">🌩️ Expected Conditions</h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px;">
-                <div style="text-align: center;">
-                    <div style="font-size: 32px; margin-bottom: 5px;">🌧️</div>
-                    <div style="font-weight: bold;">Heavy Rain</div>
-                    <div style="font-size: 14px; color: #666;">40-60 mm</div>
-                </div>
-                <div style="text-align: center;">
-                    <div style="font-size: 32px; margin-bottom: 5px;">💨</div>
-                    <div style="font-weight: bold;">Strong Winds</div>
-                    <div style="font-size: 14px; color: #666;">70-90 km/h</div>
-                </div>
-                <div style="text-align: center;">
-                    <div style="font-size: 32px; margin-bottom: 5px;">⚡</div>
-                    <div style="font-weight: bold;">Thunderstorms</div>
-                    <div style="font-size: 14px; color: #666;">Likely</div>
-                </div>
-            </div>
-            
-            <h3 style="color: #333; margin-bottom: 15px;">🛡️ Safety Recommendations</h3>
-            <ol style="padding-left: 20px; margin-bottom: 25px;">
-                <li>Avoid unnecessary travel</li>
-                <li>Secure outdoor objects</li>
-                <li>Stay away from windows</li>
-                <li>Keep electronic devices charged</li>
-                <li>Monitor local news for updates</li>
-            </ol>
-            
-            <div style="background: #e8f5e9; padding: 15px; border-radius: 8px;">
-                <h4 style="margin: 0 0 10px 0; color: #2e7d32;">ℹ️ Additional Information</h4>
-                <p style="margin: 0;">This alert will be updated as conditions change. For emergency assistance, call 112.</p>
-            </div>
-        </div>`,
-        to: ["residents@kyiv.ua"],
-        cc: [],
-        bcc: [],
-        labels: ["travel", "important"],
-        size: "1.8 MB",
-        deleted: false,
-        deletedDate: null
-    },
-    {
-        id: 103,
-        sender: "Finance Department",
-        senderEmail: "finance@company.com",
-        subject: "Monthly Expense Report & Invoice",
-        preview: "Your monthly financial summary is ready...",
-        date: "Yesterday, 16:30",
-        unread: false,
-        important: true,
-        folder: "inbox",
-        attachments: 2,
-        body: `<div style="font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6;">
-            <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
-                <h2 style="margin: 0 0 10px 0;">💰 Monthly Financial Report</h2>
-                <p style="margin: 0; opacity: 0.9;">March 2024 - Summary & Analysis</p>
-            </div>
-            
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px;">
-                <div style="background: #f3f4f6; padding: 15px; border-radius: 8px;">
-                    <div style="font-size: 12px; color: #666; margin-bottom: 5px;">Total Income</div>
-                    <div style="font-size: 24px; font-weight: bold; color: #10b981;">$12,450.00</div>
-                    <div style="font-size: 12px; color: #10b981;">↑ 8.5% from last month</div>
-                </div>
-                <div style="background: #f3f4f6; padding: 15px; border-radius: 8px;">
-                    <div style="font-size: 12px; color: #666; margin-bottom: 5px;">Total Expenses</div>
-                    <div style="font-size: 24px; font-weight: bold; color: #ef4444;">$8,720.50</div>
-                    <div style="font-size: 12px; color: #ef4444;">↑ 3.2% from last month</div>
-                </div>
-                <div style="background: #f3f4f6; padding: 15px; border-radius: 8px;">
-                    <div style="font-size: 12px; color: #666; margin-bottom: 5px;">Net Profit</div>
-                    <div style="font-size: 24px; font-weight: bold; color: #3b82f6;">$3,729.50</div>
-                    <div style="font-size: 12px; color: #3b82f6;">↑ 15.7% from last month</div>
-                </div>
-            </div>
-            
-            <h3 style="color: #333; margin-bottom: 15px;">📈 Expense Breakdown</h3>
-            <div style="margin-bottom: 25px;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                    <span>Office Supplies</span>
-                    <span style="font-weight: bold;">$450.00</span>
-                </div>
-                <div style="height: 8px; background: #e5e7eb; border-radius: 4px; margin-bottom: 12px;">
-                    <div style="width: 15%; height: 100%; background: #3b82f6; border-radius: 4px;"></div>
-                </div>
-                
-                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                    <span>Software Subscriptions</span>
-                    <span style="font-weight: bold;">$1,250.00</span>
-                </div>
-                <div style="height: 8px; background: #e5e7eb; border-radius: 4px; margin-bottom: 12px;">
-                    <div style="width: 25%; height: 100%; background: #8b5cf6; border-radius: 4px;"></div>
-                </div>
-                
-                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                    <span>Marketing & Advertising</span>
-                    <span style="font-weight: bold;">$3,500.00</span>
-                </div>
-                <div style="height: 8px; background: #e5e7eb; border-radius: 4px; margin-bottom: 12px;">
-                    <div style="width: 70%; height: 100%; background: #10b981; border-radius: 4px;"></div>
-                </div>
-                
-                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                    <span>Travel & Entertainment</span>
-                    <span style="font-weight: bold;">$1,200.00</span>
-                </div>
-                <div style="height: 8px; background: #e5e7eb; border-radius: 4px; margin-bottom: 12px;">
-                    <div style="width: 24%; height: 100%; background: #f59e0b; border-radius: 4px;"></div>
-                </div>
-                
-                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                    <span>Other Expenses</span>
-                    <span style="font-weight: bold;">$2,320.50</span>
-                </div>
-                <div style="height: 8px; background: #e5e7eb; border-radius: 4px; margin-bottom: 12px;">
-                    <div style="width: 46%; height: 100%; background: #ef4444; border-radius: 4px;"></div>
-                </div>
-            </div>
-            
-            <div style="background: #fef3c7; padding: 15px; border-radius: 8px;">
-                <h4 style="margin: 0 0 10px 0; color: #92400e;">📋 Action Required</h4>
-                <p style="margin: 0;">Please review the attached invoice and submit payment by <strong>March 31, 2024</strong>. Late payments may incur additional fees.</p>
-            </div>
-        </div>`,
-        to: ["accounting@company.com"],
-        cc: ["manager@company.com"],
-        bcc: [],
-        labels: ["finance", "work", "important"],
-        size: "3.5 MB",
-        deleted: false,
-        deletedDate: null
+        deletedDate: null,
+        originalFolder: "inbox"
     }
 ];
 
 // ====================== LANGUAGE TRANSLATIONS ======================
 const translations = {
     en: {
-        // Login
         welcomeBack: "Welcome Back",
         emailAddress: "Email Address",
         password: "Password",
@@ -433,27 +254,17 @@ const translations = {
         passwordHint: "Min. 8 characters with letters & numbers",
         createAccountBtn: "Create Account",
         alreadyHaveAccount: "Already have an account?",
-        
-        // Features
         aiFilter: "AI Spam Filter",
         smartSorting: "Smart Sorting",
         securePrivate: "Secure & Private",
-        
-        // Header
         aiActive: "AI Active",
         searchPlaceholder: "Search emails, contacts, subjects...",
         refresh: "Refresh",
-        
-        // Themes
         lightTheme: "Light",
         darkTheme: "Dark",
         oledTheme: "OLED",
         blueTheme: "Ocean",
-        
-        // AI Status
         aiOrganizing: "AI is organizing your inbox. <strong>15</strong> emails sorted automatically.",
-        
-        // Sidebar
         compose: "Compose",
         archive: "Archive",
         important: "Important",
@@ -476,8 +287,6 @@ const translations = {
         unread: "Unread",
         storage: "Storage",
         kyiv: "Kyiv, UA",
-        
-        // Content
         newest: "Newest first",
         oldest: "Oldest first",
         importantFirst: "Important first",
@@ -500,17 +309,11 @@ const translations = {
         replyPlaceholder: "Type your reply...",
         send: "Send",
         cancel: "Cancel",
-        
-        // Pagination
         previous: "Previous",
         next: "Next",
-        
-        // Bottom bar
         systemOperational: "All systems operational",
         syncing: "Syncing...",
         loading: "Loading...",
-        
-        // Settings
         userSettings: "User Settings",
         profile: "Profile",
         appearance: "Appearance",
@@ -518,14 +321,7 @@ const translations = {
         security: "Security",
         advanced: "Advanced",
         saveChanges: "Save Changes",
-        
-        // Compose
         newMessage: "New Message",
-        to: "To",
-        cc: "CC",
-        bcc: "BCC",
-        subject: "Subject",
-        message: "Write your message here...",
         addAttachment: "Add Attachment",
         maxSize: "Max 25MB each",
         urgent: "Mark as Urgent",
@@ -535,18 +331,12 @@ const translations = {
         discard: "Discard",
         emptyTrash: "Empty Trash",
         signOut: "Sign Out",
-        
-        // Delete confirmation
         confirmDelete: "Confirm Delete",
         deleteMessage: "Are you sure you want to delete this email?",
         deleteMultipleMessage: "Are you sure you want to delete {count} emails?",
         deleteWarning: "Deleted emails will be moved to Trash and stored for 30 days before permanent deletion.",
-        delete: "Delete",
-        cancel: "Cancel",
         permanentlyDelete: "Permanently Delete",
         restore: "Restore",
-        
-        // Models
         models: "Models",
         documents: "Documents",
         images: "Images",
@@ -638,11 +428,6 @@ const translations = {
         advanced: "Додатково",
         saveChanges: "Зберегти зміни",
         newMessage: "Нове повідомлення",
-        to: "Кому",
-        cc: "Копія",
-        bcc: "Прихована копія",
-        subject: "Тема",
-        message: "Напишіть ваше повідомлення...",
         addAttachment: "Додати файл",
         maxSize: "Макс. 25MB кожен",
         urgent: "Позначити як термінове",
@@ -656,8 +441,6 @@ const translations = {
         deleteMessage: "Ви впевнені, що хочете видалити цей лист?",
         deleteMultipleMessage: "Ви впевнені, що хочете видалити {count} листів?",
         deleteWarning: "Видалені листи будуть переміщені в кошик та зберігатимуться 30 днів перед остаточним видаленням.",
-        delete: "Видалити",
-        cancel: "Скасувати",
         permanentlyDelete: "Видалити назавжди",
         restore: "Відновити",
         models: "Моделі",
@@ -668,232 +451,6 @@ const translations = {
         recent: "Нещодавні",
         starred: "Помічені",
         shared: "Спільні"
-    },
-    ru: {
-        welcomeBack: "С возвращением",
-        emailAddress: "Электронная почта",
-        password: "Пароль",
-        rememberMe: "Запомнить меня",
-        forgotPassword: "Забыли пароль?",
-        signIn: "Войти",
-        newUser: "Новый пользователь?",
-        createAccount: "Создать аккаунт",
-        fullName: "Полное имя",
-        confirmPassword: "Подтвердите пароль",
-        passwordHint: "Мин. 8 символов с буквами и цифрами",
-        createAccountBtn: "Создать аккаунт",
-        alreadyHaveAccount: "Уже есть аккаунт?",
-        aiFilter: "AI-фильтр спама",
-        smartSorting: "Умная сортировка",
-        securePrivate: "Безопасно и приватно",
-        aiActive: "AI активен",
-        searchPlaceholder: "Поиск писем, контактов, тем...",
-        refresh: "Обновить",
-        lightTheme: "Светлая",
-        darkTheme: "Темная",
-        oledTheme: "OLED",
-        blueTheme: "Океан",
-        aiOrganizing: "AI организует вашу почту. <strong>15</strong> писем отсортировано.",
-        compose: "Написать",
-        archive: "Архив",
-        important: "Важные",
-        delete: "Удалить",
-        snooze: "Отложить",
-        folders: "Папки",
-        inbox: "Входящие",
-        sent: "Отправленные",
-        drafts: "Черновики",
-        spam: "Спам",
-        trash: "Корзина",
-        labels: "Метки",
-        work: "Работа",
-        personal: "Личное",
-        travel: "Путешествия",
-        finance: "Финансы",
-        social: "Социальное",
-        emailStats: "Статистика",
-        total: "Всего",
-        unread: "Непрочитанные",
-        storage: "Хранилище",
-        kyiv: "Киев, UA",
-        newest: "Сначала новые",
-        oldest: "Сначала старые",
-        importantFirst: "Сначала важные",
-        unreadFirst: "Сначала непрочитанные",
-        all: "Все",
-        withAttachments: "С вложениями",
-        moreFilters: "Больше фильтров",
-        back: "Назад",
-        selectEmail: "Выберите письмо",
-        verified: "Подтверждено",
-        secure: "Безопасно",
-        to: "Кому:",
-        cc: "Копия:",
-        selectEmailDesc: "Выберите письмо для просмотра",
-        attachments: "Вложения",
-        downloadAll: "Скачать все",
-        quickReply: "Быстрый ответ",
-        print: "Печать",
-        report: "Пожаловаться",
-        replyPlaceholder: "Введите ваш ответ...",
-        send: "Отправить",
-        cancel: "Отмена",
-        previous: "Назад",
-        next: "Далее",
-        systemOperational: "Все системы работают",
-        syncing: "Синхронизация...",
-        loading: "Загрузка...",
-        userSettings: "Настройки",
-        profile: "Профиль",
-        appearance: "Внешний вид",
-        notifications: "Уведомления",
-        security: "Безопасность",
-        advanced: "Дополнительно",
-        saveChanges: "Сохранить изменения",
-        newMessage: "Новое сообщение",
-        to: "Кому",
-        cc: "Копия",
-        bcc: "Скрытая копия",
-        subject: "Тема",
-        message: "Напишите ваше сообщение...",
-        addAttachment: "Добавить файл",
-        maxSize: "Макс. 25MB каждый",
-        urgent: "Пометить как срочное",
-        readReceipt: "Запрос подтверждения прочтения",
-        encrypt: "Зашифровать сообщение",
-        schedule: "Запланировать",
-        discard: "Отмена",
-        emptyTrash: "Очистить корзину",
-        signOut: "Выйти",
-        confirmDelete: "Подтвердить удаление",
-        deleteMessage: "Вы уверены, что хотите удалить это письмо?",
-        deleteMultipleMessage: "Вы уверены, что хотите удалить {count} писем?",
-        deleteWarning: "Удаленные письма будут перемещены в корзину и храниться 30 дней перед окончательным удалением.",
-        delete: "Удалить",
-        cancel: "Отмена",
-        permanentlyDelete: "Удалить навсегда",
-        restore: "Восстановить",
-        models: "Модели",
-        documents: "Документы",
-        images: "Изображения",
-        archives: "Архивы",
-        allFiles: "Все файлы",
-        recent: "Недавние",
-        starred: "Отмеченные",
-        shared: "Общие"
-    },
-    de: {
-        welcomeBack: "Willkommen zurück",
-        emailAddress: "E-Mail-Adresse",
-        password: "Passwort",
-        rememberMe: "Angemeldet bleiben",
-        forgotPassword: "Passwort vergessen?",
-        signIn: "Anmelden",
-        newUser: "Neuer Benutzer?",
-        createAccount: "Konto erstellen",
-        fullName: "Vollständiger Name",
-        confirmPassword: "Passwort bestätigen",
-        passwordHint: "Mind. 8 Zeichen mit Buchstaben und Zahlen",
-        createAccountBtn: "Konto erstellen",
-        alreadyHaveAccount: "Bereits ein Konto?",
-        aiFilter: "AI-Spamfilter",
-        smartSorting: "Intelligente Sortierung",
-        securePrivate: "Sicher und privat",
-        aiActive: "AI aktiv",
-        searchPlaceholder: "E-Mails, Kontakte, Betreffe suchen...",
-        refresh: "Aktualisieren",
-        lightTheme: "Hell",
-        darkTheme: "Dunkel",
-        oledTheme: "OLED",
-        blueTheme: "Ozean",
-        aiOrganizing: "AI organisiert Ihren Posteingang. <strong>15</strong> E-Mails automatisch sortiert.",
-        compose: "Verfassen",
-        archive: "Archiv",
-        important: "Wichtig",
-        delete: "Löschen",
-        snooze: "Verschieben",
-        folders: "Ordner",
-        inbox: "Posteingang",
-        sent: "Gesendet",
-        drafts: "Entwürfe",
-        spam: "Spam",
-        trash: "Papierkorb",
-        labels: "Labels",
-        work: "Arbeit",
-        personal: "Persönlich",
-        travel: "Reisen",
-        finance: "Finanzen",
-        social: "Sozial",
-        emailStats: "E-Mail-Statistik",
-        total: "Gesamt",
-        unread: "Ungelesen",
-        storage: "Speicher",
-        kyiv: "Kiew, UA",
-        newest: "Neueste zuerst",
-        oldest: "Älteste zuerst",
-        importantFirst: "Wichtige zuerst",
-        unreadFirst: "Ungelesene zuerst",
-        all: "Alle",
-        withAttachments: "Mit Anhängen",
-        moreFilters: "Mehr Filter",
-        back: "Zurück",
-        selectEmail: "Wählen Sie eine E-Mail",
-        verified: "Verifiziert",
-        secure: "Sicher",
-        to: "An:",
-        cc: "CC:",
-        selectEmailDesc: "Wählen Sie eine E-Mail zum Lesen",
-        attachments: "Anhänge",
-        downloadAll: "Alle herunterladen",
-        quickReply: "Schnelle Antwort",
-        print: "Drucken",
-        report: "Melden",
-        replyPlaceholder: "Geben Sie Ihre Antwort ein...",
-        send: "Senden",
-        cancel: "Abbrechen",
-        previous: "Zurück",
-        next: "Weiter",
-        systemOperational: "Alle Systeme funktionieren",
-        syncing: "Synchronisierung...",
-        loading: "Laden...",
-        userSettings: "Benutzereinstellungen",
-        profile: "Profil",
-        appearance: "Erscheinungsbild",
-        notifications: "Benachrichtigungen",
-        security: "Sicherheit",
-        advanced: "Erweitert",
-        saveChanges: "Änderungen speichern",
-        newMessage: "Neue Nachricht",
-        to: "An",
-        cc: "CC",
-        bcc: "BCC",
-        subject: "Betreff",
-        message: "Schreiben Sie Ihre Nachricht hier...",
-        addAttachment: "Anhang hinzufügen",
-        maxSize: "Max. 25MB pro Datei",
-        urgent: "Als dringend markieren",
-        readReceipt: "Lesebestätigung anfordern",
-        encrypt: "Nachricht verschlüsseln",
-        schedule: "Planen",
-        discard: "Verwerfen",
-        emptyTrash: "Papierkorb leeren",
-        signOut: "Abmelden",
-        confirmDelete: "Löschen bestätigen",
-        deleteMessage: "Sind Sie sicher, dass Sie diese E-Mail löschen möchten?",
-        deleteMultipleMessage: "Sind Sie sicher, dass Sie {count} E-Mails löschen möchten?",
-        deleteWarning: "Gelöschte E-Mails werden in den Papierkorb verschoben und 30 Tage lang aufbewahrt, bevor sie endgültig gelöscht werden.",
-        delete: "Löschen",
-        cancel: "Abbrechen",
-        permanentlyDelete: "Endgültig löschen",
-        restore: "Wiederherstellen",
-        models: "Modelle",
-        documents: "Dokumente",
-        images: "Bilder",
-        archives: "Archive",
-        allFiles: "Alle Dateien",
-        recent: "Kürzlich",
-        starred: "Favorisiert",
-        shared: "Geteilt"
     }
 };
 
@@ -904,14 +461,17 @@ function showToast(message, type = 'info') {
     
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
+    const icon = type === 'success' ? 'check-circle' : 
+                 type === 'error' ? 'exclamation-circle' : 
+                 type === 'warning' ? 'exclamation-triangle' : 'info-circle';
+    
     toast.innerHTML = `
-        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
+        <i class="fas fa-${icon}"></i>
         <span>${message}</span>
     `;
     
     toastContainer.appendChild(toast);
     
-    // Remove toast after 5 seconds
     setTimeout(() => {
         toast.style.animation = 'toastOut 0.3s ease forwards';
         setTimeout(() => toast.remove(), 300);
@@ -940,7 +500,6 @@ function updateLanguage(lang) {
         }
     });
     
-    // Update placeholders
     document.querySelectorAll('[data-i18n-ph]').forEach(element => {
         const key = element.getAttribute('data-i18n-ph');
         if (translations[lang] && translations[lang][key]) {
@@ -948,7 +507,6 @@ function updateLanguage(lang) {
         }
     });
     
-    // Update title attributes
     document.querySelectorAll('[data-i18n-title]').forEach(element => {
         const key = element.getAttribute('data-i18n-title');
         if (translations[lang] && translations[lang][key]) {
@@ -961,7 +519,6 @@ function updateTheme(theme) {
     currentTheme = theme;
     document.body.className = `${theme}-theme`;
     
-    // Update theme menu active state
     document.querySelectorAll('.theme-option').forEach(option => {
         option.classList.remove('active');
         if (option.dataset.theme === theme) {
@@ -969,7 +526,6 @@ function updateTheme(theme) {
         }
     });
     
-    // Save to localStorage
     try {
         localStorage.setItem('inboxProTheme', theme);
     } catch (e) {
@@ -984,18 +540,12 @@ function toggleSidebar() {
 
 // ====================== EMAIL MANAGEMENT ======================
 function initializeEmails() {
-    // Clear existing emails
     Object.keys(emailsData).forEach(folder => {
         emailsData[folder] = [];
     });
     
-    // Add sample emails to inbox
-    emailsData.inbox = [...sampleEmails];
+    emailsData.inbox = [...sampleEmails, ...emailModels];
     
-    // Add model emails
-    emailsData.inbox.push(...emailModels);
-    
-    // Add some emails to other folders
     emailsData.sent = [
         {
             id: 6,
@@ -1015,7 +565,8 @@ function initializeEmails() {
             labels: ["work"],
             size: "1.8 MB",
             deleted: false,
-            deletedDate: null
+            deletedDate: null,
+            originalFolder: "sent"
         }
     ];
     
@@ -1038,7 +589,8 @@ function initializeEmails() {
             labels: ["work"],
             size: "0.5 MB",
             deleted: false,
-            deletedDate: null
+            deletedDate: null,
+            originalFolder: "drafts"
         }
     ];
     
@@ -1061,7 +613,8 @@ function initializeEmails() {
             labels: [],
             size: "0.2 MB",
             deleted: false,
-            deletedDate: null
+            deletedDate: null,
+            originalFolder: "spam"
         }
     ];
     
@@ -1070,7 +623,6 @@ function initializeEmails() {
 }
 
 function updateEmailCounts() {
-    // Update sidebar counts
     const inboxCount = document.getElementById('inboxCount');
     const importantCount = document.getElementById('importantCount');
     const sentCount = document.getElementById('sentCount');
@@ -1085,7 +637,6 @@ function updateEmailCounts() {
     if (spamCount) spamCount.textContent = emailsData.spam.length;
     if (trashCount) trashCount.textContent = emailsData.trash.length;
     
-    // Update stats widget
     const totalEmails = document.getElementById('totalEmails');
     const unreadEmails = document.getElementById('unreadEmails');
     const importantEmails = document.getElementById('importantEmails');
@@ -1094,7 +645,6 @@ function updateEmailCounts() {
     if (unreadEmails) unreadEmails.textContent = emailsData.inbox.filter(e => e.unread).length;
     if (importantEmails) importantEmails.textContent = emailsData.important.length;
     
-    // Update filter counts
     const folderEmails = emailsData[currentFolder] || [];
     
     const allFilter = document.querySelector('[data-filter="all"] .filter-count');
@@ -1107,7 +657,6 @@ function updateEmailCounts() {
     if (importantFilter) importantFilter.textContent = folderEmails.filter(e => e.important).length;
     if (attachmentsFilter) attachmentsFilter.textContent = folderEmails.filter(e => e.attachments > 0).length;
     
-    // Update content header
     const emailCount = document.getElementById('emailCount');
     const unreadCount = document.getElementById('unreadCount');
     
@@ -1118,7 +667,6 @@ function updateEmailCounts() {
 function getFilteredEmails() {
     let folderEmails = emailsData[currentFolder] || [];
     
-    // Apply filter
     if (currentEmailFilter === 'unread') {
         folderEmails = folderEmails.filter(email => email.unread);
     } else if (currentEmailFilter === 'important') {
@@ -1136,7 +684,6 @@ function displayEmails() {
     
     if (!emailsList) return;
     
-    // Clear existing emails
     emailsList.innerHTML = '';
     
     if (folderEmails.length === 0) {
@@ -1150,7 +697,6 @@ function displayEmails() {
         return;
     }
     
-    // Display emails
     folderEmails.forEach(email => {
         const emailElement = document.createElement('div');
         emailElement.className = 'email';
@@ -1158,10 +704,7 @@ function displayEmails() {
         if (email.important) emailElement.classList.add('important');
         if (selectedEmails.has(email.id)) emailElement.classList.add('selected');
         
-        // Get initials for avatar
         const initials = email.sender.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
-        
-        // Check if email has AI label
         const hasAI = email.labels && email.labels.includes('ai');
         
         emailElement.innerHTML = `
@@ -1193,7 +736,6 @@ function displayEmails() {
         emailsList.appendChild(emailElement);
     });
     
-    // Update email checkboxes
     updateEmailCheckboxes();
 }
 
@@ -1211,7 +753,6 @@ function displayEmailContent(email) {
     
     if (!readerTitle || !readerSender || !readerText) return;
     
-    // Update email info
     readerTitle.textContent = email.subject;
     readerSender.textContent = email.sender;
     if (readerSenderEmail) readerSenderEmail.textContent = email.senderEmail;
@@ -1224,25 +765,22 @@ function displayEmailContent(email) {
     if (emailTo) emailTo.textContent = email.to.join(', ');
     if (emailCc) emailCc.textContent = email.cc && email.cc.length > 0 ? email.cc.join(', ') : '—';
     
-    // Update avatar
     const initials = email.sender.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+    const hasAI = email.labels && email.labels.includes('ai');
+    
     if (readerAvatar) {
         readerAvatar.textContent = initials;
-        // Check if email has AI label
-        const hasAI = email.labels && email.labels.includes('ai');
         if (hasAI) {
             readerAvatar.style.background = 'linear-gradient(135deg, #667eea, #9d4edd)';
             readerAvatar.innerHTML = `${initials}<div class="ai-badge"><i class="fas fa-robot"></i></div>`;
         }
     }
     
-    // Update email size
     if (emailSize) {
         const sizeSpan = emailSize.querySelector('span');
         if (sizeSpan && email.size) sizeSpan.textContent = email.size;
     }
     
-    // Update attachments
     const attachmentsList = document.getElementById('attachmentsList');
     const attachmentCount = document.querySelector('.attachment-count');
     
@@ -1251,7 +789,6 @@ function displayEmailContent(email) {
         if (attachmentsList) {
             attachmentsList.innerHTML = '';
             
-            // Create attachments from models
             for (let i = 0; i < Math.min(email.attachments, attachmentModels.length); i++) {
                 const model = attachmentModels[i];
                 const attachmentItem = document.createElement('div');
@@ -1278,7 +815,6 @@ function displayEmailContent(email) {
                 attachmentsList.appendChild(attachmentItem);
             }
             
-            // Add download functionality
             document.querySelectorAll('.download-attachment-btn').forEach(btn => {
                 btn.addEventListener('click', function(e) {
                     e.stopPropagation();
@@ -1287,7 +823,6 @@ function displayEmailContent(email) {
                 });
             });
             
-            // Add preview functionality
             document.querySelectorAll('.preview-attachment-btn').forEach(btn => {
                 btn.addEventListener('click', function(e) {
                     e.stopPropagation();
@@ -1300,7 +835,6 @@ function displayEmailContent(email) {
         if (attachmentsList) attachmentsList.innerHTML = '<p class="no-attachments">No attachments</p>';
     }
     
-    // Update email labels
     const emailLabels = document.getElementById('emailLabels');
     if (emailLabels && email.labels && email.labels.length > 0) {
         emailLabels.innerHTML = email.labels.map(label => 
@@ -1308,14 +842,12 @@ function displayEmailContent(email) {
         ).join('');
     }
     
-    // Mark as read
     if (email.unread) {
         email.unread = false;
         updateEmailCounts();
         displayEmails();
     }
     
-    // Update star button
     const starBtn = document.getElementById('starBtn');
     if (starBtn) {
         if (email.important) {
@@ -1327,12 +859,10 @@ function displayEmailContent(email) {
         }
     }
     
-    // Set current email ID for actions
     starBtn.dataset.emailId = email.id;
     const deleteEmailBtn = document.getElementById('deleteEmailBtn');
     if (deleteEmailBtn) deleteEmailBtn.dataset.emailId = email.id;
     
-    // Show email reader on mobile
     if (window.innerWidth <= 768) {
         const emailsDiv = document.querySelector('.emails');
         const emailReader = document.querySelector('.email-reader');
@@ -1347,11 +877,8 @@ function displayEmailContent(email) {
 function downloadAttachment(filename) {
     showToast(`Downloading ${filename}...`, 'info');
     
-    // Simulate download
     setTimeout(() => {
         showToast(`${filename} downloaded successfully`, 'success');
-        
-        // In a real app, this would trigger an actual download
         const link = document.createElement('a');
         link.href = 'data:application/pdf;base64,' + btoa('fake pdf content for demo');
         link.download = filename;
@@ -1374,105 +901,10 @@ function downloadAllAttachments() {
     showLoading();
     showToast(`Downloading ${attachmentItems.length} attachments...`, 'info');
     
-    // Simulate batch download
     setTimeout(() => {
         hideLoading();
         showToast(`All ${attachmentItems.length} attachments downloaded`, 'success');
     }, 2000);
-}
-
-// ====================== DELETE CONFIRMATION MODAL ======================
-function showDeleteConfirmation(emailCount = 1, permanent = false) {
-    return new Promise((resolve) => {
-        // Create modal if it doesn't exist
-        let deleteModal = document.getElementById('deleteConfirmationModal');
-        if (!deleteModal) {
-            deleteModal = document.createElement('div');
-            deleteModal.id = 'deleteConfirmationModal';
-            deleteModal.className = 'modal';
-            deleteModal.innerHTML = `
-                <div class="modal-box delete-modal">
-                    <div class="modal-header">
-                        <h3><i class="fas fa-trash"></i> <span data-i18n="confirmDelete">Confirm Delete</span></h3>
-                        <button class="modal-close" id="closeDeleteModal">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    <div class="modal-content">
-                        <div class="delete-icon">
-                            <i class="fas fa-exclamation-triangle"></i>
-                        </div>
-                        <h4 id="deleteMessage"></h4>
-                        <p id="deleteWarning" style="color: var(--text-secondary); margin: 15px 0; line-height: 1.5;"></p>
-                        <div class="delete-options" style="margin-top: 20px;">
-                            <label class="checkbox" style="display: flex; align-items: center; gap: 10px;">
-                                <input type="checkbox" id="dontAskAgain">
-                                <span class="checkmark"></span>
-                                <span>Don't ask again</span>
-                            </label>
-                        </div>
-                    </div>
-                    <div class="modal-actions">
-                        <button class="btn-secondary" id="cancelDelete">
-                            <span data-i18n="cancel">Cancel</span>
-                        </button>
-                        <button class="btn-primary danger" id="confirmDeleteBtn" style="background: var(--danger);">
-                            <i class="fas fa-trash"></i> <span data-i18n="${permanent ? 'permanentlyDelete' : 'delete'}">${permanent ? 'Permanently Delete' : 'Delete'}</span>
-                        </button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(deleteModal);
-            
-            // Add event listeners
-            document.getElementById('closeDeleteModal')?.addEventListener('click', () => {
-                deleteModal.style.display = 'none';
-                resolve(false);
-            });
-            
-            document.getElementById('cancelDelete')?.addEventListener('click', () => {
-                deleteModal.style.display = 'none';
-                resolve(false);
-            });
-            
-            document.getElementById('confirmDeleteBtn')?.addEventListener('click', () => {
-                deleteModal.style.display = 'none';
-                resolve(true);
-            });
-            
-            // Close on outside click
-            deleteModal.addEventListener('click', (e) => {
-                if (e.target === deleteModal) {
-                    deleteModal.style.display = 'none';
-                    resolve(false);
-                }
-            });
-        }
-        
-        // Update modal content
-        const deleteMessage = document.getElementById('deleteMessage');
-        const deleteWarning = document.getElementById('deleteWarning');
-        const confirmBtn = document.getElementById('confirmDeleteBtn');
-        
-        if (emailCount === 1) {
-            deleteMessage.textContent = translations[currentLanguage].deleteMessage;
-        } else {
-            deleteMessage.textContent = translations[currentLanguage].deleteMultipleMessage.replace('{count}', emailCount);
-        }
-        
-        deleteWarning.textContent = translations[currentLanguage].deleteWarning;
-        
-        if (permanent) {
-            confirmBtn.innerHTML = `<i class="fas fa-trash"></i> <span>${translations[currentLanguage].permanentlyDelete}</span>`;
-            deleteWarning.textContent = "This action cannot be undone. Emails will be permanently deleted.";
-        }
-        
-        // Show modal
-        deleteModal.style.display = 'flex';
-        
-        // Update translations
-        updateLanguage(currentLanguage);
-    });
 }
 
 function selectEmail(emailId) {
@@ -1544,7 +976,6 @@ function markAsImportant() {
         }
     });
     
-    // Update important folder
     emailsData.important = emailsData.inbox.filter(email => email.important);
     
     if (markedCount > 0) {
@@ -1552,7 +983,6 @@ function markAsImportant() {
         updateEmailCounts();
         displayEmails();
         
-        // Update current email if it's open
         const starBtn = document.getElementById('starBtn');
         if (starBtn && starBtn.dataset.emailId) {
             const emailId = parseInt(starBtn.dataset.emailId);
@@ -1574,11 +1004,88 @@ function markAsImportant() {
     }
 }
 
+function showDeleteConfirmation(emailCount = 1, permanent = false) {
+    return new Promise((resolve) => {
+        let deleteModal = document.getElementById('deleteConfirmationModal');
+        if (!deleteModal) {
+            deleteModal = document.createElement('div');
+            deleteModal.id = 'deleteConfirmationModal';
+            deleteModal.className = 'modal';
+            deleteModal.innerHTML = `
+                <div class="modal-box delete-modal">
+                    <div class="modal-header">
+                        <h3><i class="fas fa-trash"></i> <span>${translations[currentLanguage].confirmDelete}</span></h3>
+                        <button class="modal-close" id="closeDeleteModal">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="modal-content">
+                        <div class="delete-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <h4 id="deleteMessage"></h4>
+                        <p id="deleteWarning" style="color: var(--text-secondary); margin: 15px 0; line-height: 1.5;"></p>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn-secondary" id="cancelDelete">
+                            <span>${translations[currentLanguage].cancel}</span>
+                        </button>
+                        <button class="btn-primary danger" id="confirmDeleteBtn" style="background: var(--danger);">
+                            <i class="fas fa-trash"></i> <span>${permanent ? translations[currentLanguage].permanentlyDelete : translations[currentLanguage].delete}</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(deleteModal);
+            
+            document.getElementById('closeDeleteModal')?.addEventListener('click', () => {
+                deleteModal.style.display = 'none';
+                resolve(false);
+            });
+            
+            document.getElementById('cancelDelete')?.addEventListener('click', () => {
+                deleteModal.style.display = 'none';
+                resolve(false);
+            });
+            
+            document.getElementById('confirmDeleteBtn')?.addEventListener('click', () => {
+                deleteModal.style.display = 'none';
+                resolve(true);
+            });
+            
+            deleteModal.addEventListener('click', (e) => {
+                if (e.target === deleteModal) {
+                    deleteModal.style.display = 'none';
+                    resolve(false);
+                }
+            });
+        }
+        
+        const deleteMessage = document.getElementById('deleteMessage');
+        const deleteWarning = document.getElementById('deleteWarning');
+        const confirmBtn = document.getElementById('confirmDeleteBtn');
+        
+        if (emailCount === 1) {
+            deleteMessage.textContent = translations[currentLanguage].deleteMessage;
+        } else {
+            deleteMessage.textContent = translations[currentLanguage].deleteMultipleMessage.replace('{count}', emailCount);
+        }
+        
+        deleteWarning.textContent = translations[currentLanguage].deleteWarning;
+        
+        if (permanent) {
+            confirmBtn.innerHTML = `<i class="fas fa-trash"></i> <span>${translations[currentLanguage].permanentlyDelete}</span>`;
+            deleteWarning.textContent = "This action cannot be undone. Emails will be permanently deleted.";
+        }
+        
+        deleteModal.style.display = 'flex';
+    });
+}
+
 async function deleteSelectedEmails() {
     let emailsToDelete = [];
     
     if (selectedEmails.size === 0) {
-        // Check if we're deleting a single email from reader
         const deleteBtn = document.getElementById('deleteEmailBtn');
         if (deleteBtn && deleteBtn.dataset.emailId) {
             const emailId = parseInt(deleteBtn.dataset.emailId);
@@ -1597,7 +1104,6 @@ async function deleteSelectedEmails() {
         return;
     }
     
-    // Show confirmation dialog
     const confirmed = await showDeleteConfirmation(emailsToDelete.length, currentFolder === 'trash');
     
     if (!confirmed) {
@@ -1606,21 +1112,18 @@ async function deleteSelectedEmails() {
     }
     
     if (currentFolder === 'trash') {
-        // Permanently delete from trash
         emailsData.trash = emailsData.trash.filter(email => !selectedEmails.has(email.id));
         showToast(`Permanently deleted ${emailsToDelete.length} email(s)`, 'success');
     } else {
-        // Move to trash
         emailsToDelete.forEach(email => {
+            email.originalFolder = currentFolder;
             email.folder = 'trash';
             email.deleted = true;
             email.deletedDate = new Date().toISOString();
             emailsData.trash.push(email);
         });
         
-        // Remove from current folder
         emailsData[currentFolder] = folderEmails.filter(email => !selectedEmails.has(email.id));
-        
         showToast(`Moved ${emailsToDelete.length} email(s) to trash`, 'success');
     }
     
@@ -1628,7 +1131,6 @@ async function deleteSelectedEmails() {
     updateEmailCounts();
     displayEmails();
     
-    // Clear email reader if we deleted the displayed email
     const readerTitle = document.getElementById('readerTitle');
     const readerText = document.getElementById('readerText');
     
@@ -1642,7 +1144,6 @@ function emptyTrash() {
         return;
     }
     
-    // Show confirmation for permanent deletion
     showDeleteConfirmation(emailsData.trash.length, true).then(confirmed => {
         if (confirmed) {
             emailsData.trash = [];
@@ -1653,38 +1154,12 @@ function emptyTrash() {
     });
 }
 
-function restoreEmail(emailId) {
-    const email = emailsData.trash.find(e => e.id === emailId);
-    if (!email) return;
-    
-    // Move back to original folder (default to inbox)
-    const originalFolder = email.originalFolder || 'inbox';
-    email.folder = originalFolder;
-    email.deleted = false;
-    email.deletedDate = null;
-    
-    // Remove from trash
-    emailsData.trash = emailsData.trash.filter(e => e.id !== emailId);
-    
-    // Add to original folder
-    if (emailsData[originalFolder]) {
-        emailsData[originalFolder].push(email);
-    } else {
-        emailsData.inbox.push(email);
-    }
-    
-    updateEmailCounts();
-    displayEmails();
-    showToast('Email restored', 'success');
-}
-
 // ====================== FOLDER MANAGEMENT ======================
 function switchFolder(folder) {
     currentFolder = folder;
     selectedEmails.clear();
-    currentEmailFilter = 'all'; // Reset filter when switching folders
+    currentEmailFilter = 'all';
     
-    // Update active menu item
     document.querySelectorAll('.menu-item').forEach(item => {
         item.classList.remove('active');
         if (item.dataset.folder === folder) {
@@ -1692,7 +1167,6 @@ function switchFolder(folder) {
         }
     });
     
-    // Update folder title
     const folderTitle = document.getElementById('currentFolder');
     const folderIcon = folder === 'inbox' ? 'fa-inbox' :
                       folder === 'important' ? 'fa-star' :
@@ -1704,13 +1178,11 @@ function switchFolder(folder) {
         folderTitle.innerHTML = `<i class="fas ${folderIcon}"></i> <span data-i18n="${folder}">${translations[currentLanguage][folder]}</span>`;
     }
     
-    // Show/hide empty trash button
     const emptyTrashBtn = document.getElementById('emptyTrashBtn');
     if (emptyTrashBtn) {
         emptyTrashBtn.style.display = folder === 'trash' ? 'flex' : 'none';
     }
     
-    // Update active filter tag
     document.querySelectorAll('.filter-tag').forEach(tag => {
         tag.classList.remove('active');
         if (tag.dataset.filter === currentEmailFilter) {
@@ -1718,18 +1190,15 @@ function switchFolder(folder) {
         }
     });
     
-    // Update UI
     updateEmailCounts();
     displayEmails();
     
-    // Clear email reader
     const readerTitle = document.getElementById('readerTitle');
     const readerText = document.getElementById('readerText');
     
     if (readerTitle) readerTitle.textContent = translations[currentLanguage].selectEmail;
     if (readerText) readerText.innerHTML = `<p>${translations[currentLanguage].selectEmailDesc}</p>`;
     
-    // On mobile, show emails list
     if (window.innerWidth <= 768) {
         const emailsDiv = document.querySelector('.emails');
         const emailReader = document.querySelector('.email-reader');
@@ -1746,7 +1215,6 @@ function openComposeModal() {
     const modal = document.getElementById('composeModal');
     if (modal) modal.style.display = 'flex';
     
-    // Clear form
     const mailTo = document.getElementById('mailTo');
     const mailSubject = document.getElementById('mailSubject');
     const mailText = document.getElementById('mailText');
@@ -1757,7 +1225,6 @@ function openComposeModal() {
     if (mailText) mailText.value = '';
     if (filePreview) filePreview.innerHTML = '';
     
-    // Focus on To field
     setTimeout(() => {
         if (mailTo) mailTo.focus();
     }, 100);
@@ -1773,7 +1240,6 @@ function sendEmail() {
         return;
     }
     
-    // Create new email
     const newEmail = {
         id: Date.now(),
         sender: currentUser ? currentUser.name : "You",
@@ -1792,19 +1258,13 @@ function sendEmail() {
         labels: [],
         size: `${(Math.random() * 3 + 0.5).toFixed(1)} MB`,
         deleted: false,
-        deletedDate: null
+        deletedDate: null,
+        originalFolder: "sent"
     };
     
-    // Add to sent folder
     emailsData.sent.unshift(newEmail);
-    
-    // Close modal
     closeComposeModal();
-    
-    // Show success message
     showToast('Email sent successfully', 'success');
-    
-    // Switch to sent folder
     switchFolder('sent');
 }
 
@@ -1850,7 +1310,6 @@ function closeSettingsModal() {
 }
 
 function showTab(tabName) {
-    // Update active tab
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.classList.remove('active');
         if (btn.dataset.tab === tabName) {
@@ -1858,7 +1317,6 @@ function showTab(tabName) {
         }
     });
     
-    // Show tab content
     const modalContent = document.querySelector('.modal-content');
     if (!modalContent) return;
     
@@ -1909,7 +1367,6 @@ function showTab(tabName) {
                 </div>
             `;
             
-            // Add event listeners for theme buttons
             document.querySelectorAll('.theme-option-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     document.querySelectorAll('.theme-option-btn').forEach(b => b.classList.remove('active'));
@@ -1918,90 +1375,10 @@ function showTab(tabName) {
                 });
             });
             break;
-            
-        case 'notifications':
-            modalContent.innerHTML = `
-                <div class="tab-content">
-                    <h4>Notification Settings</h4>
-                    <label class="checkbox">
-                        <input type="checkbox" id="notifyNewEmail" checked>
-                        <span class="checkmark"></span>
-                        <span>New email notifications</span>
-                    </label>
-                    <label class="checkbox">
-                        <input type="checkbox" id="notifyImportant" checked>
-                        <span class="checkmark"></span>
-                        <span>Important email alerts</span>
-                    </label>
-                    <label class="checkbox">
-                        <input type="checkbox" id="notifySound">
-                        <span class="checkmark"></span>
-                        <span>Play sound for notifications</span>
-                    </label>
-                    <label class="checkbox">
-                        <input type="checkbox" id="notifyDesktop">
-                        <span class="checkmark"></span>
-                        <span>Desktop notifications</span>
-                    </label>
-                </div>
-            `;
-            break;
-            
-        case 'security':
-            modalContent.innerHTML = `
-                <div class="tab-content">
-                    <h4>Security Settings</h4>
-                    <div class="form-group">
-                        <label for="currentPassword">Current Password</label>
-                        <input type="password" id="currentPassword" placeholder="••••••••">
-                    </div>
-                    <div class="form-group">
-                        <label for="newPassword">New Password</label>
-                        <input type="password" id="newPassword" placeholder="••••••••">
-                    </div>
-                    <div class="form-group">
-                        <label for="confirmNewPassword">Confirm New Password</label>
-                        <input type="password" id="confirmNewPassword" placeholder="••••••••">
-                    </div>
-                    <label class="checkbox">
-                        <input type="checkbox" id="twoFactorAuth">
-                        <span class="checkmark"></span>
-                        <span>Two-factor authentication</span>
-                    </label>
-                </div>
-            `;
-            break;
-            
-        case 'advanced':
-            modalContent.innerHTML = `
-                <div class="tab-content">
-                    <h4>Advanced Settings</h4>
-                    <div class="form-group">
-                        <label for="signature">Email Signature</label>
-                        <textarea id="signature" rows="4" placeholder="Your email signature"></textarea>
-                    </div>
-                    <label class="checkbox">
-                        <input type="checkbox" id="autoReply">
-                        <span class="checkmark"></span>
-                        <span>Auto-reply when away</span>
-                    </label>
-                    <div class="form-group">
-                        <label for="replyMessage">Auto-reply Message</label>
-                        <textarea id="replyMessage" rows="3" placeholder="I'm currently away from my email..."></textarea>
-                    </div>
-                    <label class="checkbox">
-                        <input type="checkbox" id="spamFilter">
-                        <span class="checkmark"></span>
-                        <span>Aggressive spam filter</span>
-                    </label>
-                </div>
-            `;
-            break;
     }
 }
 
 function saveSettings() {
-    // Update user info if changed
     if (currentUser) {
         const nameInput = document.getElementById('settingsName');
         const emailInput = document.getElementById('settingsEmail');
@@ -2009,7 +1386,6 @@ function saveSettings() {
         if (nameInput) currentUser.name = nameInput.value;
         if (emailInput) currentUser.email = emailInput.value;
         
-        // Update UI
         const userName = document.getElementById('userName');
         const userEmail = document.getElementById('userEmail');
         const userAvatar = document.getElementById('userAvatar');
@@ -2028,10 +1404,8 @@ function saveSettings() {
 
 // ====================== AI FEATURES ======================
 function simulateAISorting() {
-    // Simulate AI sorting emails
     setTimeout(() => {
         emailsData.inbox.forEach(email => {
-            // AI decides if email is important based on content
             if (email.subject.toLowerCase().includes('important') || 
                 email.subject.toLowerCase().includes('urgent') ||
                 email.subject.toLowerCase().includes('meeting') ||
@@ -2040,7 +1414,6 @@ function simulateAISorting() {
                 email.important = true;
             }
             
-            // AI assigns labels based on content
             if (!email.labels) email.labels = [];
             
             if (email.subject.toLowerCase().includes('meeting') || 
@@ -2062,7 +1435,6 @@ function simulateAISorting() {
             }
         });
         
-        // Update important folder
         emailsData.important = emailsData.inbox.filter(email => email.important);
         
         updateEmailCounts();
@@ -2178,7 +1550,6 @@ function initializeEventListeners() {
             e.stopPropagation();
             userDropdown.classList.toggle('show');
             
-            // Close other dropdowns
             const notificationDropdown = document.getElementById('notificationDropdown');
             if (notificationDropdown) notificationDropdown.classList.remove('show');
         });
@@ -2216,8 +1587,6 @@ function initializeEventListeners() {
             const notificationDropdown = document.getElementById('notificationDropdown');
             if (notificationDropdown) {
                 notificationDropdown.classList.toggle('show');
-                
-                // Close other dropdowns
                 if (userDropdown) userDropdown.classList.remove('show');
             }
         });
@@ -2321,7 +1690,6 @@ function initializeEventListeners() {
             this.classList.add('active');
             currentEmailFilter = this.dataset.filter;
             
-            // Update filtered count display
             const filteredCount = document.getElementById('filteredCount');
             if (filteredCount) {
                 if (currentEmailFilter === 'all') {
@@ -2345,11 +1713,9 @@ function initializeEventListeners() {
     if (langSelect) {
         langSelect.addEventListener('change', function() {
             updateLanguage(this.value);
-            
-            // Update UI elements that might have changed
             updateEmailCounts();
             if (currentFolder) {
-                switchFolder(currentFolder); // This will update folder title
+                switchFolder(currentFolder);
             }
         });
     }
@@ -2435,15 +1801,10 @@ function initializeEventListeners() {
 
 // ====================== LOGIN/REGISTER ======================
 function handleLogin() {
-    console.log('Login button clicked');
-    
     const emailInput = document.getElementById('loginEmail');
     const passwordInput = document.getElementById('loginPassword');
     
-    if (!emailInput || !passwordInput) {
-        console.error('Login form elements not found');
-        return;
-    }
+    if (!emailInput || !passwordInput) return;
     
     const email = emailInput.value;
     const password = passwordInput.value;
@@ -2453,7 +1814,6 @@ function handleLogin() {
         return;
     }
     
-    // Simulate login process
     showLoading();
     
     setTimeout(() => {
@@ -2463,7 +1823,6 @@ function handleLogin() {
             avatar: "JD"
         };
         
-        // Switch to app
         const loginScreen = document.getElementById('loginScreen');
         const app = document.getElementById('app');
         
@@ -2473,13 +1832,11 @@ function handleLogin() {
             app.style.display = 'flex';
         }
         
-        // Initialize app
         initializeApp();
         
         hideLoading();
         showToast('Login successful', 'success');
         
-        // Save demo login
         try {
             localStorage.setItem('inboxProDemoLogin', 'true');
             localStorage.setItem('inboxProUserEmail', email);
@@ -2490,17 +1847,12 @@ function handleLogin() {
 }
 
 function handleRegister() {
-    console.log('Register button clicked');
-    
     const nameInput = document.getElementById('registerName');
     const emailInput = document.getElementById('registerEmail');
     const passwordInput = document.getElementById('registerPassword');
     const confirmInput = document.getElementById('registerConfirm');
     
-    if (!nameInput || !emailInput || !passwordInput || !confirmInput) {
-        console.error('Register form elements not found');
-        return;
-    }
+    if (!nameInput || !emailInput || !passwordInput || !confirmInput) return;
     
     const name = nameInput.value;
     const email = emailInput.value;
@@ -2522,7 +1874,6 @@ function handleRegister() {
         return;
     }
     
-    // Simulate registration process
     showLoading();
     
     setTimeout(() => {
@@ -2532,7 +1883,6 @@ function handleRegister() {
             avatar: name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)
         };
         
-        // Switch to app
         const loginScreen = document.getElementById('loginScreen');
         const app = document.getElementById('app');
         
@@ -2542,13 +1892,11 @@ function handleRegister() {
             app.style.display = 'flex';
         }
         
-        // Initialize app
         initializeApp();
         
         hideLoading();
         showToast('Registration successful', 'success');
         
-        // Save demo login
         try {
             localStorage.setItem('inboxProDemoLogin', 'true');
             localStorage.setItem('inboxProUserName', name);
@@ -2565,7 +1913,6 @@ function handleLogout() {
     setTimeout(() => {
         currentUser = null;
         
-        // Clear localStorage
         try {
             localStorage.removeItem('inboxProDemoLogin');
             localStorage.removeItem('inboxProUserName');
@@ -2574,13 +1921,11 @@ function handleLogout() {
             console.log('Could not clear localStorage:', e);
         }
         
-        // Switch to login screen
         const loginScreen = document.getElementById('loginScreen');
         const app = document.getElementById('app');
         
         if (loginScreen) {
             loginScreen.style.display = 'flex';
-            // Reset login form
             const loginForm = document.getElementById('loginForm');
             const registerForm = document.getElementById('registerForm');
             if (loginForm) loginForm.classList.add('active');
@@ -2618,7 +1963,6 @@ function showLoginForm(e) {
 function initializeApp() {
     console.log('Inbox Pro starting...');
     
-    // Load saved theme
     try {
         const savedTheme = localStorage.getItem('inboxProTheme');
         if (savedTheme) {
@@ -2628,7 +1972,6 @@ function initializeApp() {
         console.log('Could not load theme from localStorage:', e);
     }
     
-    // Load saved language
     try {
         const savedLang = localStorage.getItem('inboxProLanguage');
         if (savedLang && translations[savedLang]) {
@@ -2638,17 +1981,11 @@ function initializeApp() {
         console.log('Could not load language from localStorage:', e);
     }
     
-    // Set current language
     updateLanguage(currentLanguage);
-    
-    // Initialize email data
     initializeEmails();
-    
-    // Update UI
     updateEmailCounts();
     displayEmails();
     
-    // Update user info in header
     if (currentUser) {
         const userName = document.getElementById('userName');
         const userEmail = document.getElementById('userEmail');
@@ -2662,10 +1999,8 @@ function initializeApp() {
         }
     }
     
-    // Initialize event listeners
     initializeEventListeners();
     
-    // Show welcome message
     setTimeout(() => {
         showToast('Welcome to Inbox Pro!', 'success');
         simulateAISorting();
@@ -2678,7 +2013,7 @@ function initializeApp() {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM loaded');
     
-    // Add CSS for delete confirmation modal and AI badges
+    // Add necessary CSS
     const style = document.createElement('style');
     style.textContent = `
         .theme-options-settings {
@@ -2787,7 +2122,6 @@ document.addEventListener('DOMContentLoaded', function() {
             border-radius: 12px;
         }
         
-        /* Fix for login/register forms */
         .login-form {
             display: none;
         }
@@ -2796,16 +2130,10 @@ document.addEventListener('DOMContentLoaded', function() {
             display: block;
         }
         
-        /* Fix for modals */
         .modal {
             display: none;
         }
         
-        .modal.show {
-            display: flex;
-        }
-        
-        /* Animation for infinite pulse */
         @keyframes pulseInfinite {
             0% { transform: scale(1); }
             50% { transform: scale(1.05); }
@@ -2816,7 +2144,6 @@ document.addEventListener('DOMContentLoaded', function() {
             animation-name: pulseInfinite;
         }
         
-        /* Delete confirmation modal */
         .delete-modal {
             max-width: 400px;
         }
@@ -2828,4 +2155,182 @@ document.addEventListener('DOMContentLoaded', function() {
             margin-bottom: 20px;
         }
         
-        .delete-modal h4
+        .ai-badge {
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            background: var(--success);
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            border: 2px solid var(--panel);
+        }
+        
+        .email-avatar {
+            position: relative;
+        }
+    `;
+    document.head.appendChild(style);
+    
+    let demoLogin = false;
+    try {
+        demoLogin = localStorage.getItem('inboxProDemoLogin') === 'true';
+    } catch (e) {
+        console.log('Could not read from localStorage:', e);
+    }
+    
+    if (demoLogin) {
+        const savedName = localStorage.getItem('inboxProUserName');
+        const savedEmail = localStorage.getItem('inboxProUserEmail');
+        
+        currentUser = {
+            name: savedName || "John Doe",
+            email: savedEmail || "john@example.com",
+            avatar: (savedName || "John Doe").split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)
+        };
+        
+        const loginScreen = document.getElementById('loginScreen');
+        const app = document.getElementById('app');
+        
+        if (loginScreen) loginScreen.style.display = 'none';
+        if (app) {
+            app.style.opacity = '1';
+            app.style.display = 'flex';
+        }
+        initializeApp();
+    } else {
+        const loginScreen = document.getElementById('loginScreen');
+        const app = document.getElementById('app');
+        
+        if (loginScreen) {
+            loginScreen.style.display = 'flex';
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            if (loginForm) loginForm.classList.add('active');
+            if (registerForm) registerForm.classList.remove('active');
+        }
+        if (app) {
+            app.style.opacity = '0';
+            app.style.display = 'none';
+        }
+        
+        const loginEmail = document.getElementById('loginEmail');
+        const loginPassword = document.getElementById('loginPassword');
+        
+        if (loginEmail) loginEmail.value = 'demo@example.com';
+        if (loginPassword) loginPassword.value = 'password123';
+    }
+});
+
+// ====================== ERROR HANDLING ======================
+window.addEventListener('error', function(e) {
+    console.error('Global error:', e.error);
+    showToast('An error occurred. Please refresh the page.', 'error');
+});
+
+// ====================== SAVE LANGUAGE PREFERENCE ======================
+document.getElementById('langSelect')?.addEventListener('change', function() {
+    try {
+        localStorage.setItem('inboxProLanguage', this.value);
+    } catch (e) {
+        console.log('Could not save language to localStorage:', e);
+    }
+});
+
+// ====================== FIX FOR FONT AWESOME ICONS ======================
+// Додамо стилі для іконок, які не завантажились
+document.head.insertAdjacentHTML('beforeend', `
+    <style>
+        /* Fallback icons if Font Awesome fails */
+        .fa:before {
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+        }
+        
+        .far:before {
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 400;
+        }
+        
+        /* Specific icons fallback */
+        .fa-mail-bulk:before { content: "📬"; }
+        .fa-envelope:before { content: "✉️"; }
+        .fa-inbox:before { content: "📥"; }
+        .fa-star:before { content: "⭐"; }
+        .fa-paper-plane:before { content: "✈️"; }
+        .fa-file-alt:before { content: "📄"; }
+        .fa-ban:before { content: "🚫"; }
+        .fa-trash:before { content: "🗑️"; }
+        .fa-bars:before { content: "☰"; }
+        .fa-search:before { content: "🔍"; }
+        .fa-sync-alt:before { content: "🔄"; }
+        .fa-bell:before { content: "🔔"; }
+        .fa-palette:before { content: "🎨"; }
+        .fa-sun:before { content: "☀️"; }
+        .fa-moon:before { content: "🌙"; }
+        .fa-circle:before { content: "⚫"; }
+        .fa-water:before { content: "💧"; }
+        .fa-cog:before { content: "⚙️"; }
+        .fa-robot:before { content: "🤖"; }
+        .fa-check-circle:before { content: "✅"; }
+        .fa-exclamation-circle:before { content: "⚠️"; }
+        .fa-exclamation-triangle:before { content: "❗"; }
+        .fa-info-circle:before { content: "ℹ️"; }
+        .fa-arrow-left:before { content: "←"; }
+        .fa-reply:before { content: "↩️"; }
+        .fa-reply-all:before { content: "↪️"; }
+        .fa-share:before { content: "↗️"; }
+        .fa-print:before { content: "🖨️"; }
+        .fa-flag:before { content: "🚩"; }
+        .fa-clock:before { content: "⏰"; }
+        .fa-folder:before { content: "📁"; }
+        .fa-ellipsis-v:before { content: "⋮"; }
+        .fa-weight-hanging:before { content: "⚖️"; }
+        .fa-shield-alt:before { content: "🛡️"; }
+        .fa-paperclip:before { content: "📎"; }
+        .fa-download:before { content: "📥"; }
+        .fa-eye:before { content: "👁️"; }
+        .fa-question-circle:before { content: "❓"; }
+        .fa-comment-alt:before { content: "💬"; }
+        .fa-user-cog:before { content: "👤⚙️"; }
+        .fa-save:before { content: "💾"; }
+        .fa-pen-alt:before { content: "✏️"; }
+        .fa-window-minimize:before { content: "🗕"; }
+        .fa-bold:before { content: "𝐁"; }
+        .fa-italic:before { content: "𝐼"; }
+        .fa-underline:before { content: "𝑈"; }
+        .fa-list:before { content: "☰"; }
+        .fa-link:before { content: "🔗"; }
+        .fa-image:before { content: "🖼️"; }
+        .fa-undo:before { content: "↶"; }
+        .fa-redo:before { content: "↷"; }
+        .fa-file-pdf:before { content: "📕"; }
+        .fa-file-word:before { content: "📘"; }
+        .fa-file-excel:before { content: "📗"; }
+        .fa-file-powerpoint:before { content: "📙"; }
+        .fa-file-archive:before { content: "🗜️"; }
+        .fa-file-image:before { content: "🖼️"; }
+        .fa-database:before { content: "🗄️"; }
+        .fa-chart-bar:before { content: "📊"; }
+        .fa-check:before { content: "✓"; }
+        .fa-times:before { content: "✕"; }
+        .fa-plus:before { content: "+"; }
+        .fa-archive:before { content: "📦"; }
+        .fa-bolt:before { content: "⚡"; }
+        .fa-user:before { content: "👤"; }
+        .fa-lock:before { content: "🔒"; }
+        .fa-sign-in-alt:before { content: "↪️"; }
+        .fa-user-plus:before { content: "👤+"; }
+        .fa-check-square:before { content: "☑️"; }
+        .fa-envelope-open:before { content: "📨"; }
+        .fa-chevron-left:before { content: "‹"; }
+        .fa-chevron-right:before { content: "›"; }
+        .fa-sign-out-alt:before { content: "↩️"; }
+        .fa-figma:before { content: "🎨"; }
+    </style>
+`);
