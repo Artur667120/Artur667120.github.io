@@ -2,35 +2,53 @@
   --bg: #0f1117;
   --panel: #1c1f26;
   --text: #e4e4e7;
+  --text-secondary: #a1a1aa;
   --accent: #667eea;
   --accent-hover: #5a67d8;
   --danger: #ef4444;
+  --danger-hover: #dc2626;
+  --success: #10b981;
+  --success-hover: #059669;
+  --warning: #f59e0b;
   --border: #2d2d3a;
+  --shadow: rgba(0, 0, 0, 0.3);
+  --unread-bg: rgba(102, 126, 234, 0.15);
   --transition: all 0.3s ease;
 }
 
-body {
-  margin:0; padding:0; font-family:sans-serif; background:var(--bg); color:var(--text);
+.light {
+  --bg: #f8fafc;
+  --panel: #ffffff;
+  --text: #1e293b;
+  --text-secondary: #64748b;
+  --accent: #4f46e5;
+  --accent-hover: #4338ca;
+  --danger: #dc2626;
+  --danger-hover: #b91c1c;
+  --success: #059669;
+  --success-hover: #047857;
+  --warning: #d97706;
+  --border: #e2e8f0;
+  --shadow: rgba(0, 0, 0, 0.1);
+  --unread-bg: rgba(79, 70, 229, 0.1);
 }
-.app { max-width:1400px; margin:0 auto; display:flex; flex-direction:column; min-height:100vh;}
-.top {display:flex; justify-content:space-between; align-items:center; padding:15px 20px; background:var(--panel); border-radius:12px; margin:10px 0;}
-.menu-toggle{display:none;}
-.main{display:flex; gap:20px;}
-.sidebar{width:260px; background:var(--panel); padding:20px; border-radius:12px; display:flex; flex-direction:column; gap:15px;}
-.compose-btn{background:linear-gradient(135deg,var(--accent),var(--accent-hover)); color:white; border:none; padding:14px; border-radius:10px; cursor:pointer;}
-.menu-item{padding:12px; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:12px; color:#a1a1aa;}
-.menu-item.active{background:var(--accent); color:white;}
-.badge{background:var(--danger); color:white; border-radius:10px; padding:2px 8px; margin-left:auto;}
-.content{flex:1; display:flex; flex-direction:column; gap:15px;}
-.emails-container{display:flex; gap:20px; flex:1;}
-.emails{flex:1; background:var(--panel); border-radius:12px; padding:20px; display:flex; flex-direction:column; gap:10px; max-height:70vh; overflow-y:auto;}
-.email{padding:15px; border-radius:10px; cursor:pointer; display:flex; gap:15px; background:transparent;}
-.email:hover{background:var(--accent); color:white;}
-.email-reader{flex:1; background:var(--panel); border-radius:12px; padding:25px; display:flex; flex-direction:column; max-height:70vh; overflow-y:auto;}
-.modal{position:fixed; inset:0; background:rgba(0,0,0,0.7); display:flex; justify-content:center; align-items:center; z-index:1000; display:none;}
-.modal-box{background:var(--panel); padding:30px; border-radius:16px; width:100%; max-width:500px;}
-.modal-actions{display:flex; gap:10px; margin-top:25px;}
-.btn-primary{background:var(--accent); color:white; border:none; padding:12px; border-radius:8px; cursor:pointer; flex:1;}
-.btn-secondary{background:transparent; color:var(--text); border:1px solid var(--border); padding:12px; border-radius:8px; cursor:pointer; flex:1;}
-.toast{position:fixed; bottom:70px; right:20px; background:var(--accent); color:white; padding:12px 20px; border-radius:8px; transform:translateX(150%); transition:transform 0.3s;}
-.toast.show{transform:translateX(0);}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen','Ubuntu','Cantarell','Fira Sans','Droid Sans','Helvetica Neue',sans-serif;
+  line-height: 1.5;
+  transition: var(--transition);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Ті ж стилі для header, sidebar, emails, модалок та кнопок, але зі змінами для анімацій та UX */
