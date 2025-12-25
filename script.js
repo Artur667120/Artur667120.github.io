@@ -1,5 +1,5 @@
-const composeModal = document.getElementById("composeModal");
 const composeBtn = document.getElementById("composeBtn");
+const composeModal = document.getElementById("composeModal");
 const closeCompose = document.getElementById("closeCompose");
 const sendMail = document.getElementById("sendMail");
 
@@ -9,39 +9,106 @@ const mailText = document.getElementById("mailText");
 const mailFile = document.getElementById("mailFile");
 const filePreview = document.getElementById("filePreview");
 
-composeBtn.onclick = () => composeModal.classList.add("show");
+const progress = document.querySelector(".progress");
+const progressBar = document.getElementById("progressBar");
 
-function resetComposeForm() {
+const DRAFT_KEY = "draft_mail";
+
+/* OPEN */
+composeBtn.onclick = () => {
+  loadDraft();
+  composeModal.classList.add("show");
+};
+
+/* RESET */
+function resetForm() {
   mailTo.value = "";
   mailSubject.value = "";
   mailText.value = "";
-
-  mailFile.value = "";          // 🔥 ОЧИЩЕННЯ FILE INPUT
-  filePreview.innerHTML = "";  // 🔥 ОЧИЩЕННЯ PREVIEW
+  mailFile.value = "";
+  filePreview.innerHTML = "Drag & drop files here";
+  localStorage.removeItem(DRAFT_KEY);
 }
 
+/* CANCEL */
 closeCompose.onclick = () => {
-  resetComposeForm();
+  resetForm();
   composeModal.classList.remove("show");
 };
 
-mailFile.onchange = () => {
+/* FILE PREVIEW */
+function renderFiles() {
   filePreview.innerHTML = "";
-  [...mailFile.files].forEach(file => {
-    const div = document.createElement("div");
-    div.textContent = file.name;
-    filePreview.appendChild(div);
+  [...mailFile.files].forEach(f => {
+    const d = document.createElement("div");
+    d.textContent = f.name;
+    filePreview.appendChild(d);
   });
+}
+
+mailFile.onchange = renderFiles;
+
+/* DRAG DROP */
+filePreview.ondragover = e => {
+  e.preventDefault();
+  filePreview.classList.add("drag");
 };
 
+filePreview.ondragleave = () => {
+  filePreview.classList.remove("drag");
+};
+
+filePreview.ondrop = e => {
+  e.preventDefault();
+  filePreview.classList.remove("drag");
+  mailFile.files = e.dataTransfer.files;
+  renderFiles();
+};
+
+/* DRAFTS */
+function saveDraft() {
+  const d = {
+    to: mailTo.value,
+    subject: mailSubject.value,
+    text: mailText.value
+  };
+  localStorage.setItem(DRAFT_KEY, JSON.stringify(d));
+}
+
+function loadDraft() {
+  const d = JSON.parse(localStorage.getItem(DRAFT_KEY));
+  if (!d) return;
+  mailTo.value = d.to;
+  mailSubject.value = d.subject;
+  mailText.value = d.text;
+}
+
+[mailTo, mailSubject, mailText].forEach(el =>
+  el.addEventListener("input", saveDraft)
+);
+
+/* SEND */
 sendMail.onclick = () => {
   if (!mailTo.value || !mailText.value) {
-    alert("Fill email and message");
+    alert("Fill required fields");
     return;
   }
 
-  alert("Mail sent ✔");
+  progress.style.display = "block";
+  let p = 0;
 
-  resetComposeForm();
-  composeModal.classList.remove("show");
+  const timer = setInterval(() => {
+    p += 10;
+    progressBar.style.width = p + "%";
+
+    if (p >= 100) {
+      clearInterval(timer);
+      progress.style.display = "none";
+      progressBar.style.width = "0%";
+
+      resetForm();
+      composeModal.classList.remove("show");
+      alert("Mail sent ✔");
+    }
+  }, 120);
 };
