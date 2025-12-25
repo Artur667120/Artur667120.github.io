@@ -1,60 +1,123 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Inbox Pro</title>
-
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Inbox Pro Demo</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-
 <body>
+<div class="app" id="app">
+  <header class="top">
+    <button class="menu-toggle" id="menuToggle">
+      <i class="fas fa-bars"></i>
+    </button>
+    <h1>📬 Inbox Pro</h1>
+    <div class="top-actions">
+      <button type="button" id="themeToggle" class="theme-btn"><i class="fas fa-moon"></i></button>
+      <span id="userEmail" class="user-email"></span>
+      <button class="settings-btn" id="settingsBtn"><i class="fas fa-user-edit"></i></button>
+    </div>
+  </header>
 
-<div class="app">
-  <aside class="sidebar">
-    <button id="composeBtn" class="compose">➕ Compose</button>
-    <div class="menu active">Inbox</div>
-    <div class="menu">Sent</div>
-    <div class="menu">Drafts</div>
-    <div class="menu">Trash</div>
-  </aside>
+  <div class="main">
+    <aside class="sidebar" id="sidebar">
+      <button type="button" class="compose-btn" id="composeBtn"><i class="fas fa-plus"></i> <span data-i18n="compose">Compose</span></button>
+      <div class="sidebar-menu">
+        <div class="menu-item active" data-folder="inbox"><i class="fas fa-inbox"></i> <span data-i18n="inbox">Inbox</span><span class="badge" id="inboxCount">0</span></div>
+        <div class="menu-item" data-folder="sent"><i class="fas fa-paper-plane"></i> <span data-i18n="sent">Sent</span></div>
+        <div class="menu-item" data-folder="drafts"><i class="fas fa-file-alt"></i> <span data-i18n="drafts">Drafts</span></div>
+        <div class="menu-item" data-folder="spam"><i class="fas fa-ban"></i> <span data-i18n="spam">Spam</span></div>
+        <div class="menu-item" data-folder="trash"><i class="fas fa-trash"></i> <span data-i18n="trash">Trash</span><span class="badge" id="trashCount">0</span></div>
+      </div>
+    </aside>
 
-  <main class="content">
-    <h2>Inbox</h2>
-    <p class="empty">No messages yet</p>
-  </main>
+    <section class="content">
+      <div class="content-header">
+        <h2 id="currentFolder">Inbox</h2>
+        <button class="delete-folder-btn" id="emptyTrashBtn" style="display:none;"><i class="fas fa-trash"></i> <span data-i18n="emptyTrash">Empty Trash</span></button>
+      </div>
+      <div class="emails-container">
+        <div class="emails" id="emailsList"></div>
+        <div class="email-reader" id="reader">
+          <div class="reader-header">
+            <button class="back-to-list" id="backToList"><i class="fas fa-arrow-left"></i></button>
+            <h2 id="readerTitle">Select an email</h2>
+            <button class="delete-email-btn" id="deleteEmailBtn" style="display:none;"><i class="fas fa-trash"></i></button>
+          </div>
+          <div class="reader-meta">
+            <span id="readerSender"></span>
+            <span id="readerDate"></span>
+          </div>
+          <div class="reader-body">
+            <p id="readerText"></p>
+            <div class="reader-attachments" id="readerFiles" style="display:none;">
+              <h4><i class="fas fa-paperclip"></i> <span data-i18n="attachments">Attachments</span></h4>
+              <div class="attachments-list" id="attachmentsList"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="lang">
+    <select id="langSelect">
+      <option value="ua">🇺🇦 UA</option>
+      <option value="en">🇬🇧 EN</option>
+      <option value="de">🇩🇪 DE</option>
+      <option value="ru">🇷🇺 RU</option>
+    </select>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal" id="settingsModal">
+  <div class="modal-box">
+    <h3><i class="fas fa-user-edit"></i> <span data-i18n="userSettings">User Settings</span></h3>
+    <div class="form-group">
+      <label for="editEmail" data-i18n="yourEmail">Your Email Address</label>
+      <input type="email" id="editEmail" placeholder="your@email.com">
+    </div>
+    <p class="hint" data-i18n="emailHint">This email will be used as your sender address</p>
+    <div class="modal-actions">
+      <button type="button" id="saveSettings" class="btn-primary" data-i18n="save">Save</button>
+      <button type="button" id="closeSettings" class="btn-secondary" data-i18n="close">Close</button>
+    </div>
+  </div>
 </div>
 
 <!-- COMPOSE MODAL -->
 <div class="modal" id="composeModal">
   <div class="modal-box">
-    <h3>New message</h3>
-
-    <input id="mailTo" type="email" placeholder="To" />
-    <input id="mailSubject" placeholder="Subject" />
-    <textarea id="mailText" rows="6" placeholder="Message"></textarea>
-
-    <label class="file-btn" for="mailFile">
-      <i class="fas fa-paperclip"></i> Add attachment
-    </label>
-    <input id="mailFile" type="file" multiple hidden />
-
-    <div id="filePreview" class="drop-zone">
-      Drag & drop files here
+    <h3><i class="fas fa-envelope"></i> <span data-i18n="newMail">New mail</span></h3>
+    <div class="form-group">
+      <input type="email" placeholder="To (email)" id="mailTo" data-i18n-ph="toEmail">
     </div>
-
-    <div class="progress">
+    <div class="form-group">
+      <input placeholder="Subject" id="mailSubject" data-i18n-ph="subject">
+    </div>
+    <div class="form-group">
+      <textarea placeholder="Message" id="mailText" rows="8" data-i18n-ph="message"></textarea>
+    </div>
+    <div class="form-group">
+      <label for="mailFile" class="file-upload-label"><i class="fas fa-paperclip"></i> <span data-i18n="addAttachment">Add Attachment</span></label>
+      <input type="file" id="mailFile" multiple style="display:none;">
+      <div class="file-preview" id="filePreview"></div>
+    </div>
+    <div class="progress-container" id="progressContainer" style="display:none;">
       <div class="progress-bar" id="progressBar"></div>
     </div>
-
-    <div class="actions">
-      <button id="sendMail" class="send">Send</button>
-      <button id="closeCompose" class="cancel">Cancel</button>
+    <div class="modal-actions">
+      <button type="button" id="sendMail" class="btn-primary"><i class="fas fa-paper-plane"></i> <span data-i18n="send">Send</span></button>
+      <button type="button" id="closeCompose" class="btn-secondary" data-i18n="close">Cancel</button>
     </div>
   </div>
 </div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
 
 <script src="script.js"></script>
 </body>
