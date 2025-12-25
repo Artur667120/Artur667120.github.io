@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📬</text></svg>">
 </head>
 <body>
     <!-- Login Screen -->
@@ -17,68 +18,72 @@
                     <i class="fas fa-mail-bulk"></i>
                     <h1>Inbox Pro</h1>
                 </div>
-                <p class="login-subtitle">Smart email client with AI features</p>
+                <p class="login-subtitle" data-i18n="subtitle">Smart email client with AI features</p>
             </div>
             
             <div class="login-form" id="loginForm">
-                <h2><i class="fas fa-sign-in-alt"></i> Welcome Back</h2>
+                <h2><i class="fas fa-sign-in-alt"></i> <span data-i18n="welcomeBack">Welcome Back</span></h2>
                 <div class="form-group">
-                    <label for="loginEmail"><i class="fas fa-envelope"></i> Email Address</label>
+                    <label for="loginEmail"><i class="fas fa-envelope"></i> <span data-i18n="emailAddress">Email Address</span></label>
                     <input type="email" id="loginEmail" placeholder="your@email.com">
                 </div>
                 <div class="form-group">
-                    <label for="loginPassword"><i class="fas fa-lock"></i> Password</label>
+                    <label for="loginPassword"><i class="fas fa-lock"></i> <span data-i18n="password">Password</span></label>
                     <input type="password" id="loginPassword" placeholder="••••••••">
                 </div>
                 <div class="form-options">
                     <label class="checkbox">
                         <input type="checkbox" id="rememberMe">
-                        <span>Remember me</span>
+                        <span data-i18n="rememberMe">Remember me</span>
                     </label>
-                    <a href="#" class="forgot-link">Forgot password?</a>
+                    <a href="#" class="forgot-link" data-i18n="forgotPassword">Forgot password?</a>
                 </div>
                 <button class="btn-primary" id="loginBtn">
-                    <i class="fas fa-sign-in-alt"></i> Sign In
+                    <i class="fas fa-sign-in-alt"></i> <span data-i18n="signIn">Sign In</span>
                 </button>
                 <p class="login-switch">
-                    New user? <a href="#" id="showRegister">Create account</a>
+                    <span data-i18n="newUser">New user?</span> <a href="#" id="showRegister" data-i18n="createAccount">Create account</a>
                 </p>
             </div>
 
             <div class="login-form" id="registerForm" style="display: none;">
-                <h2><i class="fas fa-user-plus"></i> Create Account</h2>
+                <h2><i class="fas fa-user-plus"></i> <span data-i18n="createAccount">Create Account</span></h2>
                 <div class="form-group">
-                    <label for="registerName"><i class="fas fa-user"></i> Full Name</label>
+                    <label for="registerName"><i class="fas fa-user"></i> <span data-i18n="fullName">Full Name</span></label>
                     <input type="text" id="registerName" placeholder="John Doe">
                 </div>
                 <div class="form-group">
-                    <label for="registerEmail"><i class="fas fa-envelope"></i> Email Address</label>
+                    <label for="registerEmail"><i class="fas fa-envelope"></i> <span data-i18n="emailAddress">Email Address</span></label>
                     <input type="email" id="registerEmail" placeholder="your@email.com">
                 </div>
                 <div class="form-group">
-                    <label for="registerPassword"><i class="fas fa-lock"></i> Password</label>
+                    <label for="registerPassword"><i class="fas fa-lock"></i> <span data-i18n="password">Password</span></label>
                     <input type="password" id="registerPassword" placeholder="••••••••">
                 </div>
+                <div class="form-group">
+                    <label for="registerConfirm"><i class="fas fa-lock"></i> <span data-i18n="confirmPassword">Confirm Password</span></label>
+                    <input type="password" id="registerConfirm" placeholder="••••••••">
+                </div>
                 <button class="btn-primary" id="registerBtn">
-                    <i class="fas fa-check"></i> Create Account
+                    <i class="fas fa-check"></i> <span data-i18n="createAccountBtn">Create Account</span>
                 </button>
                 <p class="login-switch">
-                    Already have an account? <a href="#" id="showLogin">Sign in</a>
+                    <span data-i18n="alreadyHaveAccount">Already have an account?</span> <a href="#" id="showLogin" data-i18n="signIn">Sign in</a>
                 </p>
             </div>
 
             <div class="login-features">
                 <div class="feature">
                     <i class="fas fa-robot"></i>
-                    <span>AI Spam Filter</span>
+                    <span data-i18n="aiFilter">AI Spam Filter</span>
                 </div>
                 <div class="feature">
                     <i class="fas fa-bolt"></i>
-                    <span>Smart Sorting</span>
+                    <span data-i18n="smartSorting">Smart Sorting</span>
                 </div>
                 <div class="feature">
                     <i class="fas fa-shield-alt"></i>
-                    <span>Secure & Private</span>
+                    <span data-i18n="securePrivate">Secure & Private</span>
                 </div>
             </div>
         </div>
@@ -97,17 +102,36 @@
                     <i class="fas fa-mail-bulk"></i>
                     <h1>Inbox Pro</h1>
                 </div>
+                <div class="user-status" id="userStatus">
+                    <span class="status-dot online"></span>
+                    <span class="status-text" data-i18n="online">Online</span>
+                </div>
             </div>
 
             <div class="search-box">
                 <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Search emails...">
+                <input type="text" id="searchInput" placeholder="Search emails..." data-i18n-ph="searchPlaceholder">
+                <button class="search-clear" id="searchClear">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
 
             <div class="top-actions">
                 <button class="action-btn" id="refreshBtn" title="Refresh">
                     <i class="fas fa-sync-alt"></i>
                 </button>
+                
+                <div class="theme-selector">
+                    <button class="theme-btn" id="themeToggle" title="Toggle Theme">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <div class="theme-menu">
+                        <button data-theme="light" data-i18n="lightTheme">Light</button>
+                        <button data-theme="dark" data-i18n="darkTheme">Dark</button>
+                        <button data-theme="oled" data-i18n="oledTheme">OLED</button>
+                        <button data-theme="blue" data-i18n="blueTheme">Ocean</button>
+                    </div>
+                </div>
                 
                 <div class="user-menu">
                     <div class="user-avatar" id="userAvatar">JD</div>
@@ -127,33 +151,87 @@
             <!-- Sidebar -->
             <aside class="sidebar" id="sidebar">
                 <button class="compose-btn" id="composeBtn">
-                    <i class="fas fa-plus"></i> Compose
+                    <i class="fas fa-plus"></i> <span data-i18n="compose">Compose</span>
                 </button>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <button class="quick-btn" data-action="archive" title="Archive">
+                        <i class="fas fa-archive"></i>
+                    </button>
+                    <button class="quick-btn" data-action="important" title="Mark Important">
+                        <i class="fas fa-star"></i>
+                    </button>
+                    <button class="quick-btn" data-action="delete" title="Delete">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
 
                 <!-- Folders -->
                 <nav class="sidebar-menu">
                     <div class="menu-item active" data-folder="inbox">
                         <i class="fas fa-inbox"></i>
-                        <span>Inbox</span>
-                        <span class="badge" id="inboxCount">0</span>
+                        <span data-i18n="inbox">Inbox</span>
+                        <span class="badge" id="inboxCount">5</span>
+                    </div>
+                    <div class="menu-item" data-folder="important">
+                        <i class="fas fa-star"></i>
+                        <span data-i18n="important">Important</span>
+                        <span class="badge" id="importantCount">2</span>
                     </div>
                     <div class="menu-item" data-folder="sent">
                         <i class="fas fa-paper-plane"></i>
-                        <span>Sent</span>
+                        <span data-i18n="sent">Sent</span>
+                        <span class="badge" id="sentCount">2</span>
                     </div>
                     <div class="menu-item" data-folder="drafts">
                         <i class="fas fa-file-alt"></i>
-                        <span>Drafts</span>
+                        <span data-i18n="drafts">Drafts</span>
+                        <span class="badge" id="draftsCount">0</span>
                     </div>
                     <div class="menu-item" data-folder="spam">
                         <i class="fas fa-ban"></i>
-                        <span>Spam</span>
+                        <span data-i18n="spam">Spam</span>
+                        <span class="badge" id="spamCount">3</span>
                     </div>
                     <div class="menu-item" data-folder="trash">
                         <i class="fas fa-trash"></i>
-                        <span>Trash</span>
+                        <span data-i18n="trash">Trash</span>
+                        <span class="badge" id="trashCount">1</span>
                     </div>
                 </nav>
+
+                <!-- Labels -->
+                <div class="labels-section">
+                    <h4><i class="fas fa-tags"></i> <span data-i18n="labels">Labels</span></h4>
+                    <div class="labels-list">
+                        <span class="label work" data-label="work">Work</span>
+                        <span class="label personal" data-label="personal">Personal</span>
+                        <span class="label travel" data-label="travel">Travel</span>
+                        <span class="label bills" data-label="bills">Bills</span>
+                    </div>
+                </div>
+
+                <!-- Widgets -->
+                <div class="sidebar-widgets">
+                    <div class="widget weather-widget">
+                        <i class="fas fa-sun"></i>
+                        <div class="weather-info">
+                            <span class="weather-temp" id="weatherTemp">24°C</span>
+                            <span class="weather-city" data-i18n="kyiv">Kyiv</span>
+                        </div>
+                    </div>
+                    <div class="widget storage-widget">
+                        <div class="storage-header">
+                            <i class="fas fa-database"></i>
+                            <span data-i18n="storage">Storage</span>
+                        </div>
+                        <div class="storage-bar">
+                            <div class="storage-progress" style="width: 65%"></div>
+                        </div>
+                        <span class="storage-text">4.2GB / 10GB</span>
+                    </div>
+                </div>
             </aside>
 
             <!-- Content Area -->
@@ -162,149 +240,290 @@
                 <div class="content-header">
                     <div class="folder-info">
                         <h2 id="currentFolder">
-                            <i class="fas fa-inbox"></i> <span>Inbox</span>
+                            <i class="fas fa-inbox"></i> <span data-i18n="inbox">Inbox</span>
                         </h2>
+                        <div class="folder-stats">
+                            <span id="emailCount">5 emails</span>
+                            <span class="divider">•</span>
+                            <span id="unreadCount">2 unread</span>
+                        </div>
                     </div>
+                    
+                    <div class="content-actions">
+                        <button class="action-btn" id="selectAllBtn" title="Select All">
+                            <i class="fas fa-check-square"></i>
+                        </button>
+                        <button class="action-btn" id="markReadBtn" title="Mark as Read">
+                            <i class="fas fa-envelope-open"></i>
+                        </button>
+                        <button class="action-btn danger" id="deleteSelectedBtn" title="Delete Selected">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                        <button class="action-btn" id="filterBtn" title="Filter">
+                            <i class="fas fa-filter"></i>
+                        </button>
+                        <button class="delete-folder-btn" id="emptyTrashBtn" style="display:none;">
+                            <i class="fas fa-trash-alt"></i> <span data-i18n="emptyTrash">Empty Trash</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- AI Status Bar -->
+                <div class="ai-status-bar" id="aiStatusBar">
+                    <div class="ai-status-content">
+                        <i class="fas fa-robot"></i>
+                        <span data-i18n="aiOrganizing">AI is organizing your inbox. <strong>15</strong> emails sorted automatically.</span>
+                    </div>
+                    <button class="ai-dismiss">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
 
                 <!-- Emails Container -->
                 <div class="emails-container">
                     <!-- Emails List -->
                     <div class="emails" id="emailsList">
-                        <div class="empty-state">
-                            <i class="fas fa-inbox"></i>
-                            <h3>Inbox is empty</h3>
-                            <p>No emails to display</p>
-                        </div>
+                        <!-- Emails will be loaded here -->
                     </div>
 
                     <!-- Email Reader -->
                     <div class="email-reader" id="reader">
                         <div class="reader-header">
+                            <button class="back-to-list" id="backToList">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
                             <div class="reader-title">
-                                <h2>Select an email</h2>
+                                <h2 id="readerTitle" data-i18n="selectEmail">Select an email</h2>
+                                <div class="email-labels" id="emailLabels"></div>
+                            </div>
+                            <div class="reader-actions">
+                                <button class="action-btn" id="replyBtn" title="Reply">
+                                    <i class="fas fa-reply"></i>
+                                </button>
+                                <button class="action-btn" id="forwardBtn" title="Forward">
+                                    <i class="fas fa-share"></i>
+                                </button>
+                                <button class="action-btn" id="starBtn" title="Star">
+                                    <i class="far fa-star"></i>
+                                </button>
+                                <button class="action-btn danger" id="deleteEmailBtn" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
                             </div>
                         </div>
-                        <div class="reader-content">
-                            <p>Select an email to read its content</p>
+
+                        <div class="reader-content" id="readerContent">
+                            <div class="reader-meta">
+                                <div class="sender-info">
+                                    <div class="sender-avatar" id="readerAvatar">JD</div>
+                                    <div class="sender-details">
+                                        <div class="sender-name" id="readerSender">John Doe</div>
+                                        <div class="sender-email" id="readerSenderEmail">john@example.com</div>
+                                    </div>
+                                </div>
+                                <div class="meta-right">
+                                    <div class="email-date" id="readerDate">Today, 10:30 AM</div>
+                                    <div class="email-size" id="emailSize">2.4 MB</div>
+                                </div>
+                            </div>
+
+                            <div class="reader-body">
+                                <div class="email-subject" id="readerSubject">Meeting Tomorrow</div>
+                                <div class="email-body" id="readerText">
+                                    <p data-i18n="selectEmailDesc">Select an email to read its content</p>
+                                </div>
+                                
+                                <div class="reader-attachments" id="readerFiles" style="display:none;">
+                                    <h4><i class="fas fa-paperclip"></i> <span data-i18n="attachments">Attachments</span> <span class="attachment-count">(0)</span></h4>
+                                    <div class="attachments-list" id="attachmentsList"></div>
+                                </div>
+                            </div>
+
+                            <div class="reader-footer">
+                                <button class="btn-secondary" id="quickReplyBtn">
+                                    <i class="fas fa-reply"></i> <span data-i18n="quickReply">Quick Reply</span>
+                                </button>
+                                <button class="btn-secondary" id="printBtn">
+                                    <i class="fas fa-print"></i> <span data-i18n="print">Print</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </section>
         </div>
+
+        <!-- Bottom Bar -->
+        <div class="bottom-bar">
+            <div class="status-message">
+                <i class="fas fa-check-circle success"></i>
+                <span id="statusText" data-i18n="systemOperational">All systems operational</span>
+            </div>
+            <div class="bottom-actions">
+                <select id="langSelect" class="lang-select">
+                    <option value="en">🇬🇧 English</option>
+                    <option value="ua">🇺🇦 Українська</option>
+                    <option value="ru">🇷🇺 Русский</option>
+                    <option value="de">🇩🇪 Deutsch</option>
+                </select>
+                <button class="help-btn" id="helpBtn">
+                    <i class="fas fa-question-circle"></i>
+                </button>
+            </div>
+        </div>
     </div>
 
-    <!-- Simple JavaScript -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Inbox Pro loaded');
+    <!-- SETTINGS MODAL -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-cog"></i> <span data-i18n="userSettings">User Settings</span></h3>
+                <button class="modal-close" id="closeSettings">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
             
-            // Перемикання між формами
-            document.getElementById('showRegister')?.addEventListener('click', function(e) {
-                e.preventDefault();
-                document.getElementById('loginForm').style.display = 'none';
-                document.getElementById('registerForm').style.display = 'block';
-            });
-            
-            document.getElementById('showLogin')?.addEventListener('click', function(e) {
-                e.preventDefault();
-                document.getElementById('registerForm').style.display = 'none';
-                document.getElementById('loginForm').style.display = 'block';
-            });
-            
-            // Вхід
-            document.getElementById('loginBtn')?.addEventListener('click', function() {
-                const email = document.getElementById('loginEmail').value;
-                if (email) {
-                    document.getElementById('loginScreen').style.display = 'none';
-                    document.getElementById('app').style.display = 'block';
-                    document.getElementById('userEmail').textContent = email;
-                    document.getElementById('userName').textContent = email.split('@')[0];
-                    document.getElementById('userAvatar').textContent = email.split('@')[0].substring(0, 2).toUpperCase();
-                    
-                    // Додаємо кілька тестових листів
-                    const emailsList = document.getElementById('emailsList');
-                    emailsList.innerHTML = `
-                        <div class="email">
-                            <div class="email-avatar">IP</div>
-                            <div class="email-content">
-                                <div class="email-header">
-                                    <div class="email-sender">Inbox Pro Team</div>
-                                    <div class="email-date">Today</div>
-                                </div>
-                                <div class="email-subject">Welcome to Inbox Pro!</div>
-                                <div class="email-preview">Thank you for choosing our email client...</div>
-                            </div>
+            <div class="modal-tabs">
+                <button class="tab-btn active" data-tab="profile" data-i18n="profileTab">Profile</button>
+                <button class="tab-btn" data-tab="appearance" data-i18n="appearanceTab">Appearance</button>
+                <button class="tab-btn" data-tab="notifications" data-i18n="notificationsTab">Notifications</button>
+                <button class="tab-btn" data-tab="security" data-i18n="securityTab">Security</button>
+            </div>
+
+            <div class="modal-content">
+                <div class="tab-content active" id="tabProfile">
+                    <div class="form-group">
+                        <label for="editName"><i class="fas fa-user"></i> <span data-i18n="fullName">Full Name</span></label>
+                        <input type="text" id="editName" placeholder="Your name">
+                    </div>
+                    <div class="form-group">
+                        <label for="editEmail"><i class="fas fa-envelope"></i> <span data-i18n="emailAddress">Email Address</span></label>
+                        <input type="email" id="editEmail" placeholder="your@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="editAvatar"><i class="fas fa-image"></i> <span data-i18n="avatarColor">Avatar Color</span></label>
+                        <div class="color-picker">
+                            <button class="color-option" style="background: #667eea;" data-color="#667eea"></button>
+                            <button class="color-option" style="background: #10b981;" data-color="#10b981"></button>
+                            <button class="color-option" style="background: #f59e0b;" data-color="#f59e0b"></button>
+                            <button class="color-option" style="background: #ef4444;" data-color="#ef4444"></button>
+                            <button class="color-option" style="background: #8b5cf6;" data-color="#8b5cf6"></button>
                         </div>
-                        <div class="email">
-                            <div class="email-avatar">TN</div>
-                            <div class="email-content">
-                                <div class="email-header">
-                                    <div class="email-sender">Tech News</div>
-                                    <div class="email-date">Yesterday</div>
-                                </div>
-                                <div class="email-subject">Latest Updates</div>
-                                <div class="email-preview">Check out the newest tech innovations...</div>
-                            </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="tabAppearance">
+                    <div class="form-group">
+                        <label data-i18n="themeSettings">Theme Settings</label>
+                        <div class="theme-options">
+                            <button class="theme-option" data-theme="light">
+                                <div class="theme-preview light"></div>
+                                <span data-i18n="lightTheme">Light</span>
+                            </button>
+                            <button class="theme-option" data-theme="dark">
+                                <div class="theme-preview dark"></div>
+                                <span data-i18n="darkTheme">Dark</span>
+                            </button>
+                            <button class="theme-option" data-theme="oled">
+                                <div class="theme-preview oled"></div>
+                                <span data-i18n="oledTheme">OLED</span>
+                            </button>
+                            <button class="theme-option" data-theme="blue">
+                                <div class="theme-preview blue"></div>
+                                <span data-i18n="blueTheme">Ocean</span>
+                            </button>
                         </div>
-                    `;
-                }
-            });
-            
-            // Реєстрація
-            document.getElementById('registerBtn')?.addEventListener('click', function() {
-                const name = document.getElementById('registerName').value;
-                const email = document.getElementById('registerEmail').value;
+                    </div>
+                </div>
+
+                <div class="tab-content" id="tabNotifications">
+                    <p data-i18n="notificationsDesc">Configure your notification preferences</p>
+                </div>
+
+                <div class="tab-content" id="tabSecurity">
+                    <p data-i18n="securityDesc">Security and privacy settings</p>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-primary" id="saveSettings">
+                    <i class="fas fa-save"></i> <span data-i18n="save">Save Changes</span>
+                </button>
+                <button class="btn-secondary" id="cancelSettings">
+                    <span data-i18n="cancel">Cancel</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- COMPOSE MODAL -->
+    <div class="modal" id="composeModal">
+        <div class="modal-box compose-modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-pen-alt"></i> <span data-i18n="newMail">New Message</span></h3>
+                <div class="compose-actions">
+                    <button class="action-btn" id="minimizeCompose" title="Minimize">
+                        <i class="fas fa-window-minimize"></i>
+                    </button>
+                    <button class="action-btn" id="saveDraftBtn" title="Save Draft">
+                        <i class="fas fa-save"></i>
+                    </button>
+                    <button class="modal-close" id="closeCompose">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="compose-form">
+                <div class="compose-field">
+                    <input type="email" id="mailTo" placeholder="To" data-i18n-ph="toEmail" multiple>
+                </div>
+                <div class="compose-field">
+                    <input id="mailSubject" placeholder="Subject" data-i18n-ph="subject">
+                </div>
+                <div class="compose-editor">
+                    <textarea id="mailText" placeholder="Write your message here..." data-i18n-ph="message" rows="8"></textarea>
+                </div>
                 
-                if (name && email) {
-                    document.getElementById('loginScreen').style.display = 'none';
-                    document.getElementById('app').style.display = 'block';
-                    document.getElementById('userEmail').textContent = email;
-                    document.getElementById('userName').textContent = name;
-                    document.getElementById('userAvatar').textContent = name.substring(0, 2).toUpperCase();
-                }
-            });
-            
-            // Compose button
-            document.getElementById('composeBtn')?.addEventListener('click', function() {
-                alert('Compose new email - feature coming soon!');
-            });
-            
-            // Menu toggle
-            document.getElementById('menuToggle')?.addEventListener('click', function() {
-                document.getElementById('sidebar').classList.toggle('active');
-            });
-            
-            // Folder navigation
-            document.querySelectorAll('.menu-item').forEach(item => {
-                item.addEventListener('click', function() {
-                    document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    const folder = this.dataset.folder;
-                    document.getElementById('currentFolder').innerHTML = 
-                        `<i class="fas fa-${folder === 'inbox' ? 'inbox' : folder === 'sent' ? 'paper-plane' : folder === 'drafts' ? 'file-alt' : folder === 'spam' ? 'ban' : 'trash'}"></i> <span>${this.querySelector('span').textContent}</span>`;
-                });
-            });
-            
-            // Email click
-            document.addEventListener('click', function(e) {
-                if (e.target.closest('.email')) {
-                    const email = e.target.closest('.email');
-                    const sender = email.querySelector('.email-sender').textContent;
-                    const subject = email.querySelector('.email-subject').textContent;
-                    
-                    document.getElementById('reader').querySelector('h2').textContent = subject;
-                    document.getElementById('reader').querySelector('.reader-content').innerHTML = `
-                        <div class="sender-info">
-                            <strong>From:</strong> ${sender}<br>
-                            <strong>Subject:</strong> ${subject}<br><br>
-                            This is a sample email content. In the full version, you would see the actual email body here.
-                        </div>
-                    `;
-                }
-            });
-        });
-    </script>
+                <div class="compose-attachments">
+                    <label for="mailFile" class="file-upload-label">
+                        <i class="fas fa-paperclip"></i> <span data-i18n="addAttachment">Add Attachment</span>
+                    </label>
+                    <input type="file" id="mailFile" multiple>
+                    <div class="file-preview" id="filePreview"></div>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-primary" id="sendMail">
+                    <i class="fas fa-paper-plane"></i> <span data-i18n="send">Send</span>
+                </button>
+                <button class="btn-secondary" id="discardBtn">
+                    <i class="fas fa-times"></i> <span data-i18n="discard">Discard</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- IMAGE PREVIEW MODAL -->
+    <div class="modal image-modal" id="imageModal">
+        <div class="modal-box">
+            <div class="image-modal-header">
+                <h3 id="imageTitle"></h3>
+                <button class="close-image" id="closeImage">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="image-container">
+                <img id="modalImage" src="" alt="Preview">
+            </div>
+        </div>
+    </div>
+
+    <!-- NOTIFICATION TOAST -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Script -->
+    <script src="script.js"></script>
 </body>
 </html>
