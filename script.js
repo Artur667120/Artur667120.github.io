@@ -34,7 +34,8 @@ const sampleEmails = [
         body: "<p>Welcome to Inbox Pro! We're excited to have you on board.</p><p>Your account has been successfully activated with all premium features enabled.</p><p>If you have any questions, please don't hesitate to contact our support team.</p>",
         to: ["user@example.com"],
         cc: [],
-        bcc: []
+        bcc: [],
+        labels: ["work"]
     },
     {
         id: 2,
@@ -50,7 +51,8 @@ const sampleEmails = [
         body: "<p>Hi team,</p><p>Let's meet tomorrow at 11 AM to discuss the project updates.</p><p>Please bring the latest reports.</p><p>Best regards,<br>John</p>",
         to: ["team@company.com"],
         cc: ["manager@company.com"],
-        bcc: []
+        bcc: [],
+        labels: ["work", "important"]
     },
     {
         id: 3,
@@ -66,7 +68,8 @@ const sampleEmails = [
         body: "<p>This week in tech:</p><ul><li>New AI breakthroughs</li><li>Latest smartphone releases</li><li>Cybersecurity updates</li></ul>",
         to: ["subscribers@tech.com"],
         cc: [],
-        bcc: []
+        bcc: [],
+        labels: ["social"]
     },
     {
         id: 4,
@@ -82,7 +85,8 @@ const sampleEmails = [
         body: "<p>Hello,</p><p>The design mockups are ready for your review. Please check the attachments.</p><p>Looking forward to your feedback.</p>",
         to: ["review@design.com"],
         cc: [],
-        bcc: []
+        bcc: [],
+        labels: ["work", "travel"]
     },
     {
         id: 5,
@@ -98,7 +102,8 @@ const sampleEmails = [
         body: "<p>Security Update Required</p><p>Please update your security settings to continue using all features.</p>",
         to: ["user@example.com"],
         cc: [],
-        bcc: []
+        bcc: [],
+        labels: ["finance"]
     }
 ];
 
@@ -401,7 +406,7 @@ const translations = {
         newMessage: "Новое сообщение",
         to: "Кому",
         cc: "Копия",
-        bcc: "Скрытая копия",
+        bcc: "Скрытая копія",
         subject: "Тема",
         message: "Напишите ваше сообщение...",
         addAttachment: "Добавить файл",
@@ -435,15 +440,20 @@ function showToast(message, type = 'info') {
 }
 
 function showLoading() {
-    document.getElementById('loadingOverlay').style.display = 'flex';
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) overlay.style.display = 'flex';
 }
 
 function hideLoading() {
-    document.getElementById('loadingOverlay').style.display = 'none';
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) overlay.style.display = 'none';
 }
 
 function updateLanguage(lang) {
     currentLanguage = lang;
+    const langSelect = document.getElementById('langSelect');
+    if (langSelect) langSelect.value = lang;
+    
     document.querySelectorAll('[data-i18n]').forEach(element => {
         const key = element.getAttribute('data-i18n');
         if (translations[lang] && translations[lang][key]) {
@@ -486,7 +496,7 @@ function updateTheme(theme) {
 
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
-    sidebar.classList.toggle('active');
+    if (sidebar) sidebar.classList.toggle('active');
 }
 
 // ====================== EMAIL MANAGEMENT ======================
@@ -511,7 +521,12 @@ function initializeEmails() {
             unread: false,
             important: false,
             folder: "sent",
-            attachments: 1
+            attachments: 1,
+            body: "<p>Hi team,</p><p>Here's the latest project update as promised.</p><p>Best regards,<br>" + (currentUser ? currentUser.name : "You") + "</p>",
+            to: ["team@company.com"],
+            cc: [],
+            bcc: [],
+            labels: ["work"]
         }
     ];
     
@@ -526,7 +541,12 @@ function initializeEmails() {
             unread: false,
             important: false,
             folder: "drafts",
-            attachments: 0
+            attachments: 0,
+            body: "<p>Meeting notes from yesterday...</p>",
+            to: ["colleague@company.com"],
+            cc: [],
+            bcc: [],
+            labels: ["work"]
         }
     ];
     
@@ -541,7 +561,12 @@ function initializeEmails() {
             unread: false,
             important: false,
             folder: "spam",
-            attachments: 0
+            attachments: 0,
+            body: "<p>This is a spam email.</p>",
+            to: ["user@example.com"],
+            cc: [],
+            bcc: [],
+            labels: []
         }
     ];
     
@@ -551,33 +576,55 @@ function initializeEmails() {
 
 function updateEmailCounts() {
     // Update sidebar counts
-    document.getElementById('inboxCount').textContent = emailsData.inbox.filter(e => e.unread).length;
-    document.getElementById('importantCount').textContent = emailsData.important.length;
-    document.getElementById('sentCount').textContent = emailsData.sent.length;
-    document.getElementById('draftsCount').textContent = emailsData.drafts.length;
-    document.getElementById('spamCount').textContent = emailsData.spam.length;
-    document.getElementById('trashCount').textContent = emailsData.trash.length;
+    const inboxCount = document.getElementById('inboxCount');
+    const importantCount = document.getElementById('importantCount');
+    const sentCount = document.getElementById('sentCount');
+    const draftsCount = document.getElementById('draftsCount');
+    const spamCount = document.getElementById('spamCount');
+    const trashCount = document.getElementById('trashCount');
+    
+    if (inboxCount) inboxCount.textContent = emailsData.inbox.filter(e => e.unread).length;
+    if (importantCount) importantCount.textContent = emailsData.important.length;
+    if (sentCount) sentCount.textContent = emailsData.sent.length;
+    if (draftsCount) draftsCount.textContent = emailsData.drafts.length;
+    if (spamCount) spamCount.textContent = emailsData.spam.length;
+    if (trashCount) trashCount.textContent = emailsData.trash.length;
     
     // Update stats widget
-    document.getElementById('totalEmails').textContent = emailsData.inbox.length;
-    document.getElementById('unreadEmails').textContent = emailsData.inbox.filter(e => e.unread).length;
-    document.getElementById('importantEmails').textContent = emailsData.important.length;
+    const totalEmails = document.getElementById('totalEmails');
+    const unreadEmails = document.getElementById('unreadEmails');
+    const importantEmails = document.getElementById('importantEmails');
+    
+    if (totalEmails) totalEmails.textContent = emailsData.inbox.length;
+    if (unreadEmails) unreadEmails.textContent = emailsData.inbox.filter(e => e.unread).length;
+    if (importantEmails) importantEmails.textContent = emailsData.important.length;
     
     // Update filter counts
     const folderEmails = emailsData[currentFolder] || [];
-    document.querySelector('[data-filter="all"] .filter-count').textContent = folderEmails.length;
-    document.querySelector('[data-filter="unread"] .filter-count').textContent = folderEmails.filter(e => e.unread).length;
-    document.querySelector('[data-filter="important"] .filter-count').textContent = folderEmails.filter(e => e.important).length;
-    document.querySelector('[data-filter="attachments"] .filter-count').textContent = folderEmails.filter(e => e.attachments > 0).length;
+    
+    const allFilter = document.querySelector('[data-filter="all"] .filter-count');
+    const unreadFilter = document.querySelector('[data-filter="unread"] .filter-count');
+    const importantFilter = document.querySelector('[data-filter="important"] .filter-count');
+    const attachmentsFilter = document.querySelector('[data-filter="attachments"] .filter-count');
+    
+    if (allFilter) allFilter.textContent = folderEmails.length;
+    if (unreadFilter) unreadFilter.textContent = folderEmails.filter(e => e.unread).length;
+    if (importantFilter) importantFilter.textContent = folderEmails.filter(e => e.important).length;
+    if (attachmentsFilter) attachmentsFilter.textContent = folderEmails.filter(e => e.attachments > 0).length;
     
     // Update content header
-    document.getElementById('emailCount').textContent = `${folderEmails.length} emails`;
-    document.getElementById('unreadCount').textContent = `${folderEmails.filter(e => e.unread).length} unread`;
+    const emailCount = document.getElementById('emailCount');
+    const unreadCount = document.getElementById('unreadCount');
+    
+    if (emailCount) emailCount.textContent = `${folderEmails.length} emails`;
+    if (unreadCount) unreadCount.textContent = `${folderEmails.filter(e => e.unread).length} unread`;
 }
 
 function displayEmails() {
     const emailsList = document.getElementById('emailsList');
     const folderEmails = emailsData[currentFolder] || [];
+    
+    if (!emailsList) return;
     
     // Clear existing emails
     emailsList.innerHTML = '';
@@ -646,46 +693,61 @@ function displayEmailContent(email) {
     const readerAvatar = document.getElementById('readerAvatar');
     const emailSize = document.getElementById('emailSize');
     
+    if (!readerTitle || !readerSender || !readerText) return;
+    
     // Update email info
     readerTitle.textContent = email.subject;
     readerSender.textContent = email.sender;
-    readerSenderEmail.textContent = email.senderEmail;
-    readerDate.innerHTML = `<i class="fas fa-clock"></i><span>${email.date}</span>`;
-    readerSubject.textContent = email.subject;
+    if (readerSenderEmail) readerSenderEmail.textContent = email.senderEmail;
+    if (readerDate) {
+        const dateSpan = readerDate.querySelector('span');
+        if (dateSpan) dateSpan.textContent = email.date;
+    }
+    if (readerSubject) readerSubject.textContent = email.subject;
     readerText.innerHTML = email.body || `<p>${translations[currentLanguage].selectEmailDesc}</p>`;
-    emailTo.textContent = email.to.join(', ');
-    emailCc.textContent = email.cc && email.cc.length > 0 ? email.cc.join(', ') : '—';
+    if (emailTo) emailTo.textContent = email.to.join(', ');
+    if (emailCc) emailCc.textContent = email.cc && email.cc.length > 0 ? email.cc.join(', ') : '—';
     
     // Update avatar
     const initials = email.sender.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
-    readerAvatar.textContent = initials;
+    if (readerAvatar) readerAvatar.textContent = initials;
     
     // Update attachments
     const attachmentsList = document.getElementById('attachmentsList');
     const attachmentCount = document.querySelector('.attachment-count');
     
     if (email.attachments > 0) {
-        attachmentCount.textContent = `(${email.attachments})`;
-        attachmentsList.innerHTML = `
-            <div class="attachment-item">
-                <div class="attachment-info">
-                    <div class="attachment-icon">
-                        <i class="fas fa-file-pdf"></i>
+        if (attachmentCount) attachmentCount.textContent = `(${email.attachments})`;
+        if (attachmentsList) {
+            attachmentsList.innerHTML = `
+                <div class="attachment-item">
+                    <div class="attachment-info">
+                        <div class="attachment-icon">
+                            <i class="fas fa-file-pdf"></i>
+                        </div>
+                        <div class="attachment-details">
+                            <div class="attachment-name">document.pdf</div>
+                            <div class="attachment-size">1.2 MB</div>
+                        </div>
                     </div>
-                    <div class="attachment-details">
-                        <div class="attachment-name">document.pdf</div>
-                        <div class="attachment-size">1.2 MB</div>
+                    <div class="attachment-actions">
+                        <button class="action-btn" title="Download"><i class="fas fa-download"></i></button>
+                        <button class="action-btn" title="Preview"><i class="fas fa-eye"></i></button>
                     </div>
                 </div>
-                <div class="attachment-actions">
-                    <button class="action-btn" title="Download"><i class="fas fa-download"></i></button>
-                    <button class="action-btn" title="Preview"><i class="fas fa-eye"></i></button>
-                </div>
-            </div>
-        `;
+            `;
+        }
     } else {
-        attachmentCount.textContent = '(0)';
-        attachmentsList.innerHTML = '<p class="no-attachments">No attachments</p>';
+        if (attachmentCount) attachmentCount.textContent = '(0)';
+        if (attachmentsList) attachmentsList.innerHTML = '<p class="no-attachments">No attachments</p>';
+    }
+    
+    // Update email labels
+    const emailLabels = document.getElementById('emailLabels');
+    if (emailLabels && email.labels && email.labels.length > 0) {
+        emailLabels.innerHTML = email.labels.map(label => 
+            `<span class="label ${label}-label">${translations[currentLanguage][label] || label}</span>`
+        ).join('');
     }
     
     // Mark as read
@@ -697,13 +759,19 @@ function displayEmailContent(email) {
     
     // Update star button
     const starBtn = document.getElementById('starBtn');
-    starBtn.innerHTML = email.important ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
+    if (starBtn) {
+        starBtn.innerHTML = email.important ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
+    }
     
     // Show email reader on mobile
     if (window.innerWidth <= 768) {
-        document.querySelector('.emails').style.display = 'none';
-        document.querySelector('.email-reader').style.display = 'flex';
-        document.querySelector('.back-to-list').style.display = 'flex';
+        const emailsDiv = document.querySelector('.emails');
+        const emailReader = document.querySelector('.email-reader');
+        const backToList = document.querySelector('.back-to-list');
+        
+        if (emailsDiv) emailsDiv.style.display = 'none';
+        if (emailReader) emailReader.style.display = 'flex';
+        if (backToList) backToList.style.display = 'flex';
     }
 }
 
@@ -830,49 +898,65 @@ function switchFolder(folder) {
                       folder === 'drafts' ? 'fa-file-alt' :
                       folder === 'spam' ? 'fa-ban' : 'fa-trash';
     
-    folderTitle.innerHTML = `<i class="fas ${folderIcon}"></i> <span data-i18n="${folder}">${translations[currentLanguage][folder]}</span>`;
+    if (folderTitle) {
+        folderTitle.innerHTML = `<i class="fas ${folderIcon}"></i> <span data-i18n="${folder}">${translations[currentLanguage][folder]}</span>`;
+    }
     
     // Show/hide empty trash button
     const emptyTrashBtn = document.getElementById('emptyTrashBtn');
-    emptyTrashBtn.style.display = folder === 'trash' ? 'flex' : 'none';
+    if (emptyTrashBtn) {
+        emptyTrashBtn.style.display = folder === 'trash' ? 'flex' : 'none';
+    }
     
     // Update UI
     updateEmailCounts();
     displayEmails();
     
     // Clear email reader
-    document.getElementById('readerTitle').textContent = translations[currentLanguage].selectEmail;
-    document.getElementById('readerText').innerHTML = `<p>${translations[currentLanguage].selectEmailDesc}</p>`;
+    const readerTitle = document.getElementById('readerTitle');
+    const readerText = document.getElementById('readerText');
+    
+    if (readerTitle) readerTitle.textContent = translations[currentLanguage].selectEmail;
+    if (readerText) readerText.innerHTML = `<p>${translations[currentLanguage].selectEmailDesc}</p>`;
     
     // On mobile, show emails list
     if (window.innerWidth <= 768) {
-        document.querySelector('.emails').style.display = 'flex';
-        document.querySelector('.email-reader').style.display = 'none';
-        document.querySelector('.back-to-list').style.display = 'none';
+        const emailsDiv = document.querySelector('.emails');
+        const emailReader = document.querySelector('.email-reader');
+        const backToList = document.querySelector('.back-to-list');
+        
+        if (emailsDiv) emailsDiv.style.display = 'flex';
+        if (emailReader) emailReader.style.display = 'none';
+        if (backToList) backToList.style.display = 'none';
     }
 }
 
 // ====================== COMPOSE EMAIL ======================
 function openComposeModal() {
     const modal = document.getElementById('composeModal');
-    modal.style.display = 'flex';
+    if (modal) modal.style.display = 'flex';
     
     // Clear form
-    document.getElementById('mailTo').value = '';
-    document.getElementById('mailSubject').value = '';
-    document.getElementById('mailText').value = '';
-    document.getElementById('filePreview').innerHTML = '';
+    const mailTo = document.getElementById('mailTo');
+    const mailSubject = document.getElementById('mailSubject');
+    const mailText = document.getElementById('mailText');
+    const filePreview = document.getElementById('filePreview');
+    
+    if (mailTo) mailTo.value = '';
+    if (mailSubject) mailSubject.value = '';
+    if (mailText) mailText.value = '';
+    if (filePreview) filePreview.innerHTML = '';
     
     // Focus on To field
     setTimeout(() => {
-        document.getElementById('mailTo').focus();
+        if (mailTo) mailTo.focus();
     }, 100);
 }
 
 function sendEmail() {
-    const to = document.getElementById('mailTo').value;
-    const subject = document.getElementById('mailSubject').value;
-    const body = document.getElementById('mailText').value;
+    const to = document.getElementById('mailTo')?.value;
+    const subject = document.getElementById('mailSubject')?.value;
+    const body = document.getElementById('mailText')?.value;
     
     if (!to || !subject || !body) {
         showToast('Please fill in all required fields', 'error');
@@ -888,11 +972,14 @@ function sendEmail() {
         preview: body.substring(0, 100) + '...',
         date: "Just now",
         unread: false,
-        important: document.getElementById('urgentCheck').checked,
+        important: document.getElementById('urgentCheck')?.checked || false,
         folder: "sent",
         attachments: document.querySelectorAll('.file-preview-item').length,
         body: `<p>${body.replace(/\n/g, '</p><p>')}</p>`,
-        to: to.split(',').map(e => e.trim())
+        to: to.split(',').map(e => e.trim()),
+        cc: [],
+        bcc: [],
+        labels: []
     };
     
     // Add to sent folder
@@ -909,34 +996,44 @@ function sendEmail() {
 }
 
 function closeComposeModal() {
-    document.getElementById('composeModal').style.display = 'none';
+    const modal = document.getElementById('composeModal');
+    if (modal) modal.style.display = 'none';
 }
 
 function toggleCcField() {
     const ccField = document.getElementById('ccField');
-    ccField.style.display = ccField.style.display === 'none' ? 'block' : 'none';
-    if (ccField.style.display === 'block') {
-        document.getElementById('mailCc').focus();
+    if (ccField) {
+        ccField.style.display = ccField.style.display === 'none' ? 'block' : 'none';
+        if (ccField.style.display === 'block') {
+            const mailCc = document.getElementById('mailCc');
+            if (mailCc) mailCc.focus();
+        }
     }
 }
 
 function toggleBccField() {
     const bccField = document.getElementById('bccField');
-    bccField.style.display = bccField.style.display === 'none' ? 'block' : 'none';
-    if (bccField.style.display === 'block') {
-        document.getElementById('mailBcc').focus();
+    if (bccField) {
+        bccField.style.display = bccField.style.display === 'none' ? 'block' : 'none';
+        if (bccField.style.display === 'block') {
+            const mailBcc = document.getElementById('mailBcc');
+            if (mailBcc) mailBcc.focus();
+        }
     }
 }
 
 // ====================== SETTINGS ======================
 function openSettingsModal() {
     const modal = document.getElementById('settingsModal');
-    modal.style.display = 'flex';
-    showTab('profile');
+    if (modal) {
+        modal.style.display = 'flex';
+        showTab('profile');
+    }
 }
 
 function closeSettingsModal() {
-    document.getElementById('settingsModal').style.display = 'none';
+    const modal = document.getElementById('settingsModal');
+    if (modal) modal.style.display = 'none';
 }
 
 function showTab(tabName) {
@@ -950,6 +1047,7 @@ function showTab(tabName) {
     
     // Show tab content
     const modalContent = document.querySelector('.modal-content');
+    if (!modalContent) return;
     
     switch(tabName) {
         case 'profile':
@@ -1099,79 +1197,148 @@ function saveSettings() {
         if (emailInput) currentUser.email = emailInput.value;
         
         // Update UI
-        document.getElementById('userName').textContent = currentUser.name;
-        document.getElementById('userEmail').textContent = currentUser.email;
+        const userName = document.getElementById('userName');
+        const userEmail = document.getElementById('userEmail');
+        
+        if (userName) userName.textContent = currentUser.name;
+        if (userEmail) userEmail.textContent = currentUser.email;
     }
     
     showToast('Settings saved successfully', 'success');
     closeSettingsModal();
 }
 
+// ====================== AI FEATURES ======================
+function simulateAISorting() {
+    // Simulate AI sorting emails
+    setTimeout(() => {
+        emailsData.inbox.forEach(email => {
+            // AI decides if email is important based on content
+            if (email.subject.toLowerCase().includes('important') || 
+                email.subject.toLowerCase().includes('urgent') ||
+                email.sender.toLowerCase().includes('boss') ||
+                email.sender.toLowerCase().includes('manager')) {
+                email.important = true;
+            }
+            
+            // AI assigns labels based on content
+            if (!email.labels) email.labels = [];
+            
+            if (email.subject.toLowerCase().includes('meeting') || 
+                email.subject.toLowerCase().includes('project')) {
+                if (!email.labels.includes('work')) email.labels.push('work');
+            }
+            
+            if (email.subject.toLowerCase().includes('travel') || 
+                email.subject.toLowerCase().includes('flight')) {
+                if (!email.labels.includes('travel')) email.labels.push('travel');
+            }
+        });
+        
+        // Update important folder
+        emailsData.important = emailsData.inbox.filter(email => email.important);
+        
+        updateEmailCounts();
+        if (currentFolder === 'inbox' || currentFolder === 'important') {
+            displayEmails();
+        }
+        
+        showToast('AI has sorted your emails', 'success');
+    }, 2000);
+}
+
 // ====================== EVENT LISTENERS ======================
 function initializeEventListeners() {
     // Login/Register
-    document.getElementById('loginBtn')?.addEventListener('click', handleLogin);
-    document.getElementById('registerBtn')?.addEventListener('click', handleRegister);
-    document.getElementById('showRegister')?.addEventListener('click', showRegisterForm);
-    document.getElementById('showLogin')?.addEventListener('click', showLoginForm);
+    const loginBtn = document.getElementById('loginBtn');
+    const registerBtn = document.getElementById('registerBtn');
+    const showRegister = document.getElementById('showRegister');
+    const showLogin = document.getElementById('showLogin');
+    
+    if (loginBtn) loginBtn.addEventListener('click', handleLogin);
+    if (registerBtn) registerBtn.addEventListener('click', handleRegister);
+    if (showRegister) showRegister.addEventListener('click', showRegisterForm);
+    if (showLogin) showLogin.addEventListener('click', showLoginForm);
     
     // Theme toggle
-    document.getElementById('themeToggle')?.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const themeMenu = document.getElementById('themeMenu');
-        themeMenu.classList.toggle('show');
-    });
+    const themeToggle = document.getElementById('themeToggle');
+    if (themeToggle) {
+        themeToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const themeMenu = document.getElementById('themeMenu');
+            if (themeMenu) themeMenu.classList.toggle('show');
+        });
+    }
     
     // Theme options
     document.querySelectorAll('.theme-option').forEach(option => {
         option.addEventListener('click', () => {
             updateTheme(option.dataset.theme);
-            document.getElementById('themeMenu').classList.remove('show');
+            const themeMenu = document.getElementById('themeMenu');
+            if (themeMenu) themeMenu.classList.remove('show');
         });
     });
     
     // Close theme menu when clicking outside
     document.addEventListener('click', (e) => {
         if (!e.target.closest('.theme-selector')) {
-            document.getElementById('themeMenu').classList.remove('show');
+            const themeMenu = document.getElementById('themeMenu');
+            if (themeMenu) themeMenu.classList.remove('show');
         }
     });
     
     // Menu toggle for mobile
-    document.getElementById('menuToggle')?.addEventListener('click', toggleSidebar);
+    const menuToggle = document.getElementById('menuToggle');
+    if (menuToggle) menuToggle.addEventListener('click', toggleSidebar);
     
     // Compose button
-    document.getElementById('composeBtn')?.addEventListener('click', openComposeModal);
+    const composeBtn = document.getElementById('composeBtn');
+    if (composeBtn) composeBtn.addEventListener('click', openComposeModal);
     
     // Compose modal
-    document.getElementById('closeCompose')?.addEventListener('click', closeComposeModal);
-    document.getElementById('sendMail')?.addEventListener('click', sendEmail);
-    document.getElementById('addCcBtn')?.addEventListener('click', toggleCcField);
-    document.getElementById('addBccBtn')?.addEventListener('click', toggleBccField);
+    const closeCompose = document.getElementById('closeCompose');
+    const sendMail = document.getElementById('sendMail');
+    const addCcBtn = document.getElementById('addCcBtn');
+    const addBccBtn = document.getElementById('addBccBtn');
+    
+    if (closeCompose) closeCompose.addEventListener('click', closeComposeModal);
+    if (sendMail) sendMail.addEventListener('click', sendEmail);
+    if (addCcBtn) addCcBtn.addEventListener('click', toggleCcField);
+    if (addBccBtn) addBccBtn.addEventListener('click', toggleBccField);
     
     // File upload for compose
-    document.getElementById('mailFile')?.addEventListener('change', function(e) {
-        const files = Array.from(e.target.files);
-        const preview = document.getElementById('filePreview');
-        
-        files.forEach(file => {
-            const item = document.createElement('div');
-            item.className = 'file-preview-item';
-            item.innerHTML = `
-                <span>${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)</span>
-                <button class="remove-file" data-name="${file.name}">
-                    <i class="fas fa-times"></i>
-                </button>
-            `;
-            preview.appendChild(item);
+    const mailFile = document.getElementById('mailFile');
+    if (mailFile) {
+        mailFile.addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            const preview = document.getElementById('filePreview');
+            
+            if (preview) {
+                files.forEach(file => {
+                    const item = document.createElement('div');
+                    item.className = 'file-preview-item';
+                    item.innerHTML = `
+                        <span>${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                        <button class="remove-file" data-name="${file.name}">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+                    preview.appendChild(item);
+                });
+            }
         });
-    });
+    }
     
     // Settings
-    document.getElementById('settingsBtn')?.addEventListener('click', openSettingsModal);
-    document.getElementById('closeSettings')?.addEventListener('click', closeSettingsModal);
-    document.getElementById('saveSettings')?.addEventListener('click', saveSettings);
-    document.getElementById('cancelSettings')?.addEventListener('click', closeSettingsModal);
+    const settingsBtn = document.getElementById('settingsBtn');
+    const closeSettings = document.getElementById('closeSettings');
+    const saveSettingsBtn = document.getElementById('saveSettings');
+    const cancelSettings = document.getElementById('cancelSettings');
+    
+    if (settingsBtn) settingsBtn.addEventListener('click', openSettingsModal);
+    if (closeSettings) closeSettings.addEventListener('click', closeSettingsModal);
+    if (saveSettingsBtn) saveSettingsBtn.addEventListener('click', saveSettings);
+    if (cancelSettings) cancelSettings.addEventListener('click', closeSettingsModal);
     
     // Settings tabs
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -1179,24 +1346,38 @@ function initializeEventListeners() {
     });
     
     // Email actions
-    document.getElementById('selectAllBtn')?.addEventListener('click', selectAllEmails);
-    document.getElementById('markReadBtn')?.addEventListener('click', markAsRead);
-    document.getElementById('archiveBtn')?.addEventListener('click', () => showToast('Archived', 'success'));
-    document.getElementById('deleteSelectedBtn')?.addEventListener('click', deleteSelectedEmails);
-    document.getElementById('emptyTrashBtn')?.addEventListener('click', emptyTrash);
+    const selectAllBtn = document.getElementById('selectAllBtn');
+    const markReadBtn = document.getElementById('markReadBtn');
+    const archiveBtn = document.getElementById('archiveBtn');
+    const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+    const emptyTrashBtn = document.getElementById('emptyTrashBtn');
+    
+    if (selectAllBtn) selectAllBtn.addEventListener('click', selectAllEmails);
+    if (markReadBtn) markReadBtn.addEventListener('click', markAsRead);
+    if (archiveBtn) archiveBtn.addEventListener('click', () => showToast('Archived', 'success'));
+    if (deleteSelectedBtn) deleteSelectedBtn.addEventListener('click', deleteSelectedEmails);
+    if (emptyTrashBtn) emptyTrashBtn.addEventListener('click', emptyTrash);
     
     // Star button
-    document.getElementById('starBtn')?.addEventListener('click', markAsImportant);
+    const starBtn = document.getElementById('starBtn');
+    if (starBtn) starBtn.addEventListener('click', markAsImportant);
     
     // Delete email button
-    document.getElementById('deleteEmailBtn')?.addEventListener('click', deleteSelectedEmails);
+    const deleteEmailBtn = document.getElementById('deleteEmailBtn');
+    if (deleteEmailBtn) deleteEmailBtn.addEventListener('click', deleteSelectedEmails);
     
     // Back to list (mobile)
-    document.getElementById('backToList')?.addEventListener('click', () => {
-        document.querySelector('.emails').style.display = 'flex';
-        document.querySelector('.email-reader').style.display = 'none';
-        document.querySelector('.back-to-list').style.display = 'none';
-    });
+    const backToList = document.getElementById('backToList');
+    if (backToList) {
+        backToList.addEventListener('click', () => {
+            const emailsDiv = document.querySelector('.emails');
+            const emailReader = document.querySelector('.email-reader');
+            
+            if (emailsDiv) emailsDiv.style.display = 'flex';
+            if (emailReader) emailReader.style.display = 'none';
+            if (backToList) backToList.style.display = 'none';
+        });
+    }
     
     // Quick actions in sidebar
     document.querySelectorAll('.quick-btn').forEach(btn => {
@@ -1230,7 +1411,6 @@ function initializeEventListeners() {
             document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
             this.classList.add('active');
             emailView = this.dataset.view;
-            // Here you would implement different view layouts
             showToast(`Switched to ${emailView} view`, 'info');
         });
     });
@@ -1240,47 +1420,66 @@ function initializeEventListeners() {
         tag.addEventListener('click', function() {
             document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
             this.classList.add('active');
-            // Here you would implement filtering logic
             showToast(`Filter: ${this.dataset.filter}`, 'info');
         });
     });
     
     // Language selector
-    document.getElementById('langSelect')?.addEventListener('change', function() {
-        updateLanguage(this.value);
-    });
+    const langSelect = document.getElementById('langSelect');
+    if (langSelect) {
+        langSelect.addEventListener('change', function() {
+            updateLanguage(this.value);
+        });
+    }
     
     // Sort selector
-    document.getElementById('sortSelect')?.addEventListener('change', function() {
-        showToast(`Sorted by: ${this.options[this.selectedIndex].text}`, 'info');
-    });
+    const sortSelect = document.getElementById('sortSelect');
+    if (sortSelect) {
+        sortSelect.addEventListener('change', function() {
+            showToast(`Sorted by: ${this.options[this.selectedIndex].text}`, 'info');
+        });
+    }
     
     // Refresh button
-    document.getElementById('refreshBtn')?.addEventListener('click', () => {
-        showLoading();
-        setTimeout(() => {
-            hideLoading();
-            showToast('Inbox refreshed', 'success');
-        }, 1000);
-    });
+    const refreshBtn = document.getElementById('refreshBtn');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', () => {
+            showLoading();
+            setTimeout(() => {
+                hideLoading();
+                simulateAISorting();
+                showToast('Inbox refreshed', 'success');
+            }, 1000);
+        });
+    }
     
     // Search
-    document.getElementById('searchInput')?.addEventListener('input', function(e) {
-        const searchTerm = e.target.value.toLowerCase();
-        // Here you would implement search logic
-        if (searchTerm.length > 0) {
-            showToast(`Searching for: ${searchTerm}`, 'info');
-        }
-    });
+    const searchInput = document.getElementById('searchInput');
+    const searchClear = document.getElementById('searchClear');
     
-    document.getElementById('searchClear')?.addEventListener('click', function() {
-        document.getElementById('searchInput').value = '';
-    });
+    if (searchInput) {
+        searchInput.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            if (searchTerm.length > 0) {
+                showToast(`Searching for: ${searchTerm}`, 'info');
+            }
+        });
+    }
+    
+    if (searchClear) {
+        searchClear.addEventListener('click', function() {
+            if (searchInput) searchInput.value = '';
+        });
+    }
     
     // AI dismiss
-    document.getElementById('aiDismiss')?.addEventListener('click', function() {
-        document.getElementById('aiStatusBar').style.display = 'none';
-    });
+    const aiDismiss = document.getElementById('aiDismiss');
+    if (aiDismiss) {
+        aiDismiss.addEventListener('click', function() {
+            const aiStatusBar = document.getElementById('aiStatusBar');
+            if (aiStatusBar) aiStatusBar.style.display = 'none';
+        });
+    }
     
     // Close modals when clicking outside
     document.querySelectorAll('.modal').forEach(modal => {
@@ -1294,18 +1493,23 @@ function initializeEventListeners() {
     // Handle window resize
     window.addEventListener('resize', () => {
         if (window.innerWidth > 768) {
-            document.querySelector('.sidebar').classList.remove('active');
-            document.querySelector('.emails').style.display = 'flex';
-            document.querySelector('.email-reader').style.display = 'flex';
-            document.querySelector('.back-to-list').style.display = 'none';
+            const sidebar = document.querySelector('.sidebar');
+            const emailsDiv = document.querySelector('.emails');
+            const emailReader = document.querySelector('.email-reader');
+            const backToList = document.querySelector('.back-to-list');
+            
+            if (sidebar) sidebar.classList.remove('active');
+            if (emailsDiv) emailsDiv.style.display = 'flex';
+            if (emailReader) emailReader.style.display = 'flex';
+            if (backToList) backToList.style.display = 'none';
         }
     });
 }
 
 // ====================== LOGIN/REGISTER ======================
 function handleLogin() {
-    const email = document.getElementById('loginEmail').value;
-    const password = document.getElementById('loginPassword').value;
+    const email = document.getElementById('loginEmail')?.value;
+    const password = document.getElementById('loginPassword')?.value;
     
     if (!email || !password) {
         showToast('Please enter email and password', 'error');
@@ -1323,22 +1527,28 @@ function handleLogin() {
         };
         
         // Switch to app
-        document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('app').style.opacity = '1';
+        const loginScreen = document.getElementById('loginScreen');
+        const app = document.getElementById('app');
+        
+        if (loginScreen) loginScreen.style.display = 'none';
+        if (app) app.style.opacity = '1';
         
         // Initialize app
         initializeApp();
         
         hideLoading();
         showToast('Login successful', 'success');
+        
+        // Save demo login
+        localStorage.setItem('inboxProDemoLogin', 'true');
     }, 1500);
 }
 
 function handleRegister() {
-    const name = document.getElementById('registerName').value;
-    const email = document.getElementById('registerEmail').value;
-    const password = document.getElementById('registerPassword').value;
-    const confirm = document.getElementById('registerConfirm').value;
+    const name = document.getElementById('registerName')?.value;
+    const email = document.getElementById('registerEmail')?.value;
+    const password = document.getElementById('registerPassword')?.value;
+    const confirm = document.getElementById('registerConfirm')?.value;
     
     if (!name || !email || !password || !confirm) {
         showToast('Please fill in all fields', 'error');
@@ -1366,27 +1576,39 @@ function handleRegister() {
         };
         
         // Switch to app
-        document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('app').style.opacity = '1';
+        const loginScreen = document.getElementById('loginScreen');
+        const app = document.getElementById('app');
+        
+        if (loginScreen) loginScreen.style.display = 'none';
+        if (app) app.style.opacity = '1';
         
         // Initialize app
         initializeApp();
         
         hideLoading();
         showToast('Registration successful', 'success');
+        
+        // Save demo login
+        localStorage.setItem('inboxProDemoLogin', 'true');
     }, 1500);
 }
 
 function showRegisterForm(e) {
     e.preventDefault();
-    document.getElementById('loginForm').classList.remove('active');
-    document.getElementById('registerForm').classList.add('active');
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+    
+    if (loginForm) loginForm.classList.remove('active');
+    if (registerForm) registerForm.classList.add('active');
 }
 
 function showLoginForm(e) {
     e.preventDefault();
-    document.getElementById('registerForm').classList.remove('active');
-    document.getElementById('loginForm').classList.add('active');
+    const registerForm = document.getElementById('registerForm');
+    const loginForm = document.getElementById('loginForm');
+    
+    if (registerForm) registerForm.classList.remove('active');
+    if (loginForm) loginForm.classList.add('active');
 }
 
 // ====================== INITIALIZE APP ======================
@@ -1411,9 +1633,15 @@ function initializeApp() {
     
     // Update user info in header
     if (currentUser) {
-        document.getElementById('userName').textContent = currentUser.name;
-        document.getElementById('userEmail').textContent = currentUser.email;
-        document.getElementById('userAvatar').innerHTML = `<span>${currentUser.avatar}</span><div class="user-status online"></div>`;
+        const userName = document.getElementById('userName');
+        const userEmail = document.getElementById('userEmail');
+        const userAvatar = document.getElementById('userAvatar');
+        
+        if (userName) userName.textContent = currentUser.name;
+        if (userEmail) userEmail.textContent = currentUser.email;
+        if (userAvatar) {
+            userAvatar.innerHTML = `<span>${currentUser.avatar}</span><div class="user-status online"></div>`;
+        }
     }
     
     // Initialize event listeners
@@ -1422,6 +1650,7 @@ function initializeApp() {
     // Show welcome message
     setTimeout(() => {
         showToast('Welcome to Inbox Pro!', 'success');
+        simulateAISorting();
     }, 1000);
     
     console.log('Inbox Pro ready');
@@ -1442,17 +1671,26 @@ document.addEventListener('DOMContentLoaded', function() {
             avatar: "JD"
         };
         
-        document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('app').style.opacity = '1';
+        const loginScreen = document.getElementById('loginScreen');
+        const app = document.getElementById('app');
+        
+        if (loginScreen) loginScreen.style.display = 'none';
+        if (app) app.style.opacity = '1';
         initializeApp();
     } else {
         // Show login screen
-        document.getElementById('loginScreen').style.display = 'flex';
-        document.getElementById('app').style.opacity = '0';
+        const loginScreen = document.getElementById('loginScreen');
+        const app = document.getElementById('app');
+        
+        if (loginScreen) loginScreen.style.display = 'flex';
+        if (app) app.style.opacity = '0';
         
         // For demo purposes, pre-fill login form
-        document.getElementById('loginEmail').value = 'demo@example.com';
-        document.getElementById('loginPassword').value = 'password123';
+        const loginEmail = document.getElementById('loginEmail');
+        const loginPassword = document.getElementById('loginPassword');
+        
+        if (loginEmail) loginEmail.value = 'demo@example.com';
+        if (loginPassword) loginPassword.value = 'password123';
     }
     
     // Add CSS for settings theme buttons
@@ -1548,6 +1786,18 @@ document.addEventListener('DOMContentLoaded', function() {
         .remove-file:hover {
             color: var(--danger-hover);
         }
+        
+        .email-labels {
+            display: flex;
+            gap: 5px;
+            margin-top: 10px;
+        }
+        
+        .email-labels .label {
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            border-radius: 12px;
+        }
     `;
     document.head.appendChild(style);
 });
@@ -1558,7 +1808,7 @@ window.addEventListener('error', function(e) {
     showToast('An error occurred. Please refresh the page.', 'error');
 });
 
-// ====================== SERVICE WORKER (FOR PWA) ======================
+// ====================== PWA SUPPORT ======================
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
         navigator.serviceWorker.register('/sw.js').catch(err => {
@@ -1570,10 +1820,27 @@ if ('serviceWorker' in navigator) {
 // ====================== OFFLINE SUPPORT ======================
 window.addEventListener('online', function() {
     showToast('You are back online', 'success');
-    document.getElementById('statusText').textContent = translations[currentLanguage].systemOperational;
+    const statusText = document.getElementById('statusText');
+    if (statusText) statusText.textContent = translations[currentLanguage].systemOperational;
 });
 
 window.addEventListener('offline', function() {
     showToast('You are offline', 'warning');
-    document.getElementById('statusText').textContent = 'Offline - Some features may be unavailable';
+    const statusText = document.getElementById('statusText');
+    if (statusText) statusText.textContent = 'Offline - Some features may be unavailable';
 });
+
+// ====================== NOTIFICATIONS ======================
+function showNotification(title, message) {
+    if ("Notification" in window && Notification.permission === "granted") {
+        new Notification(title, {
+            body: message,
+            icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📬</text></svg>"
+        });
+    }
+}
+
+// Request notification permission
+if ("Notification" in window && Notification.permission === "default") {
+    Notification.requestPermission();
+}
