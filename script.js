@@ -17,6 +17,7 @@ let totalPages = 1;
 let currentLanguage = 'en';
 let currentTheme = 'dark';
 let minimizedComposeWindows = [];
+let currentEmailFilter = 'all';
 
 // ====================== INITIAL EMAIL DATA ======================
 const sampleEmails = [
@@ -30,29 +31,31 @@ const sampleEmails = [
         unread: true,
         important: true,
         folder: "inbox",
-        attachments: 0,
+        attachments: 2,
         body: "<p>Welcome to Inbox Pro! We're excited to have you on board.</p><p>Your account has been successfully activated with all premium features enabled.</p><p>If you have any questions, please don't hesitate to contact our support team.</p>",
         to: ["user@example.com"],
         cc: [],
         bcc: [],
-        labels: ["work"]
+        labels: ["work"],
+        size: "1.2 MB"
     },
     {
         id: 2,
         sender: "John Smith",
         senderEmail: "john.smith@business.com",
-        subject: "Meeting Tomorrow",
+        subject: "Meeting Tomorrow - Important Updates",
         preview: "Hi, let's discuss the project updates...",
         date: "Today, 09:15 AM",
         unread: true,
-        important: false,
+        important: true,
         folder: "inbox",
-        attachments: 2,
-        body: "<p>Hi team,</p><p>Let's meet tomorrow at 11 AM to discuss the project updates.</p><p>Please bring the latest reports.</p><p>Best regards,<br>John</p>",
+        attachments: 3,
+        body: "<p>Hi team,</p><p>Let's meet tomorrow at 11 AM to discuss the project updates.</p><p>Please bring the latest reports and be prepared to present your findings.</p><p>Best regards,<br>John</p>",
         to: ["team@company.com"],
         cc: ["manager@company.com"],
         bcc: [],
-        labels: ["work", "important"]
+        labels: ["work", "important"],
+        size: "2.4 MB"
     },
     {
         id: 3,
@@ -65,28 +68,30 @@ const sampleEmails = [
         important: false,
         folder: "inbox",
         attachments: 0,
-        body: "<p>This week in tech:</p><ul><li>New AI breakthroughs</li><li>Latest smartphone releases</li><li>Cybersecurity updates</li></ul>",
+        body: "<p>This week in tech:</p><ul><li>New AI breakthroughs announced</li><li>Latest smartphone releases reviewed</li><li>Cybersecurity updates and patches</li></ul><p>Stay tuned for more updates!</p>",
         to: ["subscribers@tech.com"],
         cc: [],
         bcc: [],
-        labels: ["social"]
+        labels: ["social"],
+        size: "0.8 MB"
     },
     {
         id: 4,
         sender: "Alice Johnson",
         senderEmail: "alice@design.com",
-        subject: "Design Mockups Ready",
+        subject: "Design Mockups Ready for Review",
         preview: "I've completed the design mockups for review...",
         date: "Yesterday, 11:45",
         unread: false,
         important: true,
         folder: "inbox",
-        attachments: 3,
-        body: "<p>Hello,</p><p>The design mockups are ready for your review. Please check the attachments.</p><p>Looking forward to your feedback.</p>",
+        attachments: 1,
+        body: "<p>Hello,</p><p>The design mockups are ready for your review. Please check the attachment.</p><p>Looking forward to your feedback.</p><p>Best,<br>Alice</p>",
         to: ["review@design.com"],
         cc: [],
         bcc: [],
-        labels: ["work", "travel"]
+        labels: ["work", "travel"],
+        size: "3.1 MB"
     },
     {
         id: 5,
@@ -99,11 +104,12 @@ const sampleEmails = [
         important: false,
         folder: "inbox",
         attachments: 1,
-        body: "<p>Security Update Required</p><p>Please update your security settings to continue using all features.</p>",
+        body: "<p>Security Update Required</p><p>Please update your security settings to continue using all features.</p><p>Click the link below to proceed with the update.</p>",
         to: ["user@example.com"],
         cc: [],
         bcc: [],
-        labels: ["finance"]
+        labels: ["finance"],
+        size: "1.5 MB"
     }
 ];
 
@@ -224,7 +230,8 @@ const translations = {
         encrypt: "Encrypt message",
         schedule: "Schedule",
         discard: "Discard",
-        emptyTrash: "Empty Trash"
+        emptyTrash: "Empty Trash",
+        signOut: "Sign Out"
     },
     ua: {
         welcomeBack: "З поверненням",
@@ -320,7 +327,202 @@ const translations = {
         encrypt: "Зашифрувати повідомлення",
         schedule: "Запланувати",
         discard: "Скасувати",
-        emptyTrash: "Очистити сміття"
+        emptyTrash: "Очистити сміття",
+        signOut: "Вийти"
+    },
+    ru: {
+        welcomeBack: "С возвращением",
+        emailAddress: "Электронная почта",
+        password: "Пароль",
+        rememberMe: "Запомнить меня",
+        forgotPassword: "Забыли пароль?",
+        signIn: "Войти",
+        newUser: "Новый пользователь?",
+        createAccount: "Создать аккаунт",
+        fullName: "Полное имя",
+        confirmPassword: "Подтвердите пароль",
+        passwordHint: "Мин. 8 символов с буквами и цифрами",
+        createAccountBtn: "Создать аккаунт",
+        alreadyHaveAccount: "Уже есть аккаунт?",
+        aiFilter: "AI-фильтр спама",
+        smartSorting: "Умная сортировка",
+        securePrivate: "Безопасно и приватно",
+        aiActive: "AI активен",
+        searchPlaceholder: "Поиск писем, контактов, тем...",
+        refresh: "Обновить",
+        lightTheme: "Светлая",
+        darkTheme: "Темная",
+        oledTheme: "OLED",
+        blueTheme: "Океан",
+        aiOrganizing: "AI организует вашу почту. <strong>15</strong> писем отсортировано.",
+        compose: "Написать",
+        archive: "Архив",
+        important: "Важные",
+        delete: "Удалить",
+        snooze: "Отложить",
+        folders: "Папки",
+        inbox: "Входящие",
+        sent: "Отправленные",
+        drafts: "Черновики",
+        spam: "Спам",
+        trash: "Корзина",
+        labels: "Метки",
+        work: "Работа",
+        personal: "Личное",
+        travel: "Путешествия",
+        finance: "Финансы",
+        social: "Социальное",
+        emailStats: "Статистика",
+        total: "Всего",
+        unread: "Непрочитанные",
+        storage: "Хранилище",
+        kyiv: "Киев, UA",
+        newest: "Сначала новые",
+        oldest: "Сначала старые",
+        importantFirst: "Сначала важные",
+        unreadFirst: "Сначала непрочитанные",
+        all: "Все",
+        withAttachments: "С вложениями",
+        moreFilters: "Больше фильтров",
+        back: "Назад",
+        selectEmail: "Выберите письмо",
+        verified: "Подтверждено",
+        secure: "Безопасно",
+        to: "Кому:",
+        cc: "Копия:",
+        selectEmailDesc: "Выберите письмо для просмотра",
+        attachments: "Вложения",
+        downloadAll: "Скачать все",
+        quickReply: "Быстрый ответ",
+        print: "Печать",
+        report: "Пожаловаться",
+        replyPlaceholder: "Введите ваш ответ...",
+        send: "Отправить",
+        cancel: "Отмена",
+        previous: "Назад",
+        next: "Далее",
+        systemOperational: "Все системы работают",
+        syncing: "Синхронизация...",
+        loading: "Загрузка...",
+        userSettings: "Настройки",
+        profile: "Профиль",
+        appearance: "Внешний вид",
+        notifications: "Уведомления",
+        security: "Безопасность",
+        advanced: "Дополнительно",
+        saveChanges: "Сохранить изменения",
+        newMessage: "Новое сообщение",
+        to: "Кому",
+        cc: "Копия",
+        bcc: "Скрытая копия",
+        subject: "Тема",
+        message: "Напишите ваше сообщение...",
+        addAttachment: "Добавить файл",
+        maxSize: "Макс. 25MB каждый",
+        urgent: "Пометить как срочное",
+        readReceipt: "Запрос подтверждения прочтения",
+        encrypt: "Зашифровать сообщение",
+        schedule: "Запланировать",
+        discard: "Отмена",
+        emptyTrash: "Очистить корзину",
+        signOut: "Выйти"
+    },
+    de: {
+        welcomeBack: "Willkommen zurück",
+        emailAddress: "E-Mail-Adresse",
+        password: "Passwort",
+        rememberMe: "Angemeldet bleiben",
+        forgotPassword: "Passwort vergessen?",
+        signIn: "Anmelden",
+        newUser: "Neuer Benutzer?",
+        createAccount: "Konto erstellen",
+        fullName: "Vollständiger Name",
+        confirmPassword: "Passwort bestätigen",
+        passwordHint: "Mind. 8 Zeichen mit Buchstaben und Zahlen",
+        createAccountBtn: "Konto erstellen",
+        alreadyHaveAccount: "Bereits ein Konto?",
+        aiFilter: "AI-Spamfilter",
+        smartSorting: "Intelligente Sortierung",
+        securePrivate: "Sicher und privat",
+        aiActive: "AI aktiv",
+        searchPlaceholder: "E-Mails, Kontakte, Betreffe suchen...",
+        refresh: "Aktualisieren",
+        lightTheme: "Hell",
+        darkTheme: "Dunkel",
+        oledTheme: "OLED",
+        blueTheme: "Ozean",
+        aiOrganizing: "AI organisiert Ihren Posteingang. <strong>15</strong> E-Mails automatisch sortiert.",
+        compose: "Verfassen",
+        archive: "Archiv",
+        important: "Wichtig",
+        delete: "Löschen",
+        snooze: "Verschieben",
+        folders: "Ordner",
+        inbox: "Posteingang",
+        sent: "Gesendet",
+        drafts: "Entwürfe",
+        spam: "Spam",
+        trash: "Papierkorb",
+        labels: "Labels",
+        work: "Arbeit",
+        personal: "Persönlich",
+        travel: "Reisen",
+        finance: "Finanzen",
+        social: "Sozial",
+        emailStats: "E-Mail-Statistik",
+        total: "Gesamt",
+        unread: "Ungelesen",
+        storage: "Speicher",
+        kyiv: "Kiew, UA",
+        newest: "Neueste zuerst",
+        oldest: "Älteste zuerst",
+        importantFirst: "Wichtige zuerst",
+        unreadFirst: "Ungelesene zuerst",
+        all: "Alle",
+        withAttachments: "Mit Anhängen",
+        moreFilters: "Mehr Filter",
+        back: "Zurück",
+        selectEmail: "Wählen Sie eine E-Mail",
+        verified: "Verifiziert",
+        secure: "Sicher",
+        to: "An:",
+        cc: "CC:",
+        selectEmailDesc: "Wählen Sie eine E-Mail zum Lesen",
+        attachments: "Anhänge",
+        downloadAll: "Alle herunterladen",
+        quickReply: "Schnelle Antwort",
+        print: "Drucken",
+        report: "Melden",
+        replyPlaceholder: "Geben Sie Ihre Antwort ein...",
+        send: "Senden",
+        cancel: "Abbrechen",
+        previous: "Zurück",
+        next: "Weiter",
+        systemOperational: "Alle Systeme funktionieren",
+        syncing: "Synchronisierung...",
+        loading: "Laden...",
+        userSettings: "Benutzereinstellungen",
+        profile: "Profil",
+        appearance: "Erscheinungsbild",
+        notifications: "Benachrichtigungen",
+        security: "Sicherheit",
+        advanced: "Erweitert",
+        saveChanges: "Änderungen speichern",
+        newMessage: "Neue Nachricht",
+        to: "An",
+        cc: "CC",
+        bcc: "BCC",
+        subject: "Betreff",
+        message: "Schreiben Sie Ihre Nachricht hier...",
+        addAttachment: "Anhang hinzufügen",
+        maxSize: "Max. 25MB pro Datei",
+        urgent: "Als dringend markieren",
+        readReceipt: "Lesebestätigung anfordern",
+        encrypt: "Nachricht verschlüsseln",
+        schedule: "Planen",
+        discard: "Verwerfen",
+        emptyTrash: "Papierkorb leeren",
+        signOut: "Abmelden"
     }
 };
 
@@ -436,7 +638,8 @@ function initializeEmails() {
             to: ["team@company.com"],
             cc: [],
             bcc: [],
-            labels: ["work"]
+            labels: ["work"],
+            size: "1.8 MB"
         }
     ];
     
@@ -456,7 +659,8 @@ function initializeEmails() {
             to: ["colleague@company.com"],
             cc: [],
             bcc: [],
-            labels: ["work"]
+            labels: ["work"],
+            size: "0.5 MB"
         }
     ];
     
@@ -476,7 +680,8 @@ function initializeEmails() {
             to: ["user@example.com"],
             cc: [],
             bcc: [],
-            labels: []
+            labels: [],
+            size: "0.2 MB"
         }
     ];
     
@@ -530,9 +735,24 @@ function updateEmailCounts() {
     if (unreadCount) unreadCount.textContent = `${folderEmails.filter(e => e.unread).length} unread`;
 }
 
+function getFilteredEmails() {
+    let folderEmails = emailsData[currentFolder] || [];
+    
+    // Apply filter
+    if (currentEmailFilter === 'unread') {
+        folderEmails = folderEmails.filter(email => email.unread);
+    } else if (currentEmailFilter === 'important') {
+        folderEmails = folderEmails.filter(email => email.important);
+    } else if (currentEmailFilter === 'attachments') {
+        folderEmails = folderEmails.filter(email => email.attachments > 0);
+    }
+    
+    return folderEmails;
+}
+
 function displayEmails() {
     const emailsList = document.getElementById('emailsList');
-    const folderEmails = emailsData[currentFolder] || [];
+    const folderEmails = getFilteredEmails();
     
     if (!emailsList) return;
     
@@ -563,7 +783,7 @@ function displayEmails() {
         
         emailElement.innerHTML = `
             <div class="email-checkbox">
-                <input type="checkbox" class="email-select" data-id="${email.id}">
+                <input type="checkbox" class="email-select" data-id="${email.id}" ${selectedEmails.has(email.id) ? 'checked' : ''}>
             </div>
             <div class="email-avatar">${initials}</div>
             <div class="email-content">
@@ -622,6 +842,12 @@ function displayEmailContent(email) {
     const initials = email.sender.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
     if (readerAvatar) readerAvatar.textContent = initials;
     
+    // Update email size
+    if (emailSize) {
+        const sizeSpan = emailSize.querySelector('span');
+        if (sizeSpan && email.size) sizeSpan.textContent = email.size;
+    }
+    
     // Update attachments
     const attachmentsList = document.getElementById('attachmentsList');
     const attachmentCount = document.querySelector('.attachment-count');
@@ -629,23 +855,50 @@ function displayEmailContent(email) {
     if (email.attachments > 0) {
         if (attachmentCount) attachmentCount.textContent = `(${email.attachments})`;
         if (attachmentsList) {
-            attachmentsList.innerHTML = `
-                <div class="attachment-item">
+            attachmentsList.innerHTML = '';
+            
+            // Create sample attachments
+            for (let i = 1; i <= email.attachments; i++) {
+                const attachmentItem = document.createElement('div');
+                attachmentItem.className = 'attachment-item';
+                attachmentItem.innerHTML = `
                     <div class="attachment-info">
                         <div class="attachment-icon">
                             <i class="fas fa-file-pdf"></i>
                         </div>
                         <div class="attachment-details">
-                            <div class="attachment-name">document.pdf</div>
-                            <div class="attachment-size">1.2 MB</div>
+                            <div class="attachment-name">document_${i}.pdf</div>
+                            <div class="attachment-size">${Math.round(Math.random() * 2 + 0.5).toFixed(1)} MB</div>
                         </div>
                     </div>
                     <div class="attachment-actions">
-                        <button class="action-btn" title="Download"><i class="fas fa-download"></i></button>
-                        <button class="action-btn" title="Preview"><i class="fas fa-eye"></i></button>
+                        <button class="action-btn download-attachment-btn" data-filename="document_${i}.pdf" title="Download">
+                            <i class="fas fa-download"></i>
+                        </button>
+                        <button class="action-btn preview-attachment-btn" title="Preview">
+                            <i class="fas fa-eye"></i>
+                        </button>
                     </div>
-                </div>
-            `;
+                `;
+                attachmentsList.appendChild(attachmentItem);
+            }
+            
+            // Add download functionality
+            document.querySelectorAll('.download-attachment-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const filename = this.getAttribute('data-filename');
+                    downloadAttachment(filename);
+                });
+            });
+            
+            // Add preview functionality
+            document.querySelectorAll('.preview-attachment-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    showToast('Preview feature would open here', 'info');
+                });
+            });
         }
     } else {
         if (attachmentCount) attachmentCount.textContent = '(0)';
@@ -670,8 +923,19 @@ function displayEmailContent(email) {
     // Update star button
     const starBtn = document.getElementById('starBtn');
     if (starBtn) {
-        starBtn.innerHTML = email.important ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
+        if (email.important) {
+            starBtn.innerHTML = '<i class="fas fa-star"></i>';
+            starBtn.style.color = 'var(--warning)';
+        } else {
+            starBtn.innerHTML = '<i class="far fa-star"></i>';
+            starBtn.style.color = '';
+        }
     }
+    
+    // Set current email ID for actions
+    starBtn.dataset.emailId = email.id;
+    const deleteEmailBtn = document.getElementById('deleteEmailBtn');
+    if (deleteEmailBtn) deleteEmailBtn.dataset.emailId = email.id;
     
     // Show email reader on mobile
     if (window.innerWidth <= 768) {
@@ -685,6 +949,43 @@ function displayEmailContent(email) {
     }
 }
 
+function downloadAttachment(filename) {
+    showToast(`Downloading ${filename}...`, 'info');
+    
+    // Simulate download
+    setTimeout(() => {
+        showToast(`${filename} downloaded successfully`, 'success');
+        
+        // In a real app, this would trigger an actual download
+        const link = document.createElement('a');
+        link.href = 'data:application/pdf;base64,' + btoa('fake pdf content for demo');
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }, 1000);
+}
+
+function downloadAllAttachments() {
+    const attachmentsList = document.getElementById('attachmentsList');
+    if (!attachmentsList) return;
+    
+    const attachmentItems = attachmentsList.querySelectorAll('.attachment-item');
+    if (attachmentItems.length === 0) {
+        showToast('No attachments to download', 'info');
+        return;
+    }
+    
+    showLoading();
+    showToast(`Downloading ${attachmentItems.length} attachments...`, 'info');
+    
+    // Simulate batch download
+    setTimeout(() => {
+        hideLoading();
+        showToast(`All ${attachmentItems.length} attachments downloaded`, 'success');
+    }, 2000);
+}
+
 function selectEmail(emailId) {
     if (selectedEmails.has(emailId)) {
         selectedEmails.delete(emailId);
@@ -695,7 +996,7 @@ function selectEmail(emailId) {
 }
 
 function selectAllEmails() {
-    const folderEmails = emailsData[currentFolder] || [];
+    const folderEmails = getFilteredEmails();
     if (selectedEmails.size === folderEmails.length) {
         selectedEmails.clear();
     } else {
@@ -723,40 +1024,87 @@ function updateEmailCheckboxes() {
 }
 
 function markAsRead() {
-    const folderEmails = emailsData[currentFolder] || [];
+    const folderEmails = getFilteredEmails();
+    let markedCount = 0;
+    
     folderEmails.forEach(email => {
-        if (selectedEmails.has(email.id)) {
+        if (selectedEmails.has(email.id) && email.unread) {
             email.unread = false;
+            markedCount++;
         }
     });
-    selectedEmails.clear();
-    updateEmailCounts();
-    displayEmails();
-    showToast('Marked as read', 'success');
+    
+    if (markedCount > 0) {
+        selectedEmails.clear();
+        updateEmailCounts();
+        displayEmails();
+        showToast(`Marked ${markedCount} email(s) as read`, 'success');
+    } else {
+        showToast('No unread emails selected', 'info');
+    }
 }
 
 function markAsImportant() {
-    const folderEmails = emailsData[currentFolder] || [];
+    const folderEmails = getFilteredEmails();
+    let markedCount = 0;
+    
     folderEmails.forEach(email => {
         if (selectedEmails.has(email.id)) {
             email.important = !email.important;
+            markedCount++;
         }
     });
     
     // Update important folder
     emailsData.important = emailsData.inbox.filter(email => email.important);
     
-    selectedEmails.clear();
-    updateEmailCounts();
-    displayEmails();
-    showToast('Marked as important', 'success');
+    if (markedCount > 0) {
+        selectedEmails.clear();
+        updateEmailCounts();
+        displayEmails();
+        
+        // Update current email if it's open
+        const starBtn = document.getElementById('starBtn');
+        if (starBtn && starBtn.dataset.emailId) {
+            const emailId = parseInt(starBtn.dataset.emailId);
+            const currentEmail = emailsData.inbox.find(e => e.id === emailId) || 
+                               emailsData.sent.find(e => e.id === emailId) ||
+                               emailsData.drafts.find(e => e.id === emailId);
+            if (currentEmail) {
+                if (currentEmail.important) {
+                    starBtn.innerHTML = '<i class="fas fa-star"></i>';
+                    starBtn.style.color = 'var(--warning)';
+                } else {
+                    starBtn.innerHTML = '<i class="far fa-star"></i>';
+                    starBtn.style.color = '';
+                }
+            }
+        }
+        
+        showToast(`Marked ${markedCount} email(s) as important`, 'success');
+    }
 }
 
 function deleteSelectedEmails() {
-    if (selectedEmails.size === 0) return;
+    if (selectedEmails.size === 0) {
+        // Check if we're deleting a single email from reader
+        const deleteBtn = document.getElementById('deleteEmailBtn');
+        if (deleteBtn && deleteBtn.dataset.emailId) {
+            const emailId = parseInt(deleteBtn.dataset.emailId);
+            selectedEmails.add(emailId);
+        } else {
+            showToast('No emails selected', 'info');
+            return;
+        }
+    }
     
     const folderEmails = emailsData[currentFolder] || [];
     const emailsToDelete = folderEmails.filter(email => selectedEmails.has(email.id));
+    
+    if (emailsToDelete.length === 0) {
+        showToast('No emails to delete', 'info');
+        return;
+    }
     
     // Move to trash
     emailsToDelete.forEach(email => {
@@ -767,9 +1115,22 @@ function deleteSelectedEmails() {
     // Remove from current folder
     emailsData[currentFolder] = folderEmails.filter(email => !selectedEmails.has(email.id));
     
+    // If we're in trash folder, actually delete
+    if (currentFolder === 'trash') {
+        emailsData.trash = emailsData.trash.filter(email => !selectedEmails.has(email.id));
+    }
+    
     selectedEmails.clear();
     updateEmailCounts();
     displayEmails();
+    
+    // Clear email reader if we deleted the displayed email
+    const readerTitle = document.getElementById('readerTitle');
+    const readerText = document.getElementById('readerText');
+    
+    if (readerTitle) readerTitle.textContent = translations[currentLanguage].selectEmail;
+    if (readerText) readerText.innerHTML = `<p>${translations[currentLanguage].selectEmailDesc}</p>`;
+    
     showToast(`Moved ${emailsToDelete.length} email(s) to trash`, 'success');
 }
 
@@ -791,6 +1152,7 @@ function emptyTrash() {
 function switchFolder(folder) {
     currentFolder = folder;
     selectedEmails.clear();
+    currentEmailFilter = 'all'; // Reset filter when switching folders
     
     // Update active menu item
     document.querySelectorAll('.menu-item').forEach(item => {
@@ -817,6 +1179,14 @@ function switchFolder(folder) {
     if (emptyTrashBtn) {
         emptyTrashBtn.style.display = folder === 'trash' ? 'flex' : 'none';
     }
+    
+    // Update active filter tag
+    document.querySelectorAll('.filter-tag').forEach(tag => {
+        tag.classList.remove('active');
+        if (tag.dataset.filter === currentEmailFilter) {
+            tag.classList.add('active');
+        }
+    });
     
     // Update UI
     updateEmailCounts();
@@ -889,7 +1259,8 @@ function sendEmail() {
         to: to.split(',').map(e => e.trim()),
         cc: [],
         bcc: [],
-        labels: []
+        labels: [],
+        size: `${(Math.random() * 3 + 0.5).toFixed(1)} MB`
     };
     
     // Add to sent folder
@@ -1109,9 +1480,14 @@ function saveSettings() {
         // Update UI
         const userName = document.getElementById('userName');
         const userEmail = document.getElementById('userEmail');
+        const userAvatar = document.getElementById('userAvatar');
         
         if (userName) userName.textContent = currentUser.name;
         if (userEmail) userEmail.textContent = currentUser.email;
+        if (userAvatar) {
+            const initials = currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+            userAvatar.innerHTML = `<span>${initials}</span><div class="user-status online"></div>`;
+        }
     }
     
     showToast('Settings saved successfully', 'success');
@@ -1126,8 +1502,9 @@ function simulateAISorting() {
             // AI decides if email is important based on content
             if (email.subject.toLowerCase().includes('important') || 
                 email.subject.toLowerCase().includes('urgent') ||
-                email.sender.toLowerCase().includes('boss') ||
-                email.sender.toLowerCase().includes('manager')) {
+                email.subject.toLowerCase().includes('meeting') ||
+                email.sender.toLowerCase().includes('support') ||
+                email.sender.toLowerCase().includes('team')) {
                 email.important = true;
             }
             
@@ -1135,13 +1512,21 @@ function simulateAISorting() {
             if (!email.labels) email.labels = [];
             
             if (email.subject.toLowerCase().includes('meeting') || 
-                email.subject.toLowerCase().includes('project')) {
+                email.subject.toLowerCase().includes('project') ||
+                email.sender.toLowerCase().includes('company')) {
                 if (!email.labels.includes('work')) email.labels.push('work');
             }
             
             if (email.subject.toLowerCase().includes('travel') || 
-                email.subject.toLowerCase().includes('flight')) {
+                email.subject.toLowerCase().includes('flight') ||
+                email.subject.toLowerCase().includes('hotel')) {
                 if (!email.labels.includes('travel')) email.labels.push('travel');
+            }
+            
+            if (email.subject.toLowerCase().includes('finance') || 
+                email.subject.toLowerCase().includes('invoice') ||
+                email.subject.toLowerCase().includes('payment')) {
+                if (!email.labels.includes('finance')) email.labels.push('finance');
             }
         });
         
@@ -1159,32 +1544,16 @@ function simulateAISorting() {
 
 // ====================== EVENT LISTENERS ======================
 function initializeEventListeners() {
-    // Login/Register - ВАЖНО: Використовуємо делегування подій
-    document.addEventListener('click', function(e) {
-        // Login button
-        if (e.target && (e.target.id === 'loginBtn' || e.target.closest('#loginBtn'))) {
-            e.preventDefault();
-            handleLogin();
-        }
-        
-        // Register button
-        if (e.target && (e.target.id === 'registerBtn' || e.target.closest('#registerBtn'))) {
-            e.preventDefault();
-            handleRegister();
-        }
-        
-        // Show register form
-        if (e.target && (e.target.id === 'showRegister' || e.target.closest('#showRegister'))) {
-            e.preventDefault();
-            showRegisterForm(e);
-        }
-        
-        // Show login form
-        if (e.target && (e.target.id === 'showLogin' || e.target.closest('#showLogin'))) {
-            e.preventDefault();
-            showLoginForm(e);
-        }
-    });
+    // Login/Register
+    const loginBtn = document.getElementById('loginBtn');
+    const registerBtn = document.getElementById('registerBtn');
+    const showRegister = document.getElementById('showRegister');
+    const showLogin = document.getElementById('showLogin');
+    
+    if (loginBtn) loginBtn.addEventListener('click', handleLogin);
+    if (registerBtn) registerBtn.addEventListener('click', handleRegister);
+    if (showRegister) showRegister.addEventListener('click', showRegisterForm);
+    if (showLogin) showLogin.addEventListener('click', showLoginForm);
     
     // Theme toggle
     const themeToggle = document.getElementById('themeToggle');
@@ -1266,6 +1635,74 @@ function initializeEventListeners() {
     if (saveSettingsBtn) saveSettingsBtn.addEventListener('click', saveSettings);
     if (cancelSettings) cancelSettings.addEventListener('click', closeSettingsModal);
     
+    // User dropdown menu - FIXED: додано обробку кліку на аватар
+    const userMenu = document.getElementById('userMenu');
+    const userDropdown = document.getElementById('userDropdown');
+    const userSettingsBtn = document.getElementById('userSettingsBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    
+    if (userMenu && userDropdown) {
+        userMenu.addEventListener('click', function(e) {
+            e.stopPropagation();
+            userDropdown.classList.toggle('show');
+            
+            // Close other dropdowns
+            const notificationDropdown = document.getElementById('notificationDropdown');
+            if (notificationDropdown) notificationDropdown.classList.remove('show');
+        });
+    }
+    
+    if (userSettingsBtn) {
+        userSettingsBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            openSettingsModal();
+            if (userDropdown) userDropdown.classList.remove('show');
+        });
+    }
+    
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            handleLogout();
+        });
+    }
+    
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function() {
+        if (userDropdown) userDropdown.classList.remove('show');
+        const notificationDropdown = document.getElementById('notificationDropdown');
+        if (notificationDropdown) notificationDropdown.classList.remove('show');
+        const moreActionsMenu = document.getElementById('moreActionsMenu');
+        if (moreActionsMenu) moreActionsMenu.classList.remove('show');
+    });
+    
+    // Notification bell
+    const notificationBell = document.getElementById('notificationBell');
+    if (notificationBell) {
+        notificationBell.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const notificationDropdown = document.getElementById('notificationDropdown');
+            if (notificationDropdown) {
+                notificationDropdown.classList.toggle('show');
+                
+                // Close other dropdowns
+                if (userDropdown) userDropdown.classList.remove('show');
+            }
+        });
+    }
+    
+    // More actions dropdown
+    const moreActionsBtn = document.getElementById('moreActionsBtn');
+    if (moreActionsBtn) {
+        moreActionsBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const moreActionsMenu = document.getElementById('moreActionsMenu');
+            if (moreActionsMenu) {
+                moreActionsMenu.classList.toggle('show');
+            }
+        });
+    }
+    
     // Settings tabs
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => showTab(btn.dataset.tab));
@@ -1291,6 +1728,10 @@ function initializeEventListeners() {
     // Delete email button
     const deleteEmailBtn = document.getElementById('deleteEmailBtn');
     if (deleteEmailBtn) deleteEmailBtn.addEventListener('click', deleteSelectedEmails);
+    
+    // Download all attachments button
+    const downloadAllBtn = document.getElementById('downloadAllBtn');
+    if (downloadAllBtn) downloadAllBtn.addEventListener('click', downloadAllAttachments);
     
     // Back to list (mobile)
     const backToList = document.getElementById('backToList');
@@ -1341,20 +1782,43 @@ function initializeEventListeners() {
         });
     });
     
-    // Filter tags
+    // Filter tags - FIXED: тепер працюють правильно
     document.querySelectorAll('.filter-tag').forEach(tag => {
         tag.addEventListener('click', function() {
             document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
             this.classList.add('active');
-            showToast(`Filter: ${this.dataset.filter}`, 'info');
+            currentEmailFilter = this.dataset.filter;
+            
+            // Update filtered count display
+            const filteredCount = document.getElementById('filteredCount');
+            if (filteredCount) {
+                if (currentEmailFilter === 'all') {
+                    filteredCount.textContent = 'All';
+                } else if (currentEmailFilter === 'unread') {
+                    filteredCount.textContent = 'Unread';
+                } else if (currentEmailFilter === 'important') {
+                    filteredCount.textContent = 'Important';
+                } else if (currentEmailFilter === 'attachments') {
+                    filteredCount.textContent = 'With Attachments';
+                }
+            }
+            
+            displayEmails();
+            showToast(`Filter: ${currentEmailFilter}`, 'info');
         });
     });
     
-    // Language selector
+    // Language selector - FIXED: тепер працює для всіх мов
     const langSelect = document.getElementById('langSelect');
     if (langSelect) {
         langSelect.addEventListener('change', function() {
             updateLanguage(this.value);
+            
+            // Update UI elements that might have changed
+            updateEmailCounts();
+            if (currentFolder) {
+                switchFolder(currentFolder); // This will update folder title
+            }
         });
     }
     
@@ -1387,7 +1851,10 @@ function initializeEventListeners() {
         searchInput.addEventListener('input', function(e) {
             const searchTerm = e.target.value.toLowerCase();
             if (searchTerm.length > 0) {
+                if (searchClear) searchClear.style.display = 'flex';
                 showToast(`Searching for: ${searchTerm}`, 'info');
+            } else {
+                if (searchClear) searchClear.style.display = 'none';
             }
         });
     }
@@ -1395,6 +1862,8 @@ function initializeEventListeners() {
     if (searchClear) {
         searchClear.addEventListener('click', function() {
             if (searchInput) searchInput.value = '';
+            this.style.display = 'none';
+            showToast('Search cleared', 'info');
         });
     }
     
@@ -1467,7 +1936,10 @@ function handleLogin() {
         const app = document.getElementById('app');
         
         if (loginScreen) loginScreen.style.display = 'none';
-        if (app) app.style.opacity = '1';
+        if (app) {
+            app.style.opacity = '1';
+            app.style.display = 'flex';
+        }
         
         // Initialize app
         initializeApp();
@@ -1478,6 +1950,7 @@ function handleLogin() {
         // Save demo login
         try {
             localStorage.setItem('inboxProDemoLogin', 'true');
+            localStorage.setItem('inboxProUserEmail', email);
         } catch (e) {
             console.log('Could not save to localStorage:', e);
         }
@@ -1532,7 +2005,10 @@ function handleRegister() {
         const app = document.getElementById('app');
         
         if (loginScreen) loginScreen.style.display = 'none';
-        if (app) app.style.opacity = '1';
+        if (app) {
+            app.style.opacity = '1';
+            app.style.display = 'flex';
+        }
         
         // Initialize app
         initializeApp();
@@ -1543,10 +2019,49 @@ function handleRegister() {
         // Save demo login
         try {
             localStorage.setItem('inboxProDemoLogin', 'true');
+            localStorage.setItem('inboxProUserName', name);
+            localStorage.setItem('inboxProUserEmail', email);
         } catch (e) {
             console.log('Could not save to localStorage:', e);
         }
     }, 1500);
+}
+
+function handleLogout() {
+    showLoading();
+    
+    setTimeout(() => {
+        currentUser = null;
+        
+        // Clear localStorage
+        try {
+            localStorage.removeItem('inboxProDemoLogin');
+            localStorage.removeItem('inboxProUserName');
+            localStorage.removeItem('inboxProUserEmail');
+        } catch (e) {
+            console.log('Could not clear localStorage:', e);
+        }
+        
+        // Switch to login screen
+        const loginScreen = document.getElementById('loginScreen');
+        const app = document.getElementById('app');
+        
+        if (loginScreen) {
+            loginScreen.style.display = 'flex';
+            // Reset login form
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            if (loginForm) loginForm.classList.add('active');
+            if (registerForm) registerForm.classList.remove('active');
+        }
+        if (app) {
+            app.style.opacity = '0';
+            app.style.display = 'none';
+        }
+        
+        hideLoading();
+        showToast('Logged out successfully', 'success');
+    }, 1000);
 }
 
 function showRegisterForm(e) {
@@ -1581,6 +2096,16 @@ function initializeApp() {
         console.log('Could not load theme from localStorage:', e);
     }
     
+    // Load saved language
+    try {
+        const savedLang = localStorage.getItem('inboxProLanguage');
+        if (savedLang && translations[savedLang]) {
+            currentLanguage = savedLang;
+        }
+    } catch (e) {
+        console.log('Could not load language from localStorage:', e);
+    }
+    
     // Set current language
     updateLanguage(currentLanguage);
     
@@ -1600,7 +2125,8 @@ function initializeApp() {
         if (userName) userName.textContent = currentUser.name;
         if (userEmail) userEmail.textContent = currentUser.email;
         if (userAvatar) {
-            userAvatar.innerHTML = `<span>${currentUser.avatar}</span><div class="user-status online"></div>`;
+            const initials = currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+            userAvatar.innerHTML = `<span>${initials}</span><div class="user-status online"></div>`;
         }
     }
     
@@ -1698,8 +2224,11 @@ document.addEventListener('DOMContentLoaded', function() {
             position: absolute;
             right: 15px;
             bottom: 15px;
-            color: var(--text-secondary);
-            font-size: 0.8rem;
+            color: var(--accent);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
         
         .remove-file {
@@ -1743,6 +2272,17 @@ document.addEventListener('DOMContentLoaded', function() {
         .modal.show {
             display: flex;
         }
+        
+        /* Animation for infinite pulse */
+        @keyframes pulseInfinite {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .animate__pulse {
+            animation-name: pulseInfinite;
+        }
     `;
     document.head.appendChild(style);
     
@@ -1756,10 +2296,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (demoLogin) {
         // Auto-login for demo
+        const savedName = localStorage.getItem('inboxProUserName');
+        const savedEmail = localStorage.getItem('inboxProUserEmail');
+        
         currentUser = {
-            name: "John Doe",
-            email: "john@example.com",
-            avatar: "JD"
+            name: savedName || "John Doe",
+            email: savedEmail || "john@example.com",
+            avatar: (savedName || "John Doe").split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)
         };
         
         const loginScreen = document.getElementById('loginScreen');
@@ -1796,28 +2339,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (loginEmail) loginEmail.value = 'demo@example.com';
         if (loginPassword) loginPassword.value = 'password123';
     }
-    
-    // Add immediate event listeners for login/register buttons
-    const loginBtn = document.getElementById('loginBtn');
-    const registerBtn = document.getElementById('registerBtn');
-    const showRegister = document.getElementById('showRegister');
-    const showLogin = document.getElementById('showLogin');
-    
-    if (loginBtn) {
-        loginBtn.addEventListener('click', handleLogin);
-    }
-    
-    if (registerBtn) {
-        registerBtn.addEventListener('click', handleRegister);
-    }
-    
-    if (showRegister) {
-        showRegister.addEventListener('click', showRegisterForm);
-    }
-    
-    if (showLogin) {
-        showLogin.addEventListener('click', showLoginForm);
-    }
 });
 
 // ====================== ERROR HANDLING ======================
@@ -1827,42 +2348,16 @@ window.addEventListener('error', function(e) {
 });
 
 // ====================== PWA SUPPORT (FIXED) ======================
-// ВИДАЛИТИ файл sw.js або замінити його на правильний Service Worker
-// Ось правильний мінімальний Service Worker (створіть файл sw.js з цим вмістом):
-/*
-// sw.js - правильний Service Worker
-self.addEventListener('install', function(event) {
-    event.waitUntil(
-        caches.open('inbox-pro-v1').then(function(cache) {
-            return cache.addAll([
-                '/',
-                '/index.html',
-                '/style.css',
-                '/script.js'
-            ]);
-        })
-    );
-});
-
-self.addEventListener('fetch', function(event) {
-    event.respondWith(
-        caches.match(event.request).then(function(response) {
-            return response || fetch(event.request);
-        })
-    );
-});
-*/
-
-// Завантажуємо Service Worker тільки якщо він існує та на правильному origin
-if ('serviceWorker' in navigator && window.location.protocol === 'https:') {
+// Conditional Service Worker registration
+if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
-        // Перевіряємо, чи це GitHub Pages
-        if (window.location.hostname.includes('github.io')) {
+        // Only register if we're on HTTPS or localhost
+        if (window.location.protocol === 'https:' || window.location.hostname === 'localhost') {
             navigator.serviceWorker.register('/sw.js').then(function(registration) {
                 console.log('ServiceWorker registration successful with scope:', registration.scope);
             }).catch(function(err) {
                 console.log('ServiceWorker registration failed:', err);
-                // Якщо Service Worker не працює, просто ігноруємо це
+                // Silent fail - it's okay if Service Worker doesn't work
             });
         }
     });
@@ -1898,3 +2393,23 @@ if ("Notification" in window && Notification.permission === "default") {
         Notification.requestPermission();
     }, { once: true });
 }
+
+// Save language preference when changed
+document.getElementById('langSelect')?.addEventListener('change', function() {
+    try {
+        localStorage.setItem('inboxProLanguage', this.value);
+    } catch (e) {
+        console.log('Could not save language to localStorage:', e);
+    }
+});
+
+// Auto-save theme when changed
+const originalUpdateTheme = updateTheme;
+updateTheme = function(theme) {
+    originalUpdateTheme(theme);
+    try {
+        localStorage.setItem('inboxProTheme', theme);
+    } catch (e) {
+        console.log('Could not save theme to localStorage:', e);
+    }
+};
