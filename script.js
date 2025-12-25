@@ -12,9 +12,16 @@ const mailSubjectInput = document.getElementById('mailSubject');
 const mailTextInput = document.getElementById('mailText');
 const fileInput = document.getElementById('mailFile');
 const filePreview = document.getElementById('filePreview');
-const progressContainer = document.getElementById('progressContainer');
 const progressBar = document.getElementById('progressBar');
 const toast = document.getElementById('toast');
+const reader = document.getElementById('reader');
+const readerTitle = document.getElementById('readerTitle');
+const readerSender = document.getElementById('readerSender');
+const readerDate = document.getElementById('readerDate');
+const readerText = document.getElementById('readerText');
+const backToListBtn = document.getElementById('backToList');
+const deleteEmailBtn = document.getElementById('deleteEmailBtn');
+const sidebarItems = document.querySelectorAll('.sidebar .menu-item');
 
 function showToast(msg){ toast.textContent=msg; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'),2000); }
 
@@ -36,7 +43,7 @@ if(!currentUserEmail){
 
 // Кнопки модалок
 document.getElementById('composeBtn').onclick = ()=>composeModal.style.display='flex';
-document.getElementById('closeCompose').onclick = ()=>{composeModal.style.display='none'; mailToInput.value=''; mailSubjectInput.value=''; mailTextInput.value=''; filePreview.innerHTML=''; progressBar.style.width='0%'; };
+document.getElementById('closeCompose').onclick = ()=>{closeComposeModal()};
 document.getElementById('settingsBtn').onclick = ()=>settingsModal.style.display='flex';
 document.getElementById('closeSettings').onclick = ()=>settingsModal.style.display='none';
 document.getElementById('saveSettings').onclick = ()=>{
@@ -44,6 +51,12 @@ document.getElementById('saveSettings').onclick = ()=>{
     if(/\S+@\S+\.\S+/.test(val)){ saveUserEmail(val); settingsModal.style.display='none'; showToast("Email saved!"); }
     else showToast("Invalid email!");
 };
+
+function closeComposeModal(){
+    composeModal.style.display='none'; 
+    mailToInput.value=''; mailSubjectInput.value=''; mailTextInput.value=''; 
+    filePreview.innerHTML=''; progressBar.style.width='0%';
+}
 
 // Drag & Drop
 fileInput.addEventListener('change', handleFiles);
@@ -83,20 +96,65 @@ document.getElementById('sendMail').onclick = ()=>{
     emails.push(newEmail);
     localStorage.setItem('emails', JSON.stringify(emails));
     showToast("Email sent!");
-    composeModal.style.display='none';
-    mailToInput.value=''; mailSubjectInput.value=''; mailTextInput.value=''; filePreview.innerHTML='';
+    closeComposeModal();
+    if(currentFolder==='sent') renderEmails();
 };
 
-// Рендер Inbox
-function renderInbox(){
+// Рендер листів для поточної папки
+function renderEmails(){
     inboxList.innerHTML='';
-    let inboxEmails = emails.filter(e=>e.folder===currentFolder);
-    if(inboxEmails.length===0){ inboxList.innerHTML='<p>No emails</p>'; return;}
-    inboxEmails.forEach(e=>{
+    let folderEmails = emails.filter(e=>e.folder===currentFolder);
+    if(folderEmails.length===0){ inboxList.innerHTML='<p>No emails</p>'; return;}
+    folderEmails.forEach(e=>{
         let div=document.createElement('div');
         div.className='email';
-        div.innerHTML=`<strong>${e.subject}</strong> <span>${e.body}</span>`;
+        div.innerHTML=`<strong>${e.subject}</strong><span>${e.body.substring(0,50)}...</span>`;
+        div.onclick=()=>openEmail(e);
         inboxList.appendChild(div);
     });
 }
-renderInbox();
+
+// Відкриття листа
+function openEmail(email){
+    currentSelectedEmail = email;
+    readerTitle.textContent = email.subject || "(No subject)";
+    readerSender.textContent = `From: ${email.from}`;
+    readerDate.textContent = email.date;
+    readerText.textContent = email.body;
+    reader.style.display='flex';
+    inboxList.parentElement.style.display='none';
+    deleteEmailBtn.style.display='inline-flex';
+}
+
+// Повернення до списку
+backToListBtn.onclick = ()=>{
+    reader.style.display='none';
+    inboxList.parentElement.style.display='flex';
+    deleteEmailBtn.style.display='none';
+};
+
+// Видалення листа
+deleteEmailBtn.onclick = ()=>{
+    if(currentSelectedEmail){
+        currentSelectedEmail.folder='trash';
+        localStorage.setItem('emails', JSON.stringify(emails));
+        showToast("Email moved to Trash");
+        currentSelectedEmail = null;
+        backToListBtn.onclick();
+        renderEmails();
+    }
+};
+
+// Навігація по скриньках
+sidebarItems.forEach(item=>{
+    item.onclick=()=>{
+        sidebarItems.forEach(i=>i.classList.remove('active'));
+        item.classList.add('active');
+        currentFolder = item.getAttribute('data-folder');
+        document.getElementById('currentFolder').textContent = item.querySelector('span').textContent;
+        renderEmails();
+    };
+});
+
+// Початковий рендер
+renderEmails();
