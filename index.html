@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Inbox Pro</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inbox Pro</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 <div class="app" id="app">
@@ -22,24 +22,28 @@
   <div class="main">
     <aside class="sidebar" id="sidebar">
       <button type="button" class="compose-btn" id="composeBtn">
-        <i class="fas fa-plus"></i> <span data-i18n="compose">Compose</span>
+        <i class="fas fa-plus"></i> <span>Compose</span>
       </button>
       <div class="sidebar-menu">
-        <div class="menu-item active" data-folder="inbox"><i class="fas fa-inbox"></i> <span data-i18n="inbox">Inbox</span> <span class="badge" id="inboxCount">0</span></div>
-        <div class="menu-item" data-folder="sent"><i class="fas fa-paper-plane"></i> <span data-i18n="sent">Sent</span></div>
-        <div class="menu-item" data-folder="drafts"><i class="fas fa-file-alt"></i> <span data-i18n="drafts">Drafts</span></div>
-        <div class="menu-item" data-folder="spam"><i class="fas fa-ban"></i> <span data-i18n="spam">Spam</span></div>
-        <div class="menu-item" data-folder="trash"><i class="fas fa-trash"></i> <span data-i18n="trash">Trash</span> <span class="badge" id="trashCount">0</span></div>
+        <div class="menu-item active" data-folder="inbox"><i class="fas fa-inbox"></i> Inbox <span class="badge" id="inboxCount">0</span></div>
+        <div class="menu-item" data-folder="sent"><i class="fas fa-paper-plane"></i> Sent</div>
+        <div class="menu-item" data-folder="drafts"><i class="fas fa-file-alt"></i> Drafts</div>
+        <div class="menu-item" data-folder="spam"><i class="fas fa-ban"></i> Spam</div>
+        <div class="menu-item" data-folder="trash"><i class="fas fa-trash"></i> Trash <span class="badge" id="trashCount">0</span></div>
       </div>
     </aside>
 
     <section class="content">
       <div class="content-header">
         <h2 id="currentFolder">Inbox</h2>
-        <button class="delete-folder-btn" id="emptyTrashBtn" style="display:none;"><i class="fas fa-trash"></i> <span data-i18n="emptyTrash">Empty Trash</span></button>
+        <button class="delete-folder-btn" id="emptyTrashBtn" style="display:none;">
+          <i class="fas fa-trash"></i> Empty Trash
+        </button>
       </div>
+
       <div class="emails-container">
         <div class="emails" id="emailsList"></div>
+
         <div class="email-reader" id="reader">
           <div class="reader-header">
             <button class="back-to-list" id="backToList"><i class="fas fa-arrow-left"></i></button>
@@ -53,7 +57,7 @@
           <div class="reader-body">
             <p id="readerText"></p>
             <div class="reader-attachments" id="readerFiles" style="display:none;">
-              <h4><i class="fas fa-paperclip"></i> <span data-i18n="attachments">Attachments</span></h4>
+              <h4><i class="fas fa-paperclip"></i> Attachments</h4>
               <div class="attachments-list" id="attachmentsList"></div>
             </div>
           </div>
@@ -65,7 +69,7 @@
   <div class="lang">
     <select id="langSelect">
       <option value="ua">🇺🇦 UA</option>
-      <option value="en" selected>🇬🇧 EN</option>
+      <option value="en">🇬🇧 EN</option>
       <option value="de">🇩🇪 DE</option>
       <option value="ru">🇷🇺 RU</option>
     </select>
@@ -75,15 +79,14 @@
 <!-- SETTINGS MODAL -->
 <div class="modal" id="settingsModal">
   <div class="modal-box">
-    <h3><i class="fas fa-user-edit"></i> <span data-i18n="userSettings">User Settings</span></h3>
+    <h3><i class="fas fa-user-edit"></i> User Settings</h3>
     <div class="form-group">
-      <label for="editEmail" data-i18n="yourEmail">Your Email Address</label>
+      <label for="editEmail">Your Email Address</label>
       <input type="email" id="editEmail" placeholder="your@email.com">
     </div>
-    <p class="hint" data-i18n="emailHint">This email will be used as your sender address</p>
     <div class="modal-actions">
-      <button type="button" id="saveSettings" class="btn-primary" data-i18n="save">Save</button>
-      <button type="button" id="closeSettings" class="btn-secondary" data-i18n="close">Close</button>
+      <button type="button" id="saveSettings" class="btn-primary">Save</button>
+      <button type="button" id="closeSettings" class="btn-secondary">Close</button>
     </div>
   </div>
 </div>
@@ -91,29 +94,26 @@
 <!-- COMPOSE MODAL -->
 <div class="modal" id="composeModal">
   <div class="modal-box">
-    <h3><i class="fas fa-envelope"></i> <span data-i18n="newMail">New mail</span></h3>
+    <h3><i class="fas fa-envelope"></i> New mail</h3>
     <div class="form-group">
-      <input type="email" placeholder="To (email)" id="mailTo" data-i18n-ph="toEmail">
+      <input type="email" placeholder="To (email)" id="mailTo">
     </div>
     <div class="form-group">
-      <input placeholder="Subject" id="mailSubject" data-i18n-ph="subject">
+      <input placeholder="Subject" id="mailSubject">
     </div>
     <div class="form-group">
-      <textarea placeholder="Message" id="mailText" rows="8" data-i18n-ph="message"></textarea>
+      <textarea placeholder="Message" id="mailText" rows="8"></textarea>
     </div>
     <div class="form-group">
-      <label for="mailFile" class="file-upload-label">
-        <i class="fas fa-paperclip"></i> <span data-i18n="addAttachment">Add Attachment</span>
-      </label>
+      <label for="mailFile" class="file-upload-label">Attach Files</label>
       <input type="file" id="mailFile" multiple style="display:none;">
       <div class="file-preview" id="filePreview"></div>
-      <div class="progress-bar" id="uploadProgress" style="display:none;">
-        <div class="progress-fill" id="progressFill"></div>
-      </div>
+      <div class="progress-bar" id="uploadProgress"></div>
     </div>
     <div class="modal-actions">
-      <button type="button" id="sendMail" class="btn-primary"><i class="fas fa-paper-plane"></i> <span data-i18n="send">Send</span></button>
-      <button type="button" id="cancelMail" class="btn-secondary" data-i18n="cancel">Cancel</button>
+      <button type="button" id="sendMail" class="btn-primary">Send</button>
+      <button type="button" id="closeCompose" class="btn-secondary">Cancel</button>
+      <button type="button" id="saveDraft" class="btn-secondary">Save Draft</button>
     </div>
   </div>
 </div>
@@ -131,11 +131,8 @@
   </div>
 </div>
 
-<!-- NOTIFICATION TOAST -->
 <div class="toast" id="toast"></div>
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
