@@ -4,9 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>Inbox Pro | AI-Powered Email Client</title>
+    
+    <!-- Firebase SDKs (НОВЕ) -->
+    <script type="module">
+        // Імпорт Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+
+        // Конфігурація Firebase (ТВОЇ КЛЮЧІ)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDdqDJC6iI2pXLtxm61220CIPgG4YdTrYk",
+            authDomain: "inboxprodemo.firebaseapp.com",
+            projectId: "inboxprodemo",
+            storageBucket: "inboxprodemo.firebasestorage.app",
+            messagingSenderId: "674512041878",
+            appId: "1:674512041878:web:d6c4f43b74c3fb5d6c4fb7",
+            measurementId: "G-DN859E1Y0L"
+        };
+
+        // Ініціалізація Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Зберігаємо в глобальній змінній для доступу з script.js
+        window.firebaseApp = app;
+        window.firebaseAuth = auth;
+        window.firebaseFirestore = db;
+        
+        console.log("✅ Firebase завантажено!");
+    </script>
+    
+    <!-- EmailJS -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
     <!-- Local Font Awesome -->
     <style>
-        /* Font Awesome Icons - Local version to avoid tracking prevention */
         @font-face {
             font-family: 'Font Awesome 6 Free';
             font-style: normal;
@@ -22,9 +56,9 @@
             font-weight: 400;
         }
     </style>
+    
     <!-- Local Animate.css -->
     <style>
-        /* Animate.css core - local version */
         .animate__animated {
             animation-duration: 1s;
             animation-fill-mode: both;
@@ -92,10 +126,19 @@
             100% { opacity: 1; transform: scale3d(1, 1, 1); }
         }
     </style>
+    
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📬</text></svg>">
 </head>
 <body class="dark-theme">
+    <!-- Initial Loading Screen -->
+    <div class="loading-overlay" id="initialLoading">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Завантаження Inbox Pro...</div>
+        </div>
+    </div>
+
     <!-- Login Screen -->
     <div class="login-screen" id="loginScreen">
         <div class="login-container animate__animated animate__fadeIn">
@@ -109,84 +152,131 @@
                 <p class="login-subtitle">AI-Powered Smart Email Client</p>
             </div>
             
+            <!-- Login Form -->
             <div class="login-form active" id="loginForm">
-                <h2><i class="fas fa-sign-in-alt"></i> <span data-i18n="welcomeBack">Welcome Back</span></h2>
+                <h2><i class="fas fa-sign-in-alt"></i> Welcome Back</h2>
                 
                 <div class="form-group">
-                    <label for="loginEmail"><i class="fas fa-envelope"></i> <span data-i18n="emailAddress">Email Address</span></label>
-                    <input type="email" id="loginEmail" placeholder="your@email.com" autocomplete="email" value="demo@example.com">
+                    <label for="loginEmail"><i class="fas fa-envelope"></i> Email Address</label>
+                    <input type="email" id="loginEmail" placeholder="your@email.com" autocomplete="email">
+                    <div class="error-message" id="loginEmailError"></div>
                 </div>
                 
                 <div class="form-group">
-                    <label for="loginPassword"><i class="fas fa-lock"></i> <span data-i18n="password">Password</span></label>
-                    <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password" value="password123">
+                    <label for="loginPassword"><i class="fas fa-lock"></i> Password</label>
+                    <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+                    <div class="error-message" id="loginPasswordError"></div>
                 </div>
                 
                 <div class="form-options">
                     <label class="checkbox">
                         <input type="checkbox" id="rememberMe" checked>
                         <span class="checkmark"></span>
-                        <span data-i18n="rememberMe">Remember me</span>
+                        <span>Remember me</span>
                     </label>
-                    <a href="#" class="forgot-link" data-i18n="forgotPassword">Forgot password?</a>
+                    <a href="#" class="forgot-link" id="forgotPasswordBtn">Forgot password?</a>
                 </div>
                 
                 <button class="btn-primary animate__animated animate__pulse" id="loginBtn" style="animation-delay: 1s; animation-iteration-count: infinite;">
-                    <i class="fas fa-sign-in-alt"></i> <span data-i18n="signIn">Sign In</span>
+                    <i class="fas fa-sign-in-alt"></i> Sign In
                 </button>
                 
                 <p class="login-switch">
-                    <span data-i18n="newUser">New user?</span> 
-                    <a href="#" id="showRegister" data-i18n="createAccount">Create account</a>
+                    <span>New user?</span> 
+                    <a href="#" id="showRegister">Create account</a>
                 </p>
+                
+                <!-- Privacy Notice -->
+                <div class="privacy-notice">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Your data is protected. <a href="#" id="privacyPolicyBtn">Privacy Policy</a></span>
+                </div>
             </div>
 
+            <!-- Register Form -->
             <div class="login-form" id="registerForm">
-                <h2><i class="fas fa-user-plus"></i> <span data-i18n="createAccount">Create Account</span></h2>
+                <h2><i class="fas fa-user-plus"></i> Create Account</h2>
                 
                 <div class="form-group">
-                    <label for="registerName"><i class="fas fa-user"></i> <span data-i18n="fullName">Full Name</span></label>
+                    <label for="registerName"><i class="fas fa-user"></i> Full Name</label>
                     <input type="text" id="registerName" placeholder="John Doe" autocomplete="name">
+                    <div class="error-message" id="registerNameError"></div>
                 </div>
                 
                 <div class="form-group">
-                    <label for="registerEmail"><i class="fas fa-envelope"></i> <span data-i18n="emailAddress">Email Address</span></label>
+                    <label for="registerEmail"><i class="fas fa-envelope"></i> Email Address</label>
                     <input type="email" id="registerEmail" placeholder="your@email.com" autocomplete="email">
+                    <div class="error-message" id="registerEmailError"></div>
                 </div>
                 
                 <div class="form-group">
-                    <label for="registerPassword"><i class="fas fa-lock"></i> <span data-i18n="password">Password</span></label>
+                    <label for="registerPassword"><i class="fas fa-lock"></i> Password</label>
                     <input type="password" id="registerPassword" placeholder="••••••••" autocomplete="new-password">
-                    <small class="password-hint" data-i18n="passwordHint">Min. 8 characters with letters & numbers</small>
+                    <div class="error-message" id="registerPasswordError"></div>
+                    <small class="password-hint">Min. 8 characters with letters & numbers</small>
+                    <!-- Password Strength Meter -->
+                    <div class="password-strength" id="passwordStrength">
+                        <div class="password-strength-meter"></div>
+                    </div>
                 </div>
                 
                 <div class="form-group">
-                    <label for="registerConfirm"><i class="fas fa-lock"></i> <span data-i18n="confirmPassword">Confirm Password</span></label>
+                    <label for="registerConfirm"><i class="fas fa-lock"></i> Confirm Password</label>
                     <input type="password" id="registerConfirm" placeholder="••••••••" autocomplete="new-password">
+                    <div class="error-message" id="registerConfirmError"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="checkbox">
+                        <input type="checkbox" id="acceptTerms" required>
+                        <span class="checkmark"></span>
+                        <span>I accept <a href="#" id="termsBtn">Terms of Service</a> and <a href="#" id="privacyBtn">Privacy Policy</a></span>
+                    </label>
+                    <div class="error-message" id="termsError"></div>
                 </div>
                 
                 <button class="btn-primary" id="registerBtn">
-                    <i class="fas fa-check"></i> <span data-i18n="createAccountBtn">Create Account</span>
+                    <i class="fas fa-check"></i> Create Account
                 </button>
                 
                 <p class="login-switch">
-                    <span data-i18n="alreadyHaveAccount">Already have an account?</span> 
-                    <a href="#" id="showLogin" data-i18n="signIn">Sign in</a>
+                    <span>Already have an account?</span> 
+                    <a href="#" id="showLogin">Sign in</a>
+                </p>
+            </div>
+
+            <!-- Reset Password Form -->
+            <div class="login-form" id="resetForm">
+                <h2><i class="fas fa-key"></i> Reset Password</h2>
+                
+                <div class="form-group">
+                    <label for="resetEmail"><i class="fas fa-envelope"></i> Email Address</label>
+                    <input type="email" id="resetEmail" placeholder="your@email.com" autocomplete="email">
+                    <div class="error-message" id="resetEmailError"></div>
+                </div>
+                
+                <button class="btn-primary" id="sendResetBtn">
+                    <i class="fas fa-paper-plane"></i> Send Reset Link
+                </button>
+                
+                <p class="login-switch">
+                    <span>Remember password?</span> 
+                    <a href="#" id="showLoginFromReset">Sign in</a>
                 </p>
             </div>
 
             <div class="login-features">
                 <div class="feature">
                     <i class="fas fa-robot"></i>
-                    <span data-i18n="aiFilter">AI Spam Filter</span>
+                    <span>AI Spam Filter</span>
                 </div>
                 <div class="feature">
                     <i class="fas fa-bolt"></i>
-                    <span data-i18n="smartSorting">Smart Sorting</span>
+                    <span>Smart Sorting</span>
                 </div>
                 <div class="feature">
                     <i class="fas fa-shield-alt"></i>
-                    <span data-i18n="securePrivate">Secure & Private</span>
+                    <span>Secure & Private</span>
                 </div>
             </div>
         </div>
@@ -208,14 +298,14 @@
                     <h1>Inbox Pro</h1>
                     <div class="ai-status-indicator">
                         <span class="status-dot ai-active"></span>
-                        <span class="status-text" data-i18n="aiActive">AI Active</span>
+                        <span class="status-text">AI Active</span>
                     </div>
                 </div>
             </div>
 
             <div class="search-box">
                 <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Search emails, contacts, subjects..." data-i18n-ph="searchPlaceholder">
+                <input type="text" id="searchInput" placeholder="Search emails, contacts, subjects...">
                 <div class="search-actions">
                     <button class="search-filter" id="searchFilter" title="Advanced Search">
                         <i class="fas fa-sliders-h"></i>
@@ -227,7 +317,7 @@
             </div>
 
             <div class="top-actions">
-                <button class="action-btn" id="refreshBtn" title="Refresh" data-i18n-title="refresh">
+                <button class="action-btn" id="refreshBtn" title="Refresh">
                     <i class="fas fa-sync-alt"></i>
                 </button>
                 
@@ -266,19 +356,19 @@
                     <div class="theme-menu" id="themeMenu">
                         <button data-theme="light" class="theme-option">
                             <i class="fas fa-sun"></i>
-                            <span data-i18n="lightTheme">Light</span>
+                            <span>Light</span>
                         </button>
                         <button data-theme="dark" class="theme-option active">
                             <i class="fas fa-moon"></i>
-                            <span data-i18n="darkTheme">Dark</span>
+                            <span>Dark</span>
                         </button>
                         <button data-theme="oled" class="theme-option">
                             <i class="fas fa-circle"></i>
-                            <span data-i18n="oledTheme">OLED</span>
+                            <span>OLED</span>
                         </button>
                         <button data-theme="blue" class="theme-option">
                             <i class="fas fa-water"></i>
-                            <span data-i18n="blueTheme">Ocean</span>
+                            <span>Ocean</span>
                         </button>
                     </div>
                 </div>
@@ -295,20 +385,20 @@
                     <button class="settings-btn" id="settingsBtn" title="Settings">
                         <i class="fas fa-cog"></i>
                     </button>
-                    <!-- User dropdown menu (FIXED: додано це меню) -->
+                    <!-- User dropdown menu -->
                     <div class="user-dropdown" id="userDropdown">
                         <a href="#" class="dropdown-item" id="viewProfileBtn">
                             <i class="fas fa-user"></i>
-                            <span data-i18n="profile">Profile</span>
+                            <span>Profile</span>
                         </a>
                         <a href="#" class="dropdown-item" id="userSettingsBtn">
                             <i class="fas fa-cog"></i>
-                            <span data-i18n="userSettings">Settings</span>
+                            <span>Settings</span>
                         </a>
                         <div class="dropdown-divider"></div>
                         <a href="#" class="dropdown-item logout-btn" id="logoutBtn">
                             <i class="fas fa-sign-out-alt"></i>
-                            <span data-i18n="signOut">Sign Out</span>
+                            <span>Sign Out</span>
                         </a>
                     </div>
                 </div>
@@ -319,7 +409,7 @@
         <div class="ai-status-bar animate__animated animate__slideInDown" id="aiStatusBar">
             <div class="ai-status-content">
                 <i class="fas fa-robot"></i>
-                <span data-i18n="aiOrganizing">AI is organizing your inbox. <strong>15</strong> emails sorted automatically.</span>
+                <span>AI is organizing your inbox. <strong>15</strong> emails sorted automatically.</span>
                 <div class="ai-progress">
                     <div class="ai-progress-bar"></div>
                 </div>
@@ -335,100 +425,100 @@
             <aside class="sidebar animate__animated animate__slideInLeft" id="sidebar">
                 <button class="compose-btn animate__animated animate__pulse" id="composeBtn" style="animation-delay: 2s; animation-iteration-count: infinite;">
                     <i class="fas fa-plus"></i> 
-                    <span data-i18n="compose">Compose</span>
+                    <span>Compose</span>
                 </button>
 
                 <!-- Quick Actions -->
                 <div class="quick-actions">
                     <button class="quick-btn" data-action="archive" title="Archive">
                         <i class="fas fa-archive"></i>
-                        <span class="quick-label" data-i18n="archive">Archive</span>
+                        <span class="quick-label">Archive</span>
                     </button>
                     <button class="quick-btn" data-action="important" title="Mark Important">
                         <i class="fas fa-star"></i>
-                        <span class="quick-label" data-i18n="important">Important</span>
+                        <span class="quick-label">Important</span>
                     </button>
                     <button class="quick-btn" data-action="delete" title="Delete">
                         <i class="fas fa-trash"></i>
-                        <span class="quick-label" data-i18n="delete">Delete</span>
+                        <span class="quick-label">Delete</span>
                     </button>
                     <button class="quick-btn" data-action="snooze" title="Snooze">
                         <i class="fas fa-clock"></i>
-                        <span class="quick-label" data-i18n="snooze">Snooze</span>
+                        <span class="quick-label">Snooze</span>
                     </button>
                 </div>
 
                 <!-- Folders -->
                 <nav class="sidebar-menu">
                     <div class="menu-section">
-                        <h4 data-i18n="folders">Folders</h4>
+                        <h4>Folders</h4>
                         <div class="menu-item active" data-folder="inbox">
                             <div class="menu-icon">
                                 <i class="fas fa-inbox"></i>
                             </div>
-                            <span data-i18n="inbox">Inbox</span>
+                            <span>Inbox</span>
                             <span class="badge unread-badge" id="inboxCount">5</span>
                         </div>
                         <div class="menu-item" data-folder="important">
                             <div class="menu-icon">
                                 <i class="fas fa-star"></i>
                             </div>
-                            <span data-i18n="important">Important</span>
+                            <span>Important</span>
                             <span class="badge" id="importantCount">2</span>
                         </div>
                         <div class="menu-item" data-folder="sent">
                             <div class="menu-icon">
                                 <i class="fas fa-paper-plane"></i>
                             </div>
-                            <span data-i18n="sent">Sent</span>
+                            <span>Sent</span>
                             <span class="badge" id="sentCount">3</span>
                         </div>
                         <div class="menu-item" data-folder="drafts">
                             <div class="menu-icon">
                                 <i class="fas fa-file-alt"></i>
                             </div>
-                            <span data-i18n="drafts">Drafts</span>
+                            <span>Drafts</span>
                             <span class="badge" id="draftsCount">1</span>
                         </div>
                         <div class="menu-item" data-folder="spam">
                             <div class="menu-icon">
                                 <i class="fas fa-ban"></i>
                             </div>
-                            <span data-i18n="spam">Spam</span>
+                            <span>Spam</span>
                             <span class="badge" id="spamCount">4</span>
                         </div>
                         <div class="menu-item" data-folder="trash">
                             <div class="menu-icon">
                                 <i class="fas fa-trash"></i>
                             </div>
-                            <span data-i18n="trash">Trash</span>
+                            <span>Trash</span>
                             <span class="badge" id="trashCount">2</span>
                         </div>
                     </div>
 
                     <!-- Labels -->
                     <div class="menu-section">
-                        <h4 data-i18n="labels">Labels</h4>
+                        <h4>Labels</h4>
                         <div class="labels-list">
                             <span class="label work-label" data-label="work">
                                 <i class="fas fa-briefcase"></i>
-                                <span data-i18n="work">Work</span>
+                                <span>Work</span>
                             </span>
                             <span class="label personal-label" data-label="personal">
                                 <i class="fas fa-home"></i>
-                                <span data-i18n="personal">Personal</span>
+                                <span>Personal</span>
                             </span>
                             <span class="label travel-label" data-label="travel">
                                 <i class="fas fa-plane"></i>
-                                <span data-i18n="travel">Travel</span>
+                                <span>Travel</span>
                             </span>
                             <span class="label finance-label" data-label="finance">
                                 <i class="fas fa-chart-line"></i>
-                                <span data-i18n="finance">Finance</span>
+                                <span>Finance</span>
                             </span>
                             <span class="label social-label" data-label="social">
                                 <i class="fas fa-users"></i>
-                                <span data-i18n="social">Social</span>
+                                <span>Social</span>
                             </span>
                         </div>
                     </div>
@@ -438,20 +528,20 @@
                         <div class="widget stats-widget">
                             <div class="widget-header">
                                 <i class="fas fa-chart-bar"></i>
-                                <span data-i18n="emailStats">Email Stats</span>
+                                <span>Email Stats</span>
                             </div>
                             <div class="stats-grid">
                                 <div class="stat-item">
                                     <div class="stat-value" id="totalEmails">156</div>
-                                    <div class="stat-label" data-i18n="total">Total</div>
+                                    <div class="stat-label">Total</div>
                                 </div>
                                 <div class="stat-item">
                                     <div class="stat-value" id="unreadEmails">12</div>
-                                    <div class="stat-label" data-i18n="unread">Unread</div>
+                                    <div class="stat-label">Unread</div>
                                 </div>
                                 <div class="stat-item">
                                     <div class="stat-value" id="importantEmails">8</div>
-                                    <div class="stat-label" data-i18n="important">Important</div>
+                                    <div class="stat-label">Important</div>
                                 </div>
                             </div>
                         </div>
@@ -462,14 +552,14 @@
                             </div>
                             <div class="weather-info">
                                 <div class="weather-temp" id="weatherTemp">24°C</div>
-                                <div class="weather-city" data-i18n="kyiv">Kyiv, UA</div>
+                                <div class="weather-city">Kyiv, UA</div>
                             </div>
                         </div>
 
                         <div class="widget storage-widget">
                             <div class="storage-header">
                                 <i class="fas fa-database"></i>
-                                <span data-i18n="storage">Storage</span>
+                                <span>Storage</span>
                                 <span class="storage-percent">65%</span>
                             </div>
                             <div class="storage-bar">
@@ -489,7 +579,7 @@
                         <div class="folder-title">
                             <h2 id="currentFolder">
                                 <i class="fas fa-inbox"></i> 
-                                <span data-i18n="inbox">Inbox</span>
+                                <span>Inbox</span>
                             </h2>
                             <div class="folder-stats">
                                 <span id="emailCount">5 emails</span>
@@ -502,10 +592,10 @@
                         <div class="ai-sorting">
                             <i class="fas fa-robot"></i>
                             <select id="sortSelect" class="sort-select">
-                                <option value="newest" data-i18n="newest">Newest first</option>
-                                <option value="oldest" data-i18n="oldest">Oldest first</option>
-                                <option value="important" data-i18n="importantFirst">Important first</option>
-                                <option value="unread" data-i18n="unreadFirst">Unread first</option>
+                                <option value="newest">Newest first</option>
+                                <option value="oldest">Oldest first</option>
+                                <option value="important">Important first</option>
+                                <option value="unread">Unread first</option>
                             </select>
                         </div>
                     </div>
@@ -540,7 +630,7 @@
                         
                         <button class="delete-folder-btn" id="emptyTrashBtn" style="display:none;">
                             <i class="fas fa-trash-alt"></i> 
-                            <span data-i18n="emptyTrash">Empty Trash</span>
+                            <span>Empty Trash</span>
                         </button>
                     </div>
                 </div>
@@ -549,28 +639,28 @@
                 <div class="email-filters" id="emailFilters">
                     <div class="filter-tags">
                         <span class="filter-tag active" data-filter="all">
-                            <span data-i18n="all">All</span>
+                            <span>All</span>
                             <span class="filter-count">5</span>
                         </span>
                         <span class="filter-tag" data-filter="unread">
                             <i class="fas fa-envelope"></i>
-                            <span data-i18n="unread">Unread</span>
+                            <span>Unread</span>
                             <span class="filter-count">3</span>
                         </span>
                         <span class="filter-tag" data-filter="important">
                             <i class="fas fa-star"></i>
-                            <span data-i18n="important">Important</span>
+                            <span>Important</span>
                             <span class="filter-count">2</span>
                         </span>
                         <span class="filter-tag" data-filter="attachments">
                             <i class="fas fa-paperclip"></i>
-                            <span data-i18n="withAttachments">With Attachments</span>
+                            <span>With Attachments</span>
                             <span class="filter-count">1</span>
                         </span>
                     </div>
                     <button class="filter-toggle" id="filterToggle">
                         <i class="fas fa-filter"></i>
-                        <span data-i18n="moreFilters">More Filters</span>
+                        <span>More Filters</span>
                     </button>
                 </div>
 
@@ -586,10 +676,10 @@
                         <div class="reader-header">
                             <button class="back-to-list" id="backToList">
                                 <i class="fas fa-arrow-left"></i>
-                                <span data-i18n="back">Back</span>
+                                <span>Back</span>
                             </button>
                             <div class="reader-title">
-                                <h2 id="readerTitle" data-i18n="selectEmail">Select an email</h2>
+                                <h2 id="readerTitle">Select an email</h2>
                                 <div class="email-labels" id="emailLabels"></div>
                             </div>
                             <div class="reader-actions">
@@ -615,15 +705,15 @@
                                     <div class="more-actions-menu" id="moreActionsMenu">
                                         <button class="more-action-item" id="printEmailBtn">
                                             <i class="fas fa-print"></i>
-                                            <span data-i18n="print">Print</span>
+                                            <span>Print</span>
                                         </button>
                                         <button class="more-action-item" id="reportSpamBtn">
                                             <i class="fas fa-flag"></i>
-                                            <span data-i18n="report">Report</span>
+                                            <span>Report</span>
                                         </button>
                                         <button class="more-action-item" id="snoozeEmailBtn">
                                             <i class="fas fa-clock"></i>
-                                            <span data-i18n="snooze">Snooze</span>
+                                            <span>Snooze</span>
                                         </button>
                                         <button class="more-action-item" id="moveToFolderBtn">
                                             <i class="fas fa-folder"></i>
@@ -643,7 +733,7 @@
                                         <div class="sender-email" id="readerSenderEmail">john@example.com</div>
                                         <div class="sender-verified">
                                             <i class="fas fa-check-circle"></i>
-                                            <span data-i18n="verified">Verified</span>
+                                            <span>Verified</span>
                                         </div>
                                     </div>
                                 </div>
@@ -658,7 +748,7 @@
                                     </div>
                                     <div class="email-security">
                                         <i class="fas fa-shield-alt"></i>
-                                        <span data-i18n="secure">Secure</span>
+                                        <span>Secure</span>
                                     </div>
                                 </div>
                             </div>
@@ -668,17 +758,17 @@
                                 
                                 <div class="email-recipients">
                                     <div class="recipient-group">
-                                        <strong data-i18n="to">To:</strong>
+                                        <strong>To:</strong>
                                         <span class="recipients-list" id="emailTo">team@company.com</span>
                                     </div>
                                     <div class="recipient-group">
-                                        <strong data-i18n="cc">CC:</strong>
+                                        <strong>CC:</strong>
                                         <span class="recipients-list" id="emailCc">manager@company.com</span>
                                     </div>
                                 </div>
 
                                 <div class="email-body" id="readerText">
-                                    <p data-i18n="selectEmailDesc">Select an email to read its content</p>
+                                    <p>Select an email to read its content</p>
                                 </div>
                                 
                                 <div class="email-signature" id="emailSignature">
@@ -697,12 +787,12 @@
                                     <div class="attachments-header">
                                         <h4>
                                             <i class="fas fa-paperclip"></i> 
-                                            <span data-i18n="attachments">Attachments</span> 
+                                            <span>Attachments</span> 
                                             <span class="attachment-count">(0)</span>
                                         </h4>
                                         <button class="download-all-btn" id="downloadAllBtn">
                                             <i class="fas fa-download"></i>
-                                            <span data-i18n="downloadAll">Download All</span>
+                                            <span>Download All</span>
                                         </button>
                                     </div>
                                     <div class="attachments-list" id="attachmentsList"></div>
@@ -713,31 +803,31 @@
                                 <div class="quick-actions-footer">
                                     <button class="btn-secondary" id="quickReplyBtn">
                                         <i class="fas fa-reply"></i> 
-                                        <span data-i18n="quickReply">Quick Reply</span>
+                                        <span>Quick Reply</span>
                                     </button>
                                     <button class="btn-secondary" id="snoozeBtn">
                                         <i class="fas fa-clock"></i> 
-                                        <span data-i18n="snooze">Snooze</span>
+                                        <span>Snooze</span>
                                     </button>
                                     <button class="btn-secondary" id="printBtn">
                                         <i class="fas fa-print"></i> 
-                                        <span data-i18n="print">Print</span>
+                                        <span>Print</span>
                                     </button>
                                     <button class="btn-secondary" id="reportBtn">
                                         <i class="fas fa-flag"></i> 
-                                        <span data-i18n="report">Report</span>
+                                        <span>Report</span>
                                     </button>
                                 </div>
                                 
                                 <div class="reply-box" id="replyBox">
-                                    <textarea placeholder="Type your reply..." data-i18n-ph="replyPlaceholder"></textarea>
+                                    <textarea placeholder="Type your reply..."></textarea>
                                     <div class="reply-actions">
                                         <button class="btn-primary" id="sendReplyBtn">
                                             <i class="fas fa-paper-plane"></i> 
-                                            <span data-i18n="send">Send</span>
+                                            <span>Send</span>
                                         </button>
                                         <button class="btn-secondary" id="cancelReplyBtn">
-                                            <span data-i18n="cancel">Cancel</span>
+                                            <span>Cancel</span>
                                         </button>
                                     </div>
                                 </div>
@@ -750,7 +840,7 @@
                 <div class="pagination" id="pagination">
                     <button class="pagination-btn prev" id="prevPage">
                         <i class="fas fa-chevron-left"></i>
-                        <span data-i18n="previous">Previous</span>
+                        <span>Previous</span>
                     </button>
                     <div class="page-numbers">
                         <span class="page-number active">1</span>
@@ -760,7 +850,7 @@
                         <span class="page-number">10</span>
                     </div>
                     <button class="pagination-btn next" id="nextPage">
-                        <span data-i18n="next">Next</span>
+                        <span>Next</span>
                         <i class="fas fa-chevron-right"></i>
                     </button>
                     <div class="page-size">
@@ -779,14 +869,13 @@
         <div class="bottom-bar">
             <div class="status-message">
                 <i class="fas fa-check-circle success"></i>
-                <span id="statusText" data-i18n="systemOperational">All systems operational</span>
+                <span id="statusText">All systems operational</span>
                 <span class="sync-status">
                     <i class="fas fa-sync-alt spinning"></i>
-                    <span data-i18n="syncing">Syncing...</span>
+                    <span>Syncing...</span>
                 </span>
             </div>
             <div class="bottom-actions">
-                <!-- FIXED: Language selector now works properly -->
                 <select id="langSelect" class="lang-select">
                     <option value="en">🇬🇧 English</option>
                     <option value="ua">🇺🇦 Українська</option>
@@ -807,18 +896,18 @@
     <div class="modal" id="settingsModal">
         <div class="modal-box animate__animated animate__zoomIn">
             <div class="modal-header">
-                <h3><i class="fas fa-user-cog"></i> <span data-i18n="userSettings">User Settings</span></h3>
+                <h3><i class="fas fa-user-cog"></i> User Settings</h3>
                 <button class="modal-close" id="closeSettings">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             
             <div class="modal-tabs">
-                <button class="tab-btn active" data-tab="profile" data-i18n="profile">Profile</button>
-                <button class="tab-btn" data-tab="appearance" data-i18n="appearance">Appearance</button>
-                <button class="tab-btn" data-tab="notifications" data-i18n="notifications">Notifications</button>
-                <button class="tab-btn" data-tab="security" data-i18n="security">Security</button>
-                <button class="tab-btn" data-tab="advanced" data-i18n="advanced">Advanced</button>
+                <button class="tab-btn active" data-tab="profile">Profile</button>
+                <button class="tab-btn" data-tab="appearance">Appearance</button>
+                <button class="tab-btn" data-tab="notifications">Notifications</button>
+                <button class="tab-btn" data-tab="security">Security</button>
+                <button class="tab-btn" data-tab="advanced">Advanced</button>
             </div>
 
             <div class="modal-content">
@@ -827,10 +916,10 @@
 
             <div class="modal-actions">
                 <button class="btn-primary" id="saveSettings">
-                    <i class="fas fa-save"></i> <span data-i18n="saveChanges">Save Changes</span>
+                    <i class="fas fa-save"></i> Save Changes
                 </button>
                 <button class="btn-secondary" id="cancelSettings">
-                    <span data-i18n="cancel">Cancel</span>
+                    Cancel
                 </button>
             </div>
         </div>
@@ -838,92 +927,110 @@
 
     <!-- COMPOSE MODAL -->
     <div class="modal" id="composeModal">
-        <div class="modal-box compose-modal animate__animated animate__slideInUp">
+        <div class="modal-box compose-modal animate__animated animate__zoomIn">
             <div class="modal-header">
-                <h3><i class="fas fa-pen-alt"></i> <span data-i18n="newMessage">New Message</span></h3>
-                <div class="compose-actions">
-                    <button class="action-btn" id="minimizeCompose" title="Minimize">
-                        <i class="fas fa-window-minimize"></i>
-                    </button>
-                    <button class="action-btn" id="saveDraftBtn" title="Save Draft">
-                        <i class="fas fa-save"></i>
-                    </button>
-                    <button class="action-btn" id="formatBtn" title="Format">
-                        <i class="fas fa-bold"></i>
-                    </button>
-                    <button class="modal-close" id="closeCompose">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
+                <h3><i class="fas fa-edit"></i> New Message</h3>
+                <button class="modal-close" id="closeCompose">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
-
+            
             <div class="compose-form">
                 <div class="compose-field">
-                    <input type="email" id="mailTo" placeholder="To" data-i18n-ph="to" multiple>
-                    <button class="add-cc-btn" id="addCcBtn">CC</button>
-                    <button class="add-bcc-btn" id="addBccBtn">BCC</button>
-                </div>
-                <div class="cc-field" id="ccField" style="display: none;">
-                    <input type="email" id="mailCc" placeholder="CC" data-i18n-ph="cc">
-                </div>
-                <div class="bcc-field" id="bccField" style="display: none;">
-                    <input type="email" id="mailBcc" placeholder="BCC" data-i18n-ph="bcc">
+                    <input type="text" id="mailTo" placeholder="To" autocomplete="email">
                 </div>
                 <div class="compose-field">
-                    <input id="mailSubject" placeholder="Subject" data-i18n-ph="subject">
-                </div>
-                <div class="compose-editor">
-                    <div class="editor-toolbar">
-                        <button class="editor-btn" data-format="bold"><i class="fas fa-bold"></i></button>
-                        <button class="editor-btn" data-format="italic"><i class="fas fa-italic"></i></button>
-                        <button class="editor-btn" data-format="underline"><i class="fas fa-underline"></i></button>
-                        <button class="editor-btn" data-format="list"><i class="fas fa-list"></i></button>
-                        <button class="editor-btn" data-format="link"><i class="fas fa-link"></i></button>
-                        <button class="editor-btn" data-format="image"><i class="fas fa-image"></i></button>
-                        <button class="editor-btn" data-format="undo"><i class="fas fa-undo"></i></button>
-                        <button class="editor-btn" data-format="redo"><i class="fas fa-redo"></i></button>
-                    </div>
-                    <textarea id="mailText" placeholder="Write your message here..." data-i18n-ph="message" rows="10"></textarea>
+                    <input type="text" id="mailSubject" placeholder="Subject">
                 </div>
                 
-                <div class="compose-attachments">
-                    <label for="mailFile" class="file-upload-label">
-                        <i class="fas fa-paperclip"></i> 
-                        <span data-i18n="addAttachment">Add Attachment</span>
-                        <span class="file-hint" data-i18n="maxSize">Max 25MB each</span>
-                    </label>
-                    <input type="file" id="mailFile" multiple>
-                    <div class="file-preview" id="filePreview"></div>
+                <div class="email-editor">
+                    <textarea id="mailText" placeholder="Write your message here..."></textarea>
                 </div>
-
-                <div class="compose-options">
+                
+                <div class="compose-actions">
+                    <button class="btn-primary" id="sendMail">
+                        <i class="fas fa-paper-plane"></i> Send
+                    </button>
+                    <button class="btn-secondary" id="discardBtn">
+                        <i class="fas fa-trash"></i> Discard
+                    </button>
+                    <button class="btn-secondary" id="saveDraftBtn">
+                        <i class="fas fa-save"></i> Save Draft
+                    </button>
                     <label class="checkbox">
-                        <input type="checkbox" id="urgentCheck" checked>
+                        <input type="checkbox" id="urgentCheck">
                         <span class="checkmark"></span>
-                        <span data-i18n="urgent">Mark as Urgent</span>
-                    </label>
-                    <label class="checkbox">
-                        <input type="checkbox" id="readReceiptCheck">
-                        <span class="checkmark"></span>
-                        <span data-i18n="readReceipt">Request read receipt</span>
-                    </label>
-                    <label class="checkbox">
-                        <input type="checkbox" id="encryptCheck">
-                        <span class="checkmark"></span>
-                        <span data-i18n="encrypt">Encrypt message</span>
+                        <span>Important</span>
                     </label>
                 </div>
             </div>
+        </div>
+    </div>
 
+    <!-- Privacy Policy Modal -->
+    <div class="modal" id="privacyModal">
+        <div class="modal-box animate__animated animate__zoomIn">
+            <div class="modal-header">
+                <h3><i class="fas fa-shield-alt"></i> Privacy Policy</h3>
+                <button class="modal-close" id="closePrivacy">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-content">
+                <div class="privacy-content">
+                    <h4>How we protect your data</h4>
+                    <p>1. All passwords are hashed before storage</p>
+                    <p>2. Email addresses are stored encrypted</p>
+                    <p>3. We use Firebase Authentication for secure authentication</p>
+                    <p>4. Data is transmitted via secure HTTPS connection</p>
+                    <p>5. We do not share your data with third parties</p>
+                    
+                    <h4>What we collect</h4>
+                    <p>• Email address (for registration and sending emails)</p>
+                    <p>• Username (for personalization)</p>
+                    <p>• Emails you send and receive (stored in your personal storage)</p>
+                    
+                    <h4>Your rights</h4>
+                    <p>You can at any time:</p>
+                    <p>• Delete your account</p>
+                    <p>• Export your data</p>
+                    <p>• Delete email history</p>
+                </div>
+            </div>
+            
             <div class="modal-actions">
-                <button class="btn-primary" id="sendMail">
-                    <i class="fas fa-paper-plane"></i> <span data-i18n="send">Send</span>
+                <button class="btn-primary" id="acceptPrivacyBtn">
+                    <i class="fas fa-check"></i> Accept
                 </button>
-                <button class="btn-secondary" id="scheduleBtn">
-                    <i class="fas fa-clock"></i> <span data-i18n="schedule">Schedule</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Terms of Service Modal -->
+    <div class="modal" id="termsModal">
+        <div class="modal-box animate__animated animate__zoomIn">
+            <div class="modal-header">
+                <h3><i class="fas fa-file-contract"></i> Terms of Service</h3>
+                <button class="modal-close" id="closeTerms">
+                    <i class="fas fa-times"></i>
                 </button>
-                <button class="btn-secondary" id="discardBtn">
-                    <i class="fas fa-times"></i> <span data-i18n="discard">Discard</span>
+            </div>
+            
+            <div class="modal-content">
+                <div class="terms-content">
+                    <h4>Inbox Pro Terms of Use</h4>
+                    <p>1. Use the service for legal purposes only</p>
+                    <p>2. Spam distribution is prohibited</p>
+                    <p>3. The sender is responsible for the content of emails</p>
+                    <p>4. We reserve the right to delete accounts for violations</p>
+                    <p>5. Service is provided "as is" without warranties</p>
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn-primary" id="acceptTermsBtn">
+                    <i class="fas fa-check"></i> Accept
                 </button>
             </div>
         </div>
@@ -939,7 +1046,7 @@
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-content">
             <div class="loading-spinner"></div>
-            <div class="loading-text" data-i18n="loading">Loading...</div>
+            <div class="loading-text">Loading...</div>
         </div>
     </div>
 
