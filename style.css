@@ -1,63 +1,252 @@
-/* --- Root variables & themes --- */
-:root {
-  --bg: #0f1117;
-  --panel: #1c1f26;
-  --text: #e4e4e7;
-  --text-secondary: #a1a1aa;
-  --accent: #667eea;
-  --accent-hover: #5a67d8;
-  --danger: #ef4444;
-  --success: #10b981;
-  --border: #2d2d3a;
-  --transition: all 0.3s ease;
-  --unread-bg: rgba(102, 126, 234, 0.15);
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-/* --- Basic reset --- */
-* { box-sizing: border-box; margin:0; padding:0; }
-body { font-family: Arial, sans-serif; background:var(--bg); color:var(--text); min-height:100vh; transition:var(--transition); }
-h1,h2,h3,h4,h5,h6 { margin:0; }
-button,input,textarea,select { font-family: inherit; }
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f5f5f5;
+  color: #333;
+}
 
-/* --- Layout --- */
-.app { max-width:1400px; margin:0 auto; display:flex; flex-direction:column; min-height:100vh; }
-.top { display:flex; justify-content:space-between; align-items:center; padding:15px; background:var(--panel); border-radius:12px; }
-.main { display:flex; gap:20px; flex:1; padding:10px 0; }
-.sidebar { width:260px; background:var(--panel); border-radius:12px; padding:20px; display:flex; flex-direction:column; gap:15px; }
-.content { flex:1; display:flex; flex-direction:column; gap:15px; }
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
 
-/* --- Compose Button --- */
-.compose-btn { width:100%; padding:14px; background:var(--accent); color:white; border:none; border-radius:10px; cursor:pointer; display:flex; justify-content:center; gap:10px; transition:var(--transition);}
-.compose-btn:hover { transform:translateY(-2px); }
+/* Header */
+header.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #4a76a8;
+  color: white;
+  padding: 10px 15px;
+}
 
-/* --- Emails list --- */
-.emails { flex:1; background:var(--panel); border-radius:12px; padding:20px; overflow-y:auto; display:flex; flex-direction:column; gap:10px; }
-.email { display:flex; align-items:center; gap:15px; padding:15px; border-radius:10px; cursor:pointer; border:1px solid transparent; transition:var(--transition);}
-.email:hover { background:var(--accent); color:white; }
+header.top h1 {
+  font-size: 1.4rem;
+}
 
-/* --- Email reader --- */
-.email-reader { flex:1; background:var(--panel); border-radius:12px; padding:25px; display:flex; flex-direction:column; overflow-y:auto; }
-.reader-header { display:flex; align-items:center; gap:15px; margin-bottom:15px; }
-.reader-body p { line-height:1.6; white-space:pre-wrap; }
+.top-actions button {
+  background: none;
+  border: none;
+  color: white;
+  margin-left: 10px;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
 
-/* --- Modals --- */
-.modal { position:fixed; inset:0; background:rgba(0,0,0,0.7); display:none; justify-content:center; align-items:center; z-index:1000; padding:20px; }
-.modal-box { background:var(--panel); padding:30px; border-radius:16px; width:100%; max-width:500px; max-height:90vh; overflow-y:auto; box-shadow:0 20px 40px rgba(0,0,0,0.3);}
-.modal-actions { display:flex; gap:10px; margin-top:25px;}
-.btn-primary { background:var(--accent); color:white; border:none; padding:12px 25px; border-radius:8px; cursor:pointer; flex:1; display:flex; align-items:center; justify-content:center; gap:8px; }
-.btn-secondary { background:transparent; color:var(--text); border:1px solid var(--border); padding:12px 25px; border-radius:8px; cursor:pointer; flex:1; display:flex; align-items:center; justify-content:center; gap:8px; }
+/* Sidebar */
+.main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
 
-/* --- File preview --- */
-.file-preview { margin-top:15px; display:flex; flex-direction:column; gap:8px; }
-.file-preview-item { display:flex; justify-content:space-between; padding:10px; background:var(--bg); border-radius:6px; border:1px solid var(--border); }
+.sidebar {
+  width: 250px;
+  background: #2c3e50;
+  color: white;
+  padding: 10px;
+  flex-shrink: 0;
+}
 
-/* --- Progress bar --- */
-.progress-container { width:100%; height:6px; background:#444; border-radius:3px; margin-top:10px; }
-.progress-bar { height:100%; width:0%; background:var(--accent); border-radius:3px; transition:width 0.3s ease; }
+.sidebar-menu {
+  margin-top: 20px;
+}
 
-/* --- Toast --- */
-.toast { position:fixed; bottom:70px; right:20px; background:var(--accent); color:white; padding:12px 20px; border-radius:8px; box-shadow:0 4px 15px rgba(0,0,0,0.2); z-index:1000; transform:translateX(150%); transition:transform 0.3s ease;}
-.toast.show { transform:translateX(0); }
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 5px;
+}
 
-/* --- Responsive --- */
-@media(max-width:768px){ .main{ flex-direction:column; } .sidebar{ width:100%; } .emails-container{ flex-direction:column; } }
+.menu-item i {
+  margin-right: 10px;
+}
+
+.menu-item.active, .menu-item:hover {
+  background: #34495e;
+}
+
+/* Content */
+.content {
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto;
+  position: relative;
+}
+
+.emails-container {
+  display: flex;
+  gap: 15px;
+  flex-direction: column;
+}
+
+.emails .email-item {
+  background: white;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  margin-bottom: 10px;
+}
+
+/* Reader */
+.email-reader {
+  background: #fff;
+  border-radius: 5px;
+  padding: 10px;
+  display: none;
+  flex-direction: column;
+}
+
+.reader-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.reader-meta {
+  font-size: 0.85rem;
+  color: #666;
+  margin: 5px 0;
+}
+
+.reader-body p {
+  margin-top: 10px;
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  display:none;
+  justify-content:center;
+  align-items:center;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+}
+
+.modal-box {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90%;
+  overflow-y: auto;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.btn-primary {
+  background: #4a76a8;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.btn-secondary {
+  background: #bdc3c7;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* Drag & Drop */
+.file-drop-area {
+  border: 2px dashed #4a76a8;
+  padding: 20px;
+  text-align: center;
+  margin-top: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.file-drop-area.dragover {
+  background: #e3f2fd;
+}
+
+/* File Preview */
+.file-preview {
+  margin-top: 10px;
+}
+
+.file-preview div {
+  margin-bottom: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Progress Bar */
+.progress-bar {
+  width: 100%;
+  background: #eee;
+  height: 8px;
+  border-radius: 5px;
+  margin-top: 10px;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: #4a76a8;
+  border-radius: 5px;
+  transition: width 0.3s;
+}
+
+/* Toast Notification */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left:50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 10px;
+  display: none;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .main {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    display: flex;
+    overflow-x: auto;
+  }
+
+  .menu-item {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .emails-container {
+    flex-direction: column;
+  }
+}
