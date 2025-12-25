@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Inbox Pro 🔥</title>
+<title>Inbox Pro</title>
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -13,7 +13,7 @@
     <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
     <h1>📬 Inbox Pro</h1>
     <div class="top-actions">
-      <button type="button" id="themeToggle" class="theme-btn"><i class="fas fa-moon"></i></button>
+      <button id="themeToggle" class="theme-btn"><i class="fas fa-moon"></i></button>
       <span id="userEmail" class="user-email"></span>
       <button class="settings-btn" id="settingsBtn"><i class="fas fa-user-edit"></i></button>
     </div>
@@ -21,22 +21,38 @@
 
   <div class="main">
     <aside class="sidebar" id="sidebar">
-      <button type="button" class="compose-btn" id="composeBtn"><i class="fas fa-plus"></i> <span>Compose</span></button>
+      <button type="button" class="compose-btn" id="composeBtn">
+        <i class="fas fa-plus"></i> <span data-i18n="compose">Compose</span>
+      </button>
       <div class="sidebar-menu">
-        <div class="menu-item active" data-folder="inbox"><i class="fas fa-inbox"></i> Inbox <span class="badge" id="inboxCount">0</span></div>
-        <div class="menu-item" data-folder="sent"><i class="fas fa-paper-plane"></i> Sent</div>
-        <div class="menu-item" data-folder="drafts"><i class="fas fa-file-alt"></i> Drafts</div>
-        <div class="menu-item" data-folder="spam"><i class="fas fa-ban"></i> Spam</div>
-        <div class="menu-item" data-folder="trash"><i class="fas fa-trash"></i> Trash <span class="badge" id="trashCount">0</span></div>
+        <div class="menu-item active" data-folder="inbox">
+          <i class="fas fa-inbox"></i> <span data-i18n="inbox">Inbox</span>
+          <span class="badge" id="inboxCount">0</span>
+        </div>
+        <div class="menu-item" data-folder="sent">
+          <i class="fas fa-paper-plane"></i> <span data-i18n="sent">Sent</span>
+        </div>
+        <div class="menu-item" data-folder="drafts">
+          <i class="fas fa-file-alt"></i> <span data-i18n="drafts">Drafts</span>
+        </div>
+        <div class="menu-item" data-folder="spam">
+          <i class="fas fa-ban"></i> <span data-i18n="spam">Spam</span>
+        </div>
+        <div class="menu-item" data-folder="trash">
+          <i class="fas fa-trash"></i> <span data-i18n="trash">Trash</span>
+          <span class="badge" id="trashCount">0</span>
+        </div>
       </div>
     </aside>
 
     <section class="content">
       <div class="content-header">
         <h2 id="currentFolder">Inbox</h2>
-        <button class="delete-folder-btn" id="emptyTrashBtn" style="display:none;"><i class="fas fa-trash"></i> Empty Trash</button>
+        <button class="delete-folder-btn" id="emptyTrashBtn" style="display:none;">
+          <i class="fas fa-trash"></i> <span data-i18n="emptyTrash">Empty Trash</span>
+        </button>
       </div>
-
+      
       <div class="emails-container">
         <div class="emails" id="emailsList"></div>
         <div class="email-reader" id="reader">
@@ -52,7 +68,7 @@
           <div class="reader-body">
             <p id="readerText"></p>
             <div class="reader-attachments" id="readerFiles" style="display:none;">
-              <h4><i class="fas fa-paperclip"></i> Attachments</h4>
+              <h4><i class="fas fa-paperclip"></i> <span data-i18n="attachments">Attachments</span></h4>
               <div class="attachments-list" id="attachmentsList"></div>
             </div>
           </div>
@@ -64,25 +80,43 @@
   <div class="lang">
     <select id="langSelect">
       <option value="ua">🇺🇦 UA</option>
-      <option value="en" selected>🇬🇧 EN</option>
+      <option value="en">🇬🇧 EN</option>
       <option value="de">🇩🇪 DE</option>
       <option value="ru">🇷🇺 RU</option>
     </select>
   </div>
 </div>
 
+<!-- LOGIN MODAL -->
+<div class="modal" id="loginModal">
+  <div class="modal-box">
+    <h3><i class="fas fa-user"></i> <span data-i18n="login">Login / Register</span></h3>
+    <div class="form-group">
+      <label for="loginEmail" data-i18n="yourEmail">Email</label>
+      <input type="email" id="loginEmail" placeholder="your@email.com">
+    </div>
+    <div class="form-group">
+      <label for="loginPass" data-i18n="password">Password</label>
+      <input type="password" id="loginPass" placeholder="Password">
+    </div>
+    <div class="modal-actions">
+      <button type="button" id="loginBtn" class="btn-primary" data-i18n="loginBtn">Login / Register</button>
+    </div>
+  </div>
+</div>
+
 <!-- SETTINGS MODAL -->
 <div class="modal" id="settingsModal">
   <div class="modal-box">
-    <h3><i class="fas fa-user-edit"></i> User Settings</h3>
+    <h3><i class="fas fa-user-edit"></i> <span data-i18n="userSettings">User Settings</span></h3>
     <div class="form-group">
-      <label for="editEmail">Your Email Address</label>
+      <label for="editEmail" data-i18n="yourEmail">Your Email Address</label>
       <input type="email" id="editEmail" placeholder="your@email.com">
     </div>
-    <p class="hint">This email will be used as your sender address</p>
+    <p class="hint" data-i18n="emailHint">This email will be used as your sender address</p>
     <div class="modal-actions">
-      <button type="button" id="saveSettings" class="btn-primary">Save</button>
-      <button type="button" id="closeSettings" class="btn-secondary">Close</button>
+      <button type="button" id="saveSettings" class="btn-primary" data-i18n="save">Save</button>
+      <button type="button" id="closeSettings" class="btn-secondary" data-i18n="close">Close</button>
     </div>
   </div>
 </div>
@@ -90,24 +124,28 @@
 <!-- COMPOSE MODAL -->
 <div class="modal" id="composeModal">
   <div class="modal-box">
-    <h3><i class="fas fa-envelope"></i> New Mail</h3>
+    <h3><i class="fas fa-envelope"></i> <span data-i18n="newMail">New mail</span></h3>
     <div class="form-group">
-      <input type="email" placeholder="To (email)" id="mailTo">
+      <input type="email" placeholder="To (email)" id="mailTo" data-i18n-ph="toEmail">
     </div>
     <div class="form-group">
-      <input placeholder="Subject" id="mailSubject">
+      <input placeholder="Subject" id="mailSubject" data-i18n-ph="subject">
     </div>
     <div class="form-group">
-      <textarea placeholder="Message" id="mailText" rows="6"></textarea>
+      <textarea placeholder="Message" id="mailText" rows="8" data-i18n-ph="message"></textarea>
     </div>
     <div class="form-group">
-      <label for="mailFile" class="file-upload-label"><i class="fas fa-paperclip"></i> Add Attachment</label>
+      <label for="mailFile" class="file-upload-label">
+        <i class="fas fa-paperclip"></i> <span data-i18n="addAttachment">Add Attachment</span>
+      </label>
       <input type="file" id="mailFile" multiple style="display:none;">
       <div class="file-preview" id="filePreview"></div>
     </div>
     <div class="modal-actions">
-      <button type="button" id="sendMail" class="btn-primary"><i class="fas fa-paper-plane"></i> Send</button>
-      <button type="button" id="closeCompose" class="btn-secondary">Close</button>
+      <button type="button" id="sendMail" class="btn-primary">
+        <i class="fas fa-paper-plane"></i> <span data-i18n="send">Send</span>
+      </button>
+      <button type="button" id="closeCompose" class="btn-secondary" data-i18n="close">Close</button>
     </div>
   </div>
 </div>
@@ -117,7 +155,9 @@
   <div class="modal-box">
     <div class="image-modal-header">
       <h3 id="imageTitle"></h3>
-      <button class="close-image" id="closeImage"><i class="fas fa-times"></i></button>
+      <button class="close-image" id="closeImage">
+        <i class="fas fa-times"></i>
+      </button>
     </div>
     <div class="image-container">
       <img id="modalImage" src="" alt="Preview">
