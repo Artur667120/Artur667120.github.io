@@ -1,6 +1,18 @@
-/* ====================== КОНФІГУРАЦІЯ ====================== */
+/* ====================== ІМПОРТ СЕРВІСІВ ====================== */
 
-// EMAILJS CONFIG
+// Імпорт наших нових сервісів
+import { authService } from './auth-service.js';
+import { emailService } from './email-service.js';
+import { storageService } from './storage-service.js';
+import { 
+    formatDate, 
+    validateEmail, 
+    validatePassword, 
+    checkPasswordStrength,
+    pluralize 
+} from './utils.js';
+
+// EMAILJS CONFIG - ТВОЇ КЛЮЧІ
 const EMAILJS_CONFIG = {
     PUBLIC_KEY: 'afzWbZbh3EJiObFmK',
     SERVICE_ID: 'service_a3mpspb',
@@ -9,28 +21,22 @@ const EMAILJS_CONFIG = {
 
 /* ====================== ГЛОБАЛЬНІ ЗМІННІ ====================== */
 let currentUser = null;
-let auth = null;
-let db = null;
-let unsubscribeEmails = null;
 let currentFolder = 'inbox';
 let isInitialized = false;
 
-/* ====================== ІНІЦІАЛІЗАЦІЯ ====================== */
+/* ====================== ІНІЦІАЛІЗАЦІЯ ДОДАТКУ ====================== */
 function initializeApp() {
     if (isInitialized) return;
     
     console.log('🚀 Ініціалізація Inbox Pro...');
     
-    // Ініціалізація Firebase (вже в HTML)
-    auth = window.firebaseAuth;
-    db = window.firebaseFirestore;
+    // Ініціалізація сервісу автентифікації
+    authService.initAuthStateListener();
     
-    if (!auth || !db) {
-        console.error('❌ Firebase не ініціалізовано');
-        showToast('Помилка підключення до сервера', 'error');
-        setTimeout(() => location.reload(), 3000);
-        return;
-    }
+    // Додати слухача зміни стану автентифікації
+    authService.addAuthStateListener((user) => {
+        handleAuthStateChange(user);
+    });
     
     // Ініціалізація EmailJS
     if (typeof emailjs !== 'undefined') {
@@ -41,59 +47,36 @@ function initializeApp() {
     // Налаштування слухачів подій
     setupEventListeners();
     
-    // Перевірка стану автентифікації
-    checkAuthState();
+    // Приховати завантаження через 2 секунди
+    setTimeout(() => {
+        const initialLoading = document.getElementById('initialLoading');
+        if (initialLoading) initialLoading.style.display = 'none';
+    }, 2000);
     
     isInitialized = true;
     console.log('✅ Inbox Pro ініціалізовано');
 }
 
-/* ====================== АВТЕНТИФІКАЦІЯ ====================== */
-function checkAuthState() {
-    auth.onAuthStateChanged((user) => {
-        const initialLoading = document.getElementById('initialLoading');
-        if (initialLoading) initialLoading.style.display = 'none';
+function handleAuthStateChange(user) {
+    const initialLoading = document.getElementById('initialLoading');
+    if (initialLoading) initialLoading.style.display = 'none';
+    
+    if (user) {
+        currentUser = user;
+        showApp();
+        updateUserInterface();
+        emailService.setupRealtimeListener(user.uid, currentFolder);
         
-        if (user) {
-            // Користувач авторизований
-            handleUserSignedIn(user);
+        // Показати повідомлення про успішний вхід
+        if (user.emailVerified) {
+            showToast('З поверненням!', 'success');
         } else {
-            // Користувач не авторизований
-            handleUserSignedOut();
+            showToast('Ласкаво просимо до Inbox Pro!', 'success');
         }
-    });
-}
-
-async function handleUserSignedIn(user) {
-    console.log('✅ Користувач авторизований:', user.email);
-    
-    currentUser = {
-        uid: user.uid,
-        email: user.email,
-        name: user.displayName || user.email.split('@')[0],
-        emailVerified: user.emailVerified
-    };
-    
-    // Оновлення профілю користувача
-    await updateUserProfile(user.uid);
-    
-    // Завантаження додаткових даних користувача
-    await loadUserProfile(user.uid);
-    
-    // Оновлення інтерфейсу
-    updateUserInterface();
-    
-    // Показати головний додаток
-    showApp();
-    
-    // Налаштування реального часу для листів
-    setupRealtimeEmails();
-    
-    // Показати повідомлення про успішний вхід
-    if (user.metadata.creationTime === user.metadata.lastSignInTime) {
-        showToast('Ласкаво просимо до Inbox Pro!', 'success');
     } else {
-        showToast('З поверненням!', 'success');
+        currentUser = null;
+        showLoginScreen();
+        emailService.stopRealtimeListener();
     }
 }
 
@@ -114,169 +97,7 @@ function handleUserSignedOut() {
 async function registerUser(email, password, name) {
     try {
         showLoading('Реєстрація...');
-        
-        // Перевірка чи email вже існує
-        const emailExists = await checkEmailExists(email);
-        if (emailExists) {
-            hideLoading();
-            showError('registerEmailError', 'Ця електронна пошта вже використовується');
-            return false;
-        }
-        
-        // Створення користувача
-        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-        
-        // Оновлення профілю
-        await userCredential.user.updateProfile({ displayName: name });
-        
-        // Збереження додаткових даних користувача
-        await db.collection('users').doc(userCredential.user.uid).set({
-            email: email.toLowerCase(),
-            name: name,
-            createdAt: new Date().toISOString(),
-            lastLogin: new Date().toISOString(),
-            emailVerified: false,
-            storageUsed: 0,
-            plan: 'free',
-            settings: {
-                theme: 'dark',
-                language: 'ua',
-                notifications: true,
-                autoSave: true
-            },
-            profile: {
-                avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=667eea&color=fff`,
-                bio: '',
-                location: '',
-                website: ''
-            }
-        });
-        
-        // Відправлення листа з підтвердженням
-        await sendVerificationEmail(userCredential.user);
-        
-        hideLoading();
-        showToast('Акаунт успішно створено! Перевірте пошту для підтвердження.', 'success');
-        
-        // Автоматичний вхід після реєстрації
-        await loginUser(email, password, true);
-        
-        return true;
-    } catch (error) {
-        hideLoading();
-        handleAuthError(error, 'register');
-        return false;
-    }
-}
-
-async function loginUser(email, password, rememberMe) {
-    try {
-        showLoading('Вхід в систему...');
-        
-        // Налаштування персистентності сесії
-        const persistence = rememberMe ? 
-            firebase.auth.Auth.Persistence.LOCAL : 
-            firebase.auth.Auth.Persistence.SESSION;
-        
-        await auth.setPersistence(persistence);
-        
-        // Авторизація
-        await auth.signInWithEmailAndPassword(email, password);
-        
-        hideLoading();
-        return true;
-    } catch (error) {
-        hideLoading();
-        handleAuthError(error, 'login');
-        return false;
-    }
-}
-
-async function logoutUser() {
-    try {
-        showLoading('Вихід...');
-        
-        // Зупинити слухач реального часу
-        if (unsubscribeEmails) {
-            unsubscribeEmails();
-            unsubscribeEmails = null;
-        }
-        
-        // Вийти з системи
-        await auth.signOut();
-        
-        // Очистити дані користувача
-        currentUser = null;
-        localStorage.removeItem('userPreferences');
-        
-        hideLoading();
-        showToast('Ви успішно вийшли з системи', 'success');
-        
-        // Показати екран входу
-        showLoginScreen();
-    } catch (error) {
-        console.error('Помилка виходу:', error);
-        showToast('Помилка при виході з системи', 'error');
-        hideLoading();
-    }
-}
-
-async function sendPasswordResetEmail(email) {
-    try {
-        showLoading('Надсилання листа...');
-        await auth.sendPasswordResetEmail(email);
-        hideLoading();
-        showToast('Лист для відновлення пароля надіслано на вашу пошту', 'success');
-        return true;
-    } catch (error) {
-        hideLoading();
-        handleAuthError(error, 'reset');
-        return false;
-    }
-}
-
-async function checkEmailExists(email) {
-    try {
-        const methods = await auth.fetchSignInMethodsForEmail(email);
-        return methods.length > 0;
-    } catch (error) {
-        console.error('Помилка перевірки email:', error);
-        return false;
-    }
-}
-
-async function sendVerificationEmail(user) {
-    try {
-        await user.sendEmailVerification();
-        console.log('Лист з підтвердженням надіслано');
-    } catch (error) {
-        console.error('Помилка відправлення листа з підтвердженням:', error);
-    }
-}
-
-async function updateUserProfile(uid) {
-    try {
-        await db.collection('users').doc(uid).update({
-            lastLogin: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-        });
-    } catch (error) {
-        console.error('Помилка оновлення профілю:', error);
-    }
-}
-
-async function loadUserProfile(uid) {
-    try {
-        const userDoc = await db.collection('users').doc(uid).get();
-        if (userDoc.exists) {
-            const userData = userDoc.data();
-            currentUser = { ...currentUser, ...userData };
-            
-            // Застосування налаштувань користувача
-            applyUserSettings(userData.settings);
-            
-            console.log('Профіль користувача завантажено:', currentUser);
-        }
+   
     } catch (error) {
         console.error('Помилка завантаження профілю:', error);
     }
@@ -984,7 +805,15 @@ function setupAuthForms() {
             return;
         }
         
-        await loginUser(email, password, rememberMe);
+        showLoading('Вхід в систему...');
+        const result = await authService.login(email, password);
+        hideLoading();
+        
+        if (result.success) {
+            showToast('Успішний вхід!', 'success');
+        } else {
+            showError('loginEmailError', result.error);
+        }
     });
     
     // Реєстрація
@@ -1023,7 +852,15 @@ function setupAuthForms() {
             return;
         }
         
-        await registerUser(email, password, name);
+        showLoading('Реєстрація...');
+        const result = await authService.register(email, password, name);
+        hideLoading();
+        
+        if (result.success) {
+            showToast('Акаунт успішно створено!', 'success');
+        } else {
+            showError('registerEmailError', result.error);
+        }
     });
     
     // Відновлення пароля
@@ -1037,7 +874,16 @@ function setupAuthForms() {
             return;
         }
         
-        await sendPasswordResetEmail(email);
+        showLoading('Надсилання листа...');
+        const result = await authService.resetPassword(email);
+        hideLoading();
+        
+        if (result.success) {
+            showToast('Лист для відновлення пароля надіслано на вашу пошту', 'success');
+            switchAuthForm('loginForm');
+        } else {
+            showError('resetEmailError', result.error);
+        }
     });
     
     // Індикатор сили пароля
@@ -1080,10 +926,18 @@ function setupAuthForms() {
 }
 
 function setupLogout() {
-    document.getElementById('logoutBtn')?.addEventListener('click', (e) => {
+    document.getElementById('logoutBtn')?.addEventListener('click', async (e) => {
         e.preventDefault();
         if (confirm('Ви дійсно хочете вийти з акаунту?')) {
-            logoutUser();
+            showLoading('Вихід...');
+            const result = await authService.logout();
+            hideLoading();
+            
+            if (result.success) {
+                showToast('Ви успішно вийшли з системи', 'success');
+            } else {
+                showToast('Помилка при виході з системи', 'error');
+            }
         }
     });
 }
@@ -1536,7 +1390,9 @@ document.addEventListener('DOMContentLoaded', initializeApp);
 
 // Експорт функцій для глобального використання
 window.InboxPro = {
-    logout: logoutUser,
+    logout: () => authService.logout(),
     showToast: showToast,
-    getCurrentUser: () => currentUser
+    getCurrentUser: () => authService.getCurrentUser(),
+    authService: authService,
+    emailService: emailService
 };
