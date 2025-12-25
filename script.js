@@ -1,921 +1,980 @@
-// ====================== GLOBAL VARIABLES ======================
-let emails = [];
-let currentFolder = 'inbox';
-let currentUser = null;
-let currentSelectedEmail = null;
-let selectedEmails = new Set();
-let currentLanguage = localStorage.getItem('language') || 'en';
-let currentTheme = localStorage.getItem('theme') || 'dark';
-
-// ====================== TRANSLATION SYSTEM ======================
-const translations = {
-    en: {
-        // Login/Register
-        subtitle: "Smart email client with AI features",
-        welcomeBack: "Welcome Back",
-        emailAddress: "Email Address",
-        password: "Password",
-        rememberMe: "Remember me",
-        forgotPassword: "Forgot password?",
-        signIn: "Sign In",
-        newUser: "New user?",
-        createAccount: "Create account",
-        fullName: "Full Name",
-        confirmPassword: "Confirm Password",
-        createAccountBtn: "Create Account",
-        alreadyHaveAccount: "Already have an account?",
-        aiFilter: "AI Spam Filter",
-        smartSorting: "Smart Sorting",
-        securePrivate: "Secure & Private",
-        
-        // App
-        online: "Online",
-        compose: "Compose",
-        inbox: "Inbox",
-        important: "Important",
-        sent: "Sent",
-        drafts: "Drafts",
-        spam: "Spam",
-        trash: "Trash",
-        labels: "Labels",
-        searchPlaceholder: "Search emails...",
-        emptyInbox: "Inbox is empty",
-        noEmails: "No emails to display",
-        selectEmail: "Select an email",
-        selectEmailDesc: "Select an email to read its content",
-        attachments: "Attachments",
-        emptyTrash: "Empty Trash",
-        quickReply: "Quick Reply",
-        print: "Print",
-        delete: "Delete",
-        view: "View",
-        download: "Download",
-        from: "From",
-        date: "Date",
-        systemOperational: "All systems operational",
-        aiOrganizing: "AI is organizing your inbox. <strong>15</strong> emails sorted automatically.",
-        storage: "Storage",
-        kyiv: "Kyiv",
-        
-        // Themes
-        lightTheme: "Light",
-        darkTheme: "Dark",
-        oledTheme: "OLED",
-        blueTheme: "Ocean",
-        
-        // Settings
-        userSettings: "User Settings",
-        profileTab: "Profile",
-        appearanceTab: "Appearance",
-        notificationsTab: "Notifications",
-        securityTab: "Security",
-        avatarColor: "Avatar Color",
-        themeSettings: "Theme Settings",
-        notificationsDesc: "Configure your notification preferences",
-        securityDesc: "Security and privacy settings",
-        
-        // Compose
-        newMail: "New Message",
-        toEmail: "To",
-        subject: "Subject",
-        message: "Write your message here...",
-        addAttachment: "Add Attachment",
-        send: "Send",
-        close: "Close",
-        save: "Save Changes",
-        cancel: "Cancel",
-        discard: "Discard",
-        
-        // Messages
-        emailSaved: "Email saved successfully!",
-        emailSent: "Email sent successfully!",
-        emailDeleted: "Email moved to trash",
-        trashEmptied: "Trash emptied",
-        confirmDelete: "Delete this email?",
-        confirmEmptyTrash: "Empty trash? This action cannot be undone.",
-        missingRecipient: "Please enter recipient email",
-        invalidEmail: "Invalid email format",
-        fileTooLarge: "File is too large (max 5MB)",
-        maxFiles: "Maximum 5 files allowed",
-        loginSuccess: "Welcome back!",
-        registerSuccess: "Account created successfully!",
-        loginError: "Invalid email or password",
-        registerError: "Please fill all fields correctly",
-        passwordMismatch: "Passwords do not match",
-        weakPassword: "Password must be at least 8 characters with letters and numbers"
-    },
-    
-    ua: {
-        subtitle: "Розумний клієнт електронної пошти з AI",
-        welcomeBack: "Ласкаво просимо",
-        emailAddress: "Електронна адреса",
-        password: "Пароль",
-        rememberMe: "Запам'ятати мене",
-        forgotPassword: "Забули пароль?",
-        signIn: "Увійти",
-        newUser: "Новий користувач?",
-        createAccount: "Створити акаунт",
-        fullName: "Повне ім'я",
-        confirmPassword: "Підтвердіть пароль",
-        createAccountBtn: "Створити акаунт",
-        alreadyHaveAccount: "Вже маєте акаунт?",
-        aiFilter: "AI фільтр спаму",
-        smartSorting: "Розумне сортування",
-        securePrivate: "Безпека та приватність",
-        
-        online: "Онлайн",
-        compose: "Створити",
-        inbox: "Вхідні",
-        important: "Важливі",
-        sent: "Надіслані",
-        drafts: "Чернетки",
-        spam: "Спам",
-        trash: "Кошик",
-        labels: "Мітки",
-        searchPlaceholder: "Пошук листів...",
-        emptyInbox: "Вхідні порожні",
-        noEmails: "Листів немає",
-        selectEmail: "Виберіть лист",
-        selectEmailDesc: "Виберіть лист для перегляду",
-        attachments: "Вкладення",
-        emptyTrash: "Очистити кошик",
-        quickReply: "Швидка відповідь",
-        print: "Друк",
-        delete: "Видалити",
-        view: "Переглянути",
-        download: "Скачати",
-        from: "Від",
-        date: "Дата",
-        systemOperational: "Усі системи працюють",
-        aiOrganizing: "AI організовує вашу пошту. <strong>15</strong> листів відсортовано.",
-        storage: "Сховище",
-        kyiv: "Київ",
-        
-        lightTheme: "Світла",
-        darkTheme: "Темна",
-        oledTheme: "OLED",
-        blueTheme: "Океан",
-        
-        userSettings: "Налаштування",
-        profileTab: "Профіль",
-        appearanceTab: "Зовнішній вигляд",
-        notificationsTab: "Сповіщення",
-        securityTab: "Безпека",
-        avatarColor: "Колір аватара",
-        themeSettings: "Налаштування теми",
-        notificationsDesc: "Налаштування сповіщень",
-        securityDesc: "Налаштування безпеки та приватності",
-        
-        newMail: "Новий лист",
-        toEmail: "Кому",
-        subject: "Тема",
-        message: "Напишіть ваше повідомлення...",
-        addAttachment: "Додати файл",
-        send: "Надіслати",
-        close: "Закрити",
-        save: "Зберегти зміни",
-        cancel: "Скасувати",
-        discard: "Скасувати",
-        
-        emailSaved: "Email збережено!",
-        emailSent: "Лист надіслано!",
-        emailDeleted: "Лист переміщено в кошик",
-        trashEmptied: "Кошик очищено",
-        confirmDelete: "Видалити цей лист?",
-        confirmEmptyTrash: "Очистити кошик? Цю дію не можна скасувати.",
-        missingRecipient: "Введіть адресу отримувача",
-        invalidEmail: "Невірний формат email",
-        fileTooLarge: "Файл занадто великий (макс. 5MB)",
-        maxFiles: "Максимум 5 файлів",
-        loginSuccess: "Ласкаво просимо!",
-        registerSuccess: "Акаунт успішно створено!",
-        loginError: "Невірний email або пароль",
-        registerError: "Заповніть всі поля правильно",
-        passwordMismatch: "Паролі не співпадають",
-        weakPassword: "Пароль має бути щонайменше 8 символів з літерами та цифрами"
-    },
-    
-    ru: {
-        subtitle: "Умный email клиент с AI",
-        welcomeBack: "Добро пожаловать",
-        emailAddress: "Электронная почта",
-        password: "Пароль",
-        rememberMe: "Запомнить меня",
-        forgotPassword: "Забыли пароль?",
-        signIn: "Войти",
-        newUser: "Новый пользователь?",
-        createAccount: "Создать аккаунт",
-        fullName: "Полное имя",
-        confirmPassword: "Подтвердите пароль",
-        createAccountBtn: "Создать аккаунт",
-        alreadyHaveAccount: "Уже есть аккаунт?",
-        aiFilter: "AI фильтр спама",
-        smartSorting: "Умная сортировка",
-        securePrivate: "Безопасность и приватность",
-        
-        online: "Онлайн",
-        compose: "Создать",
-        inbox: "Входящие",
-        important: "Важные",
-        sent: "Отправленные",
-        drafts: "Черновики",
-        spam: "Спам",
-        trash: "Корзина",
-        labels: "Метки",
-        searchPlaceholder: "Поиск писем...",
-        emptyInbox: "Входящие пусты",
-        noEmails: "Писем нет",
-        selectEmail: "Выберите письмо",
-        selectEmailDesc: "Выберите письмо для просмотра",
-        attachments: "Вложения",
-        emptyTrash: "Очистить корзину",
-        quickReply: "Быстрый ответ",
-        print: "Печать",
-        delete: "Удалить",
-        view: "Просмотреть",
-        download: "Скачать",
-        from: "От",
-        date: "Дата",
-        systemOperational: "Все системы работают",
-        aiOrganizing: "AI организует вашу почту. <strong>15</strong> писем отсортировано.",
-        storage: "Хранилище",
-        kyiv: "Киев",
-        
-        lightTheme: "Светлая",
-        darkTheme: "Темная",
-        oledTheme: "OLED",
-        blueTheme: "Океан",
-        
-        userSettings: "Настройки",
-        profileTab: "Профиль",
-        appearanceTab: "Внешний вид",
-        notificationsTab: "Уведомления",
-        securityTab: "Безопасность",
-        avatarColor: "Цвет аватара",
-        themeSettings: "Настройки темы",
-        notificationsDesc: "Настройки уведомлений",
-        securityDesc: "Настройки безопасности и приватности",
-        
-        newMail: "Новое сообщение",
-        toEmail: "Кому",
-        subject: "Тема",
-        message: "Напишите ваше сообщение...",
-        addAttachment: "Добавить файл",
-        send: "Отправить",
-        close: "Закрыть",
-        save: "Сохранить изменения",
-        cancel: "Отменить",
-        discard: "Отменить",
-        
-        emailSaved: "Email сохранен!",
-        emailSent: "Письмо отправлено!",
-        emailDeleted: "Письмо перемещено в корзину",
-        trashEmptied: "Корзина очищена",
-        confirmDelete: "Удалить это письмо?",
-        confirmEmptyTrash: "Очистить корзину? Это действие нельзя отменить.",
-        missingRecipient: "Введите адрес получателя",
-        invalidEmail: "Неверный формат email",
-        fileTooLarge: "Файл слишком большой (макс. 5MB)",
-        maxFiles: "Максимум 5 файлов",
-        loginSuccess: "Добро пожаловать!",
-        registerSuccess: "Аккаунт успешно создан!",
-        loginError: "Неверный email или пароль",
-        registerError: "Заполните все поля правильно",
-        passwordMismatch: "Пароли не совпадают",
-        weakPassword: "Пароль должен быть не менее 8 символов с буквами и цифрами"
-    },
-    
-    de: {
-        subtitle: "Intelligenter E-Mail-Client mit KI",
-        welcomeBack: "Willkommen zurück",
-        emailAddress: "E-Mail-Adresse",
-        password: "Passwort",
-        rememberMe: "Angemeldet bleiben",
-        forgotPassword: "Passwort vergessen?",
-        signIn: "Anmelden",
-        newUser: "Neuer Benutzer?",
-        createAccount: "Konto erstellen",
-        fullName: "Vollständiger Name",
-        confirmPassword: "Passwort bestätigen",
-        createAccountBtn: "Konto erstellen",
-        alreadyHaveAccount: "Haben Sie bereits ein Konto?",
-        aiFilter: "KI-Spam-Filter",
-        smartSorting: "Intelligente Sortierung",
-        securePrivate: "Sicher & Privat",
-        
-        online: "Online",
-        compose: "Verfassen",
-        inbox: "Posteingang",
-        important: "Wichtig",
-        sent: "Gesendet",
-        drafts: "Entwürfe",
-        spam: "Spam",
-        trash: "Papierkorb",
-        labels: "Labels",
-        searchPlaceholder: "E-Mails suchen...",
-        emptyInbox: "Posteingang ist leer",
-        noEmails: "Keine E-Mails vorhanden",
-        selectEmail: "Wählen Sie eine E-Mail",
-        selectEmailDesc: "Wählen Sie eine E-Mail zum Lesen",
-        attachments: "Anhänge",
-        emptyTrash: "Papierkorb leeren",
-        quickReply: "Schnelle Antwort",
-        print: "Drucken",
-        delete: "Löschen",
-        view: "Ansehen",
-        download: "Herunterladen",
-        from: "Von",
-        date: "Datum",
-        systemOperational: "Alle Systeme funktionieren",
-        aiOrganizing: "KI organisiert Ihren Posteingang. <strong>15</strong> E-Mails sortiert.",
-        storage: "Speicher",
-        kyiv: "Kiew",
-        
-        lightTheme: "Hell",
-        darkTheme: "Dunkel",
-        oledTheme: "OLED",
-        blueTheme: "Ozean",
-        
-        userSettings: "Benutzereinstellungen",
-        profileTab: "Profil",
-        appearanceTab: "Erscheinungsbild",
-        notificationsTab: "Benachrichtigungen",
-        securityTab: "Sicherheit",
-        avatarColor: "Avatar-Farbe",
-        themeSettings: "Theme-Einstellungen",
-        notificationsDesc: "Benachrichtigungseinstellungen konfigurieren",
-        securityDesc: "Sicherheits- und Datenschutzeinstellungen",
-        
-        newMail: "Neue Nachricht",
-        toEmail: "An",
-        subject: "Betreff",
-        message: "Schreiben Sie Ihre Nachricht...",
-        addAttachment: "Anhang hinzufügen",
-        send: "Senden",
-        close: "Schließen",
-        save: "Änderungen speichern",
-        cancel: "Abbrechen",
-        discard: "Verwerfen",
-        
-        emailSaved: "E-Mail gespeichert!",
-        emailSent: "E-Mail gesendet!",
-        emailDeleted: "E-Mail in Papierkorb verschoben",
-        trashEmptied: "Papierkorb geleert",
-        confirmDelete: "Diese E-Mail löschen?",
-        confirmEmptyTrash: "Papierkorb leeren? Diese Aktion kann nicht rückgängig gemacht werden.",
-        missingRecipient: "Bitte geben Sie die Empfänger-E-Mail ein",
-        invalidEmail: "Ungültiges E-Mail-Format",
-        fileTooLarge: "Datei ist zu groß (max. 5MB)",
-        maxFiles: "Maximal 5 Dateien erlaubt",
-        loginSuccess: "Willkommen zurück!",
-        registerSuccess: "Konto erfolgreich erstellt!",
-        loginError: "Ungültige E-Mail oder Passwort",
-        registerError: "Bitte füllen Sie alle Felder korrekt aus",
-        passwordMismatch: "Passwörter stimmen nicht überein",
-        weakPassword: "Passwort muss mindestens 8 Zeichen mit Buchstaben und Zahlen enthalten"
-    }
-};
-
-// ====================== INITIALIZATION ======================
-function init() {
-    console.log('Inbox Pro loading...');
-    
-    // Load data from localStorage
-    loadUserData();
-    loadEmails();
-    
-    // Apply saved theme
-    applyTheme(currentTheme);
-    
-    // Setup event listeners
-    setupEventListeners();
-    
-    // Apply language
-    applyLanguage();
-    
-    // Check if user is logged in
-    checkAutoLogin();
-    
-    console.log('Inbox Pro initialized');
-}
-
-function loadUserData() {
-    const savedUser = localStorage.getItem('currentUser');
-    if (savedUser) {
-        currentUser = JSON.parse(savedUser);
-    }
-}
-
-function loadEmails() {
-    const savedEmails = localStorage.getItem('inboxProEmails');
-    if (savedEmails) {
-        emails = JSON.parse(savedEmails);
-    } else {
-        // Generate sample emails if none exist
-        generateSampleEmails();
-    }
-}
-
-function saveEmails() {
-    localStorage.setItem('inboxProEmails', JSON.stringify(emails));
-}
-
-function checkAutoLogin() {
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-    const savedUser = localStorage.getItem('currentUser');
-    
-    if (isLoggedIn && savedUser) {
-        currentUser = JSON.parse(savedUser);
-        document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('app').style.display = 'block';
-        updateUI();
-        showToast(translations[currentLanguage].loginSuccess, 'success');
-    }
-}
-
-// ====================== EVENT LISTENERS ======================
-function setupEventListeners() {
-    // Login/Register switches
-    document.getElementById('showRegister')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        document.getElementById('loginForm').style.display = 'none';
-        document.getElementById('registerForm').style.display = 'block';
-    });
-    
-    document.getElementById('showLogin')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        document.getElementById('registerForm').style.display = 'none';
-        document.getElementById('loginForm').style.display = 'block';
-    });
-    
-    // Login button
-    document.getElementById('loginBtn')?.addEventListener('click', handleLogin);
-    
-    // Register button
-    document.getElementById('registerBtn')?.addEventListener('click', handleRegister);
-    
-    // Compose button
-    document.getElementById('composeBtn')?.addEventListener('click', openComposeModal);
-    
-    // Settings button
-    document.getElementById('settingsBtn')?.addEventListener('click', openSettingsModal);
-    
-    // Menu toggle for mobile
-    document.getElementById('menuToggle')?.addEventListener('click', () => {
-        document.getElementById('sidebar').classList.toggle('active');
-    });
-    
-    // Folder navigation
-    document.querySelectorAll('.menu-item').forEach(item => {
-        item.addEventListener('click', () => {
-            const folder = item.dataset.folder;
-            switchFolder(folder);
-            
-            // Update active state
-            document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
-            item.classList.add('active');
-        });
-    });
-    
-    // Back to list button
-    document.getElementById('backToList')?.addEventListener('click', () => {
-        document.getElementById('reader').classList.remove('active');
-        if (window.innerWidth <= 768) {
-            document.querySelector('.emails').style.display = 'block';
+            id: 11,
+            from: 'oldnews@archive.com',
+            fromName: 'Old Newsletter',
+            to: currentUser ? currentUser.email : 'user@example.com',
+            subject: 'News from 2020',
+            body: 'This is an old newsletter that you deleted.',
+            date: new Date(Date.now() - 31536000000).toISOString(), // 1 year ago
+            folder: 'trash',
+            read: true,
+            important: false,
+            labels: [],
+            attachments: []
+        },
+        {
+            id: 12,
+            from: 'boss@company.com',
+            fromName: 'Your Manager',
+            to: currentUser ? currentUser.email : 'user@example.com',
+            subject: 'Important: Quarterly Review',
+            body: 'Please prepare your quarterly review presentation.\n\nMeeting: Friday, 10 AM\nDuration: 1 hour\n\nRequired: Performance metrics, achievements, goals.',
+            date: new Date(Date.now() - 3600000).toISOString(),
+            folder: 'important',
+            read: false,
+            important: true,
+            labels: ['work'],
+            attachments: []
+        },
+        {
+            id: 13,
+            from: 'family@home.com',
+            fromName: 'Family Group',
+            to: currentUser ? currentUser.email : 'user@example.com',
+            subject: 'Family Reunion Photos',
+            body: 'Here are the photos from our family reunion!\n\nEveryone looks great. Check out the attached photos.',
+            date: new Date(Date.now() - 86400000).toISOString(),
+            folder: 'important',
+            read: true,
+            important: true,
+            labels: ['personal'],
+            attachments: [
+                { name: 'reunion_photo1.jpg', size: '2.1 MB', type: 'image' },
+                { name: 'reunion_photo2.jpg', size: '1.8 MB', type: 'image' }
+            ]
         }
-    });
+    ];
     
-    // Delete email button
-    document.getElementById('deleteEmailBtn')?.addEventListener('click', deleteCurrentEmail);
-    
-    // Empty trash button
-    document.getElementById('emptyTrashBtn')?.addEventListener('click', emptyTrash);
-    
-    // Select all button
-    document.getElementById('selectAllBtn')?.addEventListener('click', toggleSelectAll);
-    
-    // Mark as read button
-    document.getElementById('markReadBtn')?.addEventListener('click', markSelectedAsRead);
-    
-    // Delete selected button
-    document.getElementById('deleteSelectedBtn')?.addEventListener('click', deleteSelectedEmails);
-    
-    // Search input
-    document.getElementById('searchInput')?.addEventListener('input', handleSearch);
-    
-    // Search clear button
-    document.getElementById('searchClear')?.addEventListener('click', () => {
-        document.getElementById('searchInput').value = '';
-        handleSearch();
-    });
-    
-    // Refresh button
-    document.getElementById('refreshBtn')?.addEventListener('click', () => {
-        updateUI();
-        showToast('Refreshed', 'success');
-    });
-    
-    // Theme toggle
-    document.getElementById('themeToggle')?.addEventListener('click', () => {
-        const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        applyTheme(nextTheme);
-    });
-    
-    // Theme menu buttons
-    document.querySelectorAll('.theme-menu button').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const theme = btn.dataset.theme;
-            applyTheme(theme);
-        });
-    });
-    
-    // Language select
-    document.getElementById('langSelect')?.addEventListener('change', (e) => {
-        currentLanguage = e.target.value;
-        localStorage.setItem('language', currentLanguage);
-        applyLanguage();
-        updateUI();
-    });
-    
-    // Settings modal close
-    document.getElementById('closeSettings')?.addEventListener('click', () => {
-        closeModal(document.getElementById('settingsModal'));
-    });
-    
-    // Settings save
-    document.getElementById('saveSettings')?.addEventListener('click', saveSettings);
-    
-    // Compose modal close
-    document.getElementById('closeCompose')?.addEventListener('click', () => {
-        closeModal(document.getElementById('composeModal'));
-        clearComposeForm();
-    });
-    
-    // Send email button
-    document.getElementById('sendMail')?.addEventListener('click', sendEmail);
-    
-    // Discard button
-    document.getElementById('discardBtn')?.addEventListener('click', () => {
-        closeModal(document.getElementById('composeModal'));
-        clearComposeForm();
-    });
-    
-    // File upload
-    document.getElementById('mailFile')?.addEventListener('change', handleFileUpload);
-    
-    // Quick actions
-    document.querySelectorAll('.quick-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const action = e.currentTarget.dataset.action;
-            handleQuickAction(action);
-        });
-    });
-    
-    // AI dismiss button
-    document.querySelector('.ai-dismiss')?.addEventListener('click', () => {
-        document.getElementById('aiStatusBar').style.display = 'none';
-    });
-    
-    // Help button
-    document.getElementById('helpBtn')?.addEventListener('click', () => {
-        showToast('Help guide will be available soon!', 'info');
-    });
-    
-    // Reply button
-    document.getElementById('replyBtn')?.addEventListener('click', () => {
-        if (currentSelectedEmail) {
-            const email = emails.find(e => e.id === currentSelectedEmail);
-            if (email) {
-                openComposeModal();
-                document.getElementById('mailTo').value = email.from;
-                document.getElementById('mailSubject').value = `Re: ${email.subject}`;
-                document.getElementById('mailText').value = `\n\n--- Original Message ---\nFrom: ${email.from}\nSubject: ${email.subject}\n\n`;
-            }
-        }
-    });
-    
-    // Quick reply button
-    document.getElementById('quickReplyBtn')?.addEventListener('click', () => {
-        if (currentSelectedEmail) {
-            const email = emails.find(e => e.id === currentSelectedEmail);
-            if (email) {
-                openComposeModal();
-                document.getElementById('mailTo').value = email.from;
-                document.getElementById('mailSubject').value = `Re: ${email.subject}`;
-            }
-        }
-    });
-    
-    // Print button
-    document.getElementById('printBtn')?.addEventListener('click', () => {
-        window.print();
-    });
-    
-    // Star button
-    document.getElementById('starBtn')?.addEventListener('click', toggleStarEmail);
-    
-    // Close image modal
-    document.getElementById('closeImage')?.addEventListener('click', () => {
-        closeModal(document.getElementById('imageModal'));
-    });
-    
-    // Cancel settings button
-    document.getElementById('cancelSettings')?.addEventListener('click', () => {
-        closeModal(document.getElementById('settingsModal'));
-    });
-    
-    // Theme options in settings
-    document.querySelectorAll('.theme-option').forEach(option => {
-        option.addEventListener('click', () => {
-            const theme = option.dataset.theme;
-            applyTheme(theme);
-            showToast(`Theme changed to ${theme}`, 'success');
-        });
-    });
-    
-    // Color picker for avatar
-    document.querySelectorAll('.color-option').forEach(color => {
-        color.addEventListener('click', () => {
-            const selectedColor = color.dataset.color;
-            document.querySelectorAll('.color-option').forEach(c => c.classList.remove('selected'));
-            color.classList.add('selected');
-            if (currentUser) {
-                currentUser.avatarColor = selectedColor;
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                updateUserAvatar();
-            }
-        });
-    });
-    
-    // Click outside to close sidebar on mobile
-    document.addEventListener('click', (e) => {
-        if (window.innerWidth <= 768 && 
-            !e.target.closest('.sidebar') && 
-            !e.target.closest('.menu-toggle') &&
-            document.getElementById('sidebar').classList.contains('active')) {
-            document.getElementById('sidebar').classList.remove('active');
-        }
-    });
+    emails = sampleEmails;
+    saveEmails();
 }
 
-// ====================== LOGIN/REGISTER FUNCTIONS ======================
-function handleLogin() {
-    const email = document.getElementById('loginEmail').value.trim();
-    const password = document.getElementById('loginPassword').value;
-    const rememberMe = document.getElementById('rememberMe').checked;
+function switchFolder(folder) {
+    currentFolder = folder;
+    selectedEmails.clear();
+    currentSelectedEmail = null;
     
-    if (!email || !password) {
-        showToast(translations[currentLanguage].loginError, 'error');
-        return;
-    }
-    
-    // Simple validation for demo
-    if (password.length < 6) {
-        showToast('Password must be at least 6 characters', 'error');
-        return;
-    }
-    
-    // Create or get user
-    let users = JSON.parse(localStorage.getItem('users') || '[]');
-    let user = users.find(u => u.email === email);
-    
-    if (!user) {
-        // Create new user for demo
-        user = {
-            id: Date.now(),
-            name: email.split('@')[0],
-            email: email,
-            avatarColor: '#667eea',
-            createdAt: new Date().toISOString()
-        };
-        users.push(user);
-        localStorage.setItem('users', JSON.stringify(users));
-    }
-    
-    // Set current user
-    currentUser = user;
-    localStorage.setItem('currentUser', JSON.stringify(user));
-    localStorage.setItem('isLoggedIn', 'true');
-    
-    if (rememberMe) {
-        localStorage.setItem('rememberMe', 'true');
-    }
-    
-    // Switch to app
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-    
-    showToast(translations[currentLanguage].loginSuccess, 'success');
+    // Update UI
     updateUI();
+    
+    // Show/hide empty trash button
+    document.getElementById('emptyTrashBtn').style.display = folder === 'trash' ? 'flex' : 'none';
+    
+    // Update folder icon in header
+    const iconMap = {
+        inbox: 'fa-inbox',
+        important: 'fa-star',
+        sent: 'fa-paper-plane',
+        drafts: 'fa-file-alt',
+        spam: 'fa-ban',
+        trash: 'fa-trash'
+    };
+    
+    const icon = iconMap[folder] || 'fa-inbox';
+    document.getElementById('currentFolder').innerHTML = `<i class="fas ${icon}"></i> <span>${translations[currentLanguage][folder] || folder}</span>`;
 }
 
-function handleRegister() {
-    const name = document.getElementById('registerName').value.trim();
-    const email = document.getElementById('registerEmail').value.trim();
-    const password = document.getElementById('registerPassword').value;
-    const confirm = document.getElementById('registerConfirm').value;
+function updateUI() {
+    if (!currentUser) return;
     
-    // Validation
-    if (!name || !email || !password || !confirm) {
-        showToast(translations[currentLanguage].registerError, 'error');
+    // Update user info
+    document.getElementById('userName').textContent = currentUser.name;
+    document.getElementById('userEmail').textContent = currentUser.email;
+    updateUserAvatar();
+    
+    // Update counts
+    updateFolderCounts();
+    
+    // Display emails
+    displayEmails();
+    
+    // Update reader if email is selected
+    if (currentSelectedEmail) {
+        const email = emails.find(e => e.id === currentSelectedEmail);
+        if (email) {
+            displayEmail(email);
+        } else {
+            // Reset reader if email not found
+            document.getElementById('readerTitle').textContent = translations[currentLanguage].selectEmail;
+            document.getElementById('readerText').innerHTML = `<p>${translations[currentLanguage].selectEmailDesc}</p>`;
+            document.getElementById('readerFiles').style.display = 'none';
+        }
+    }
+}
+
+function updateUserAvatar() {
+    if (!currentUser) return;
+    
+    const avatar = document.getElementById('userAvatar');
+    avatar.textContent = getInitials(currentUser.name);
+    avatar.style.background = currentUser.avatarColor || '#667eea';
+}
+
+function updateFolderCounts() {
+    if (!emails.length) return;
+    
+    const inboxCount = emails.filter(e => e.folder === 'inbox' && !e.read).length;
+    const importantCount = emails.filter(e => e.folder === 'important').length;
+    const sentCount = emails.filter(e => e.folder === 'sent').length;
+    const draftsCount = emails.filter(e => e.folder === 'drafts').length;
+    const spamCount = emails.filter(e => e.folder === 'spam').length;
+    const trashCount = emails.filter(e => e.folder === 'trash').length;
+    
+    document.getElementById('inboxCount').textContent = inboxCount > 0 ? inboxCount : '';
+    document.getElementById('importantCount').textContent = importantCount > 0 ? importantCount : '';
+    document.getElementById('sentCount').textContent = sentCount > 0 ? sentCount : '';
+    document.getElementById('draftsCount').textContent = draftsCount > 0 ? draftsCount : '';
+    document.getElementById('spamCount').textContent = spamCount > 0 ? spamCount : '';
+    document.getElementById('trashCount').textContent = trashCount > 0 ? trashCount : '';
+    
+    // Update folder stats
+    const folderEmails = emails.filter(e => e.folder === currentFolder);
+    const unreadInFolder = folderEmails.filter(e => !e.read).length;
+    
+    document.getElementById('emailCount').textContent = `${folderEmails.length} ${folderEmails.length === 1 ? 'email' : 'emails'}`;
+    document.getElementById('unreadCount').textContent = `${unreadInFolder} unread`;
+}
+
+function displayEmails() {
+    const container = document.getElementById('emailsList');
+    if (!container) return;
+    
+    let folderEmails = emails.filter(e => e.folder === currentFolder);
+    
+    // Apply search filter
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    if (searchTerm) {
+        folderEmails = folderEmails.filter(email => 
+            email.subject.toLowerCase().includes(searchTerm) ||
+            email.fromName.toLowerCase().includes(searchTerm) ||
+            email.from.toLowerCase().includes(searchTerm) ||
+            email.body.toLowerCase().includes(searchTerm)
+        );
+    }
+    
+    if (folderEmails.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state animate__animated animate__fadeIn">
+                <i class="fas fa-inbox"></i>
+                <h3 data-i18n="emptyInbox">${translations[currentLanguage].emptyInbox}</h3>
+                <p data-i18n="noEmails">${translations[currentLanguage].noEmails}</p>
+            </div>
+        `;
+        applyLanguage();
         return;
     }
     
-    if (password !== confirm) {
-        showToast(translations[currentLanguage].passwordMismatch, 'error');
-        return;
+    container.innerHTML = '';
+    
+    // Sort by date (newest first)
+    folderEmails.sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    folderEmails.forEach((email, index) => {
+        const emailElement = createEmailElement(email, index);
+        container.appendChild(emailElement);
+        
+        // Animate with delay
+        setTimeout(() => {
+            emailElement.style.opacity = '1';
+            emailElement.style.transform = 'translateY(0)';
+        }, index * 50);
+    });
+}
+
+function createEmailElement(email, index) {
+    const div = document.createElement('div');
+    div.className = `email ${email.read ? '' : 'unread'} ${selectedEmails.has(email.id) ? 'selected' : ''}`;
+    div.dataset.id = email.id;
+    div.style.animationDelay = `${index * 50}ms`;
+    
+    const initials = getInitials(email.fromName || email.from);
+    const date = formatDate(email.date);
+    const preview = email.body.substring(0, 80) + (email.body.length > 80 ? '...' : '');
+    
+    div.innerHTML = `
+        <div class="email-avatar" style="background: ${stringToColor(email.from)}">
+            ${initials}
+        </div>
+        <div class="email-content">
+            <div class="email-header">
+                <div class="email-sender">${email.fromName || email.from}</div>
+                <div class="email-date">${date}</div>
+            </div>
+            <div class="email-subject">${email.subject}</div>
+            <div class="email-preview">${preview}</div>
+        </div>
+    `;
+    
+    div.addEventListener('click', (e) => {
+        if (!e.target.closest('.email-actions')) {
+            selectEmail(email.id);
+            displayEmail(email);
+            
+            // Mark as read
+            if (!email.read) {
+                email.read = true;
+                saveEmails();
+                updateUI();
+            }
+        }
+    });
+    
+    return div;
+}
+
+function displayEmail(email) {
+    if (!email) return;
+    
+    // Update reader view
+    document.getElementById('readerTitle').textContent = email.subject;
+    document.getElementById('readerAvatar').textContent = getInitials(email.fromName || email.from);
+    document.getElementById('readerAvatar').style.background = stringToColor(email.from);
+    document.getElementById('readerSender').textContent = email.fromName || email.from;
+    document.getElementById('readerSenderEmail').textContent = email.from;
+    document.getElementById('readerSubject').textContent = email.subject;
+    document.getElementById('readerDate').textContent = formatDate(email.date, true);
+    document.getElementById('readerText').innerHTML = email.body.replace(/\n/g, '<br>');
+    
+    // Update star button
+    const starBtn = document.getElementById('starBtn');
+    starBtn.innerHTML = email.important ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
+    
+    // Show labels
+    const labelsContainer = document.getElementById('emailLabels');
+    labelsContainer.innerHTML = '';
+    if (email.labels && email.labels.length > 0) {
+        email.labels.forEach(label => {
+            const labelElement = document.createElement('span');
+            labelElement.className = `label ${label}`;
+            labelElement.textContent = label.charAt(0).toUpperCase() + label.slice(1);
+            labelsContainer.appendChild(labelElement);
+        });
     }
     
-    if (password.length < 8) {
-        showToast(translations[currentLanguage].weakPassword, 'error');
+    // Show attachments if any
+    if (email.attachments && email.attachments.length > 0) {
+        document.getElementById('readerFiles').style.display = 'block';
+        const attachmentsList = document.getElementById('attachmentsList');
+        attachmentsList.innerHTML = '';
+        
+        email.attachments.forEach(attachment => {
+            const attachmentElement = createAttachmentElement(attachment);
+            attachmentsList.appendChild(attachmentElement);
+        });
+        
+        document.querySelector('.attachment-count').textContent = `(${email.attachments.length})`;
+        
+        // Update size
+        const totalSize = email.attachments.reduce((sum, att) => {
+            const size = parseFloat(att.size) || 0;
+            return sum + size;
+        }, 0);
+        document.getElementById('emailSize').textContent = totalSize > 1024 ? 
+            `${(totalSize / 1024).toFixed(1)} MB` : `${totalSize} KB`;
+    } else {
+        document.getElementById('readerFiles').style.display = 'none';
+        document.getElementById('emailSize').textContent = '0 KB';
+    }
+    
+    // Show reader on mobile
+    if (window.innerWidth <= 768) {
+        document.querySelector('.emails').style.display = 'none';
+        document.getElementById('reader').classList.add('active');
+    }
+    
+    currentSelectedEmail = email.id;
+}
+
+function createAttachmentElement(attachment) {
+    const div = document.createElement('div');
+    div.className = 'attachment-item';
+    
+    const icon = getFileIcon(attachment.type || attachment.name.split('.').pop());
+    const size = attachment.size || 'Unknown size';
+    
+    div.innerHTML = `
+        <div class="attachment-info">
+            <i class="fas ${icon} attachment-icon"></i>
+            <div class="attachment-details">
+                <div class="attachment-name">${attachment.name}</div>
+                <div class="attachment-size">${size}</div>
+            </div>
+        </div>
+        <div class="attachment-actions">
+            <button class="attachment-btn view" data-file="${attachment.name}">
+                <i class="fas fa-eye"></i> ${translations[currentLanguage].view}
+            </button>
+            <button class="attachment-btn download" data-file="${attachment.name}">
+                <i class="fas fa-download"></i> ${translations[currentLanguage].download}
+            </button>
+        </div>
+    `;
+    
+    // Add event listeners for attachment buttons
+    div.querySelector('.view').addEventListener('click', () => {
+        if (isImageFile(attachment.name)) {
+            openImagePreview(attachment.name, 'Attachment preview');
+        } else {
+            showToast(`Preview not available for ${attachment.name}`, 'info');
+        }
+    });
+    
+    div.querySelector('.download').addEventListener('click', () => {
+        showToast(`Downloading ${attachment.name}...`, 'info');
+        // In a real app, this would trigger actual download
+        simulateDownload(attachment.name);
+    });
+    
+    return div;
+}
+
+function selectEmail(id) {
+    const email = emails.find(e => e.id === id);
+    if (email) {
+        // Toggle selection
+        if (selectedEmails.has(id)) {
+            selectedEmails.delete(id);
+        } else {
+            selectedEmails.add(id);
+        }
+        
+        // If only one email selected, display it
+        if (selectedEmails.size === 1) {
+            currentSelectedEmail = id;
+            displayEmail(email);
+        } else {
+            currentSelectedEmail = null;
+            document.getElementById('readerTitle').textContent = `${selectedEmails.size} emails selected`;
+            document.getElementById('readerText').innerHTML = `<p>${selectedEmails.size} emails are selected. Use the actions above to manage them.</p>`;
+        }
+        
+        updateUI();
+    }
+}
+
+// ====================== UTILITY FUNCTIONS ======================
+function getInitials(name) {
+    if (!name) return '??';
+    return name.split(' ')
+        .map(part => part[0])
+        .join('')
+        .toUpperCase()
+        .substring(0, 2);
+}
+
+function stringToColor(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    
+    const colors = [
+        '#667eea', '#764ba2', '#f093fb', '#f5576c',
+        '#4facfe', '#00f2fe', '#43e97b', '#38f9d7',
+        '#fa709a', '#fee140', '#a8edea', '#fed6e3'
+    ];
+    
+    return colors[Math.abs(hash) % colors.length];
+}
+
+function formatDate(dateString, full = false) {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diff = now - date;
+    
+    if (diff < 60000) { // Less than 1 minute
+        return 'Just now';
+    } else if (diff < 3600000) { // Less than 1 hour
+        const minutes = Math.floor(diff / 60000);
+        return `${minutes}m ago`;
+    } else if (diff < 86400000) { // Less than 1 day
+        const hours = Math.floor(diff / 3600000);
+        return `${hours}h ago`;
+    } else if (diff < 604800000) { // Less than 1 week
+        const days = Math.floor(diff / 86400000);
+        return `${days}d ago`;
+    } else if (full) {
+        return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } else {
+        return date.toLocaleDateString();
+    }
+}
+
+function getFileIcon(ext) {
+    const icons = {
+        pdf: 'fa-file-pdf',
+        doc: 'fa-file-word',
+        docx: 'fa-file-word',
+        xls: 'fa-file-excel',
+        xlsx: 'fa-file-excel',
+        ppt: 'fa-file-powerpoint',
+        pptx: 'fa-file-powerpoint',
+        jpg: 'fa-file-image',
+        jpeg: 'fa-file-image',
+        png: 'fa-file-image',
+        gif: 'fa-file-image',
+        txt: 'fa-file-alt',
+        zip: 'fa-file-archive',
+        rar: 'fa-file-archive',
+        mp3: 'fa-file-audio',
+        mp4: 'fa-file-video',
+        mov: 'fa-file-video'
+    };
+    
+    return icons[ext.toLowerCase()] || 'fa-file';
+}
+
+function isImageFile(filename) {
+    const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
+    const ext = filename.split('.').pop().toLowerCase();
+    return imageExtensions.includes(ext);
+}
+
+function validateEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+}
+
+// ====================== MODAL FUNCTIONS ======================
+function openComposeModal() {
+    const modal = document.getElementById('composeModal');
+    modal.style.display = 'flex';
+    
+    // Set sender email if available
+    if (currentUser) {
+        document.getElementById('mailTo').focus();
+    }
+}
+
+function closeModal(modal) {
+    modal.style.display = 'none';
+}
+
+function clearComposeForm() {
+    document.getElementById('mailTo').value = '';
+    document.getElementById('mailSubject').value = '';
+    document.getElementById('mailText').value = '';
+    document.getElementById('filePreview').innerHTML = '';
+    document.getElementById('mailFile').value = '';
+}
+
+function openSettingsModal() {
+    const modal = document.getElementById('settingsModal');
+    modal.style.display = 'flex';
+    
+    // Fill form with current user data
+    if (currentUser) {
+        document.getElementById('editName').value = currentUser.name;
+        document.getElementById('editEmail').value = currentUser.email;
+        
+        // Select current avatar color
+        const currentColor = currentUser.avatarColor || '#667eea';
+        document.querySelectorAll('.color-option').forEach(option => {
+            if (option.dataset.color === currentColor) {
+                option.classList.add('selected');
+            } else {
+                option.classList.remove('selected');
+            }
+        });
+    }
+}
+
+function saveSettings() {
+    if (!currentUser) return;
+    
+    const name = document.getElementById('editName').value.trim();
+    const email = document.getElementById('editEmail').value.trim();
+    
+    if (!name || !email) {
+        showToast('Please fill all fields', 'error');
         return;
     }
     
     if (!validateEmail(email)) {
+        showToast('Invalid email format', 'error');
+        return;
+    }
+    
+    // Update user
+    currentUser.name = name;
+    currentUser.email = email;
+    
+    // Save selected avatar color
+    const selectedColor = document.querySelector('.color-option.selected')?.dataset.color;
+    if (selectedColor) {
+        currentUser.avatarColor = selectedColor;
+    }
+    
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    
+    // Update UI
+    updateUI();
+    
+    // Close modal
+    closeModal(document.getElementById('settingsModal'));
+    
+    showToast('Settings saved successfully!', 'success');
+}
+
+function sendEmail() {
+    const to = document.getElementById('mailTo').value.trim();
+    const subject = document.getElementById('mailSubject').value.trim();
+    const body = document.getElementById('mailText').value.trim();
+    
+    if (!to || !subject) {
+        showToast(translations[currentLanguage].missingRecipient, 'error');
+        return;
+    }
+    
+    if (!validateEmail(to)) {
         showToast(translations[currentLanguage].invalidEmail, 'error');
         return;
     }
     
-    // Check if user exists
-    let users = JSON.parse(localStorage.getItem('users') || '[]');
-    if (users.some(u => u.email === email)) {
-        showToast('User with this email already exists', 'error');
+    // Create new email
+    const newEmail = {
+        id: Date.now(),
+        from: currentUser ? currentUser.email : 'user@example.com',
+        fromName: currentUser ? currentUser.name : 'You',
+        to: to,
+        subject: subject,
+        body: body,
+        date: new Date().toISOString(),
+        folder: 'sent',
+        read: true,
+        important: false,
+        labels: [],
+        attachments: getCurrentAttachments()
+    };
+    
+    // Add to emails array
+    emails.push(newEmail);
+    saveEmails();
+    
+    // Close modal and clear form
+    closeModal(document.getElementById('composeModal'));
+    clearComposeForm();
+    
+    // Switch to sent folder
+    switchFolder('sent');
+    
+    showToast(translations[currentLanguage].emailSent, 'success');
+}
+
+function getCurrentAttachments() {
+    // In a real app, this would get actual file data
+    // For demo, return sample attachments
+    const files = document.getElementById('mailFile').files;
+    const attachments = [];
+    
+    if (files.length > 0) {
+        Array.from(files).slice(0, 3).forEach(file => {
+            attachments.push({
+                name: file.name,
+                size: formatFileSize(file.size),
+                type: file.type.split('/')[0] === 'image' ? 'image' : file.name.split('.').pop()
+            });
+        });
+    }
+    
+    return attachments;
+}
+
+function formatFileSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / 1048576).toFixed(1) + ' MB';
+}
+
+function handleFileUpload() {
+    const fileInput = document.getElementById('mailFile');
+    const preview = document.getElementById('filePreview');
+    const files = fileInput.files;
+    
+    preview.innerHTML = '';
+    
+    if (files.length > 5) {
+        showToast(translations[currentLanguage].maxFiles, 'error');
+        fileInput.value = '';
         return;
     }
     
-    // Create new user
-    const newUser = {
-        id: Date.now(),
-        name: name,
-        email: email,
-        avatarColor: '#667eea',
-        createdAt: new Date().toISOString()
-    };
+    Array.from(files).forEach((file, index) => {
+        if (file.size > 5 * 1024 * 1024) { // 5MB limit
+            showToast(translations[currentLanguage].fileTooLarge, 'error');
+            return;
+        }
+        
+        const item = document.createElement('div');
+        item.className = 'file-preview-item';
+        item.innerHTML = `
+            <span>${file.name}</span>
+            <span>${formatFileSize(file.size)}</span>
+            <button class="remove-file" data-index="${index}">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+        
+        preview.appendChild(item);
+    });
     
-    users.push(newUser);
-    localStorage.setItem('users', JSON.stringify(users));
+    // Add event listeners for remove buttons
+    preview.querySelectorAll('.remove-file').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const index = parseInt(this.dataset.index);
+            removeFile(index);
+        });
+    });
+}
+
+function removeFile(index) {
+    const fileInput = document.getElementById('mailFile');
+    const files = Array.from(fileInput.files);
+    files.splice(index, 1);
     
-    // Set as current user
-    currentUser = newUser;
-    localStorage.setItem('currentUser', JSON.stringify(newUser));
-    localStorage.setItem('isLoggedIn', 'true');
+    // Create new FileList (simplified for demo)
+    const dt = new DataTransfer();
+    files.forEach(file => dt.items.add(file));
+    fileInput.files = dt.files;
     
-    // Switch to app
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
+    // Update preview
+    handleFileUpload();
+}
+
+function simulateDownload(filename) {
+    // In a real app, this would create a download link
+    console.log(`Simulating download of ${filename}`);
+}
+
+function openImagePreview(filename, title) {
+    document.getElementById('imageTitle').textContent = title;
+    document.getElementById('modalImage').src = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300"><rect width="400" height="300" fill="%23667eea"/><text x="200" y="150" text-anchor="middle" fill="white" font-family="Arial" font-size="20">${filename}</text></svg>`;
+    document.getElementById('imageModal').style.display = 'flex';
+}
+
+// ====================== EMAIL ACTIONS ======================
+function deleteCurrentEmail() {
+    if (!currentSelectedEmail) {
+        showToast('No email selected', 'error');
+        return;
+    }
     
-    showToast(translations[currentLanguage].registerSuccess, 'success');
+    if (!confirm(translations[currentLanguage].confirmDelete)) {
+        return;
+    }
+    
+    const index = emails.findIndex(e => e.id === currentSelectedEmail);
+    if (index !== -1) {
+        emails[index].folder = 'trash';
+        saveEmails();
+        
+        currentSelectedEmail = null;
+        updateUI();
+        
+        showToast(translations[currentLanguage].emailDeleted, 'success');
+    }
+}
+
+function emptyTrash() {
+    if (!confirm(translations[currentLanguage].confirmEmptyTrash)) {
+        return;
+    }
+    
+    emails = emails.filter(e => e.folder !== 'trash');
+    saveEmails();
+    
+    if (currentFolder === 'trash') {
+        switchFolder('trash');
+    }
+    
+    showToast(translations[currentLanguage].trashEmptied, 'success');
+}
+
+function toggleSelectAll() {
+    const folderEmails = emails.filter(e => e.folder === currentFolder);
+    
+    if (selectedEmails.size === folderEmails.length) {
+        // Deselect all
+        selectedEmails.clear();
+    } else {
+        // Select all
+        selectedEmails.clear();
+        folderEmails.forEach(email => selectedEmails.add(email.id));
+    }
+    
     updateUI();
 }
 
-// ====================== EMAIL FUNCTIONS ======================
-function generateSampleEmails() {
-    const sampleEmails = [
-        {
-            id: 1,
-            from: 'support@inboxpro.com',
-            fromName: 'Inbox Pro Support',
-            to: currentUser ? currentUser.email : 'user@example.com',
-            subject: translations[currentLanguage].welcomeBack + ' to Inbox Pro!',
-            body: 'Welcome to Inbox Pro, your new smart email client!\n\nFeatures:\n✓ AI-powered spam filtering\n✓ Smart email sorting\n✓ Multiple themes\n✓ 4 language support\n✓ File attachments\n\nGet started by composing your first email!',
-            date: new Date(Date.now() - 3600000).toISOString(),
-            folder: 'inbox',
-            read: false,
-            important: true,
-            labels: ['work'],
-            attachments: []
-        },
-        {
-            id: 2,
-            from: 'news@techworld.com',
-            fromName: 'Tech World News',
-            to: currentUser ? currentUser.email : 'user@example.com',
-            subject: 'Weekly Tech Digest',
-            body: 'Top stories this week:\n1. AI breakthrough in natural language processing\n2. New smartphone with foldable display\n3. Cybersecurity threats increase\n4. Cloud computing trends for 2024\n\nRead more on our website!',
-            date: new Date(Date.now() - 7200000).toISOString(),
-            folder: 'inbox',
-            read: false,
-            important: false,
-            labels: ['work'],
-            attachments: []
-        },
-        {
-            id: 3,
-            from: 'billing@services.com',
-            fromName: 'Service Billing',
-            to: currentUser ? currentUser.email : 'user@example.com',
-            subject: 'Invoice for January 2024',
-            body: 'Dear customer,\n\nYour monthly invoice is now available.\nAmount: $49.99\nDue date: February 15, 2024\n\nPlease log in to view and pay.\n\nThank you!',
-            date: new Date(Date.now() - 86400000).toISOString(),
-            folder: 'inbox',
-            read: true,
-            important: false,
-            labels: ['bills'],
-            attachments: [
-                { name: 'invoice_january.pdf', size: '245 KB', type: 'pdf' }
-            ]
-        },
-        {
-            id: 4,
-            from: 'travel@agency.com',
-            fromName: 'Travel Agency',
-            to: currentUser ? currentUser.email : 'user@example.com',
-            subject: 'Your Booking Confirmation',
-            body: 'Your travel booking is confirmed!\n\nFlight: New York to Paris\nDate: March 15, 2024\n\nHotel: Luxury Hotel Paris\nCheck-in: March 15\nCheck-out: March 22\n\nSee attached documents.',
-            date: new Date(Date.now() - 172800000).toISOString(),
-            folder: 'inbox',
-            read: true,
-            important: true,
-            labels: ['travel'],
-            attachments: [
-                { name: 'flight_tickets.pdf', size: '512 KB', type: 'pdf' },
-                { name: 'hotel_confirmation.pdf', size: '310 KB', type: 'pdf' }
-            ]
-        },
-        {
-            id: 5,
-            from: 'security@account.com',
-            fromName: 'Account Security',
-            to: currentUser ? currentUser.email : 'user@example.com',
-            subject: 'New Login Detected',
-            body: 'We detected a new login:\n\nDevice: Chrome on Windows\nLocation: New York, USA\nTime: Today, 10:30 AM\n\nIf this was you, ignore this message.',
-            date: new Date(Date.now() - 259200000).toISOString(),
-            folder: 'inbox',
-            read: true,
-            important: true,
-            labels: [],
-            attachments: []
-        },
-        {
-            id: 6,
-            from: currentUser ? currentUser.email : 'user@example.com',
-            fromName: currentUser ? currentUser.name : 'You',
-            to: 'colleague@company.com',
-            subject: 'Meeting Notes',
-            body: 'Here are the notes from our meeting:\n\n1. Project timeline discussion\n2. Resource allocation\n3. Next steps\n\nPlease review and let me know your thoughts.',
-            date: new Date(Date.now() - 43200000).toISOString(),
-            folder: 'sent',
-            read: true,
-            important: false,
-            labels: ['work'],
-            attachments: [
-                { name: 'meeting_notes.docx', size: '128 KB', type: 'doc' }
-            ]
-        },
-        {
-            id: 7,
-            from: currentUser ? currentUser.email : 'user@example.com',
-            fromName: currentUser ? currentUser.name : 'You',
-            to: 'friend@example.com',
-            subject: 'Weekend Plans',
-            body: 'Hey! What are you doing this weekend?\n\nI was thinking we could go hiking or maybe see a movie.\nLet me know what you think!\n\nCheers!',
-            date: new Date(Date.now() - 86400000).toISOString(),
-            folder: 'sent',
-            read: true,
-            important: false,
-            labels: ['personal'],
-            attachments: []
-        },
-        {
-            id: 8,
-            from: 'lottery@winbig.com',
-            fromName: 'Mega Lottery',
-            to: currentUser ? currentUser.email : 'user@example.com',
-            subject: 'YOU WON $1,000,000!',
-            body: 'CONGRATULATIONS! You have won $1,000,000 in our lottery!\n\nClick here to claim your prize: http://scam-site.com\n\nThis is a limited time offer!',
-            date: new Date(Date.now() - 3600000).toISOString(),
-            folder: 'spam',
-            read: false,
-            important: false,
-            labels: [],
-            attachments: []
-        },
-        {
-            id: 9,
-            from: 'noreply@pharmacy.com',
-            fromName: 'Online Pharmacy',
-            to: currentUser ? currentUser.email : 'user@example.com',
-            subject: 'Special Offer on Medications',
-            body: 'Buy medications without prescription!\n\nSpecial discounts available.\nWorldwide shipping.\n\nVisit our website now!',
-            date: new Date(Date.now() - 7200000).toISOString(),
-            folder: 'spam',
-            read: false,
-            important: false,
-            labels: [],
-            attachments: []
-        },
-        {
-            id: 10,
-            from: 'investment@opportunity.com',
-            fromName: 'Investment Opportunity',
-            to: currentUser ? currentUser.email : 'user@example.com',
-            subject: 'Double Your Money in 30 Days',
-            body: 'Exclusive investment opportunity!\n\nGuaranteed returns of 100% in 30 days.\nMinimum investment: $500.\n\nContact us immediately!',
-            date: new Date(Date.now() - 10800000).toISOString(),
-            folder: 'spam',
-            read: true,
-            important: false,
-            labels: [],
-            attachments: []
-        },
-        {
+function markSelectedAsRead() {
+    if (selectedEmails.size === 0) {
+        showToast('No emails selected', 'error');
+        return;
+    }
+    
+    emails.forEach(email => {
+        if (selectedEmails.has(email.id)) {
+            email.read = true;
+        }
+    });
+    
+    saveEmails();
+    updateUI();
+    
+    showToast(`${selectedEmails.size} emails marked as read`, 'success');
+}
+
+function deleteSelectedEmails() {
+    if (selectedEmails.size === 0) {
+        showToast('No emails selected', 'error');
+        return;
+    }
+    
+    if (!confirm(`Delete ${selectedEmails.size} selected emails?`)) {
+        return;
+    }
+    
+    emails.forEach(email => {
+        if (selectedEmails.has(email.id)) {
+            email.folder = 'trash';
+        }
+    });
+    
+    saveEmails();
+    selectedEmails.clear();
+    updateUI();
+    
+    showToast(`${selectedEmails.size} emails moved to trash`, 'success');
+}
+
+function handleSearch() {
+    displayEmails();
+    
+    // Show/hide clear button
+    const searchInput = document.getElementById('searchInput');
+    const searchClear = document.getElementById('searchClear');
+    searchClear.style.display = searchInput.value ? 'block' : 'none';
+}
+
+function handleQuickAction(action) {
+    switch (action) {
+        case 'archive':
+            if (selectedEmails.size > 0) {
+                // For demo, just mark as read
+                markSelectedAsRead();
+                showToast('Emails archived', 'success');
+            } else {
+                showToast('Select emails first', 'info');
+            }
+            break;
+            
+        case 'important':
+            if (selectedEmails.size > 0) {
+                emails.forEach(email => {
+                    if (selectedEmails.has(email.id)) {
+                        email.important = !email.important;
+                    }
+                });
+                saveEmails();
+                updateUI();
+                showToast('Emails marked as important', 'success');
+            } else {
+                showToast('Select emails first', 'info');
+            }
+            break;
+            
+        case 'delete':
+            if (selectedEmails.size > 0) {
+                deleteSelectedEmails();
+            } else {
+                showToast('Select emails first', 'info');
+            }
+            break;
+    }
+}
+
+function toggleStarEmail() {
+    if (!currentSelectedEmail) {
+        showToast('No email selected', 'error');
+        return;
+    }
+    
+    const email = emails.find(e => e.id === currentSelectedEmail);
+    if (email) {
+        email.important = !email.important;
+        saveEmails();
+        updateUI();
+        
+        const action = email.important ? 'starred' : 'unstarred';
+        showToast(`Email ${action}`, 'success');
+    }
+}
+
+// ====================== THEME & LANGUAGE ======================
+function applyTheme(theme) {
+    currentTheme = theme;
+    localStorage.setItem('theme', theme);
+    
+    // Remove all theme classes
+    document.body.classList.remove('light', 'dark', 'oled', 'blue');
+    
+    // Add new theme class
+    if (theme !== 'dark') {
+        document.body.classList.add(theme);
+    }
+    
+    // Update theme button icon
+    const themeBtn = document.getElementById('themeToggle');
+    if (themeBtn) {
+        themeBtn.innerHTML = theme === 'light' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    }
+}
+
+function applyLanguage() {
+    // Apply to all elements with data-i18n
+    document.querySelectorAll('[data-i18n]').forEach(element => {
+        const key = element.getAttribute('data-i18n');
+        if (translations[currentLanguage] && translations[currentLanguage][key]) {
+            element.textContent = translations[currentLanguage][key];
+        }
+    });
+    
+    // Apply to placeholders
+    document.querySelectorAll('[data-i18n-ph]').forEach(element => {
+        const key = element.getAttribute('data-i18n-ph');
+        if (translations[currentLanguage] && translations[currentLanguage][key]) {
+            element.placeholder = translations[currentLanguage][key];
+        }
+    });
+    
+    // Update language selector
+    const langSelect = document.getElementById('langSelect');
+    if (langSelect) {
+        langSelect.value = currentLanguage;
+    }
+}
+
+// ====================== TOAST NOTIFICATIONS ======================
+function showToast(message, type = 'info') {
+    const container = document.getElementById('toastContainer');
+    if (!container) {
+        // Create container if it doesn't exist
+        const newContainer = document.createElement('div');
+        newContainer.id = 'toastContainer';
+        newContainer.className = 'toast-container';
+        newContainer.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        `;
+        document.body.appendChild(newContainer);
+    }
+    
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    toast.style.cssText = `
+        background: ${type === 'error' ? '#ef4444' : type === 'success' ? '#10b981' : type === 'warning' ? '#f59e0b' : '#3b82f6'};
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        animation: toastIn 0.3s ease;
+        max-width: 300px;
+        word-break: break-word;
+    `;
+    
+    document.getElementById('toastContainer').appendChild(toast);
+    
+    // Remove toast after 3 seconds
+    setTimeout(() => {
+        toast.style.animation = 'toastOut 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+// ====================== START APPLICATION ======================
+// Add CSS animations for toast
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes toastIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes toastOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+    }
+    
+    .toast-container {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 10000;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .file-preview-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 12px;
+        background: var(--bg);
+        border-radius: 6px;
+        margin-bottom: 5px;
+        border: 1px solid var(--border);
+    }
+    
+    .remove-file {
+        background: none;
+        border: none;
+        color: var(--text-secondary);
+        cursor: pointer;
+        padding: 4px;
+    }
+    
+    .remove-file:hover {
+        color: var(--danger);
+    }
+    
+    .color-option.selected {
+        outline: 3px solid white;
+        outline-offset: 2px;
+    }
+    
+    .theme-option {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        background: none;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 15px;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+    
+    .theme-option:hover {
+        border-color: var(--accent);
+    }
+    
+    .theme-preview {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+    }
+    
+    .theme-preview.light { background: #f8fafc; border: 1px solid #e2e8f0; }
+    .theme-preview.dark { background: #0f1117; border: 1px solid #2d2d3a; }
+    .theme-preview.oled { background: #000000; border: 1px solid #222222; }
+    .theme-preview.blue { background: #0c4a6e; border: 1px solid #0284c7; }
+`;
+document.head.appendChild(style);
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', init);
