@@ -1,745 +1,626 @@
-// ====================== GLOBAL VARIABLES ======================
+/* ====================== КОНФІГУРАЦІЯ ====================== */
+
+// EMAILJS CONFIG
+const EMAILJS_CONFIG = {
+    PUBLIC_KEY: 'afzWbZbh3EJiObFmK',
+    SERVICE_ID: 'service_a3mpspb',
+    TEMPLATE_ID: 'xftxq1o'
+};
+
+/* ====================== ГЛОБАЛЬНІ ЗМІННІ ====================== */
 let currentUser = null;
+let auth = null;
+let db = null;
+let unsubscribeEmails = null;
 let currentFolder = 'inbox';
-let selectedEmails = new Set();
-let emailsData = {
-    inbox: [],
-    important: [],
-    sent: [],
-    drafts: [],
-    spam: [],
-    trash: []
-};
-let emailView = 'list';
-let currentPage = 1;
-let pageSize = 10;
-let totalPages = 1;
-let currentLanguage = 'en';
-let currentTheme = 'dark';
-let minimizedComposeWindows = [];
-let currentEmailFilter = 'all';
+let isInitialized = false;
 
-// ====================== INITIAL EMAIL DATA ======================
-const sampleEmails = [
-    {
-        id: 1,
-        sender: "Support Team",
-        senderEmail: "support@company.com",
-        subject: "Welcome to Inbox Pro",
-        preview: "Thank you for choosing our email service...",
-        date: "Today, 10:30 AM",
-        unread: true,
-        important: true,
-        folder: "inbox",
-        attachments: 2,
-        body: "<p>Welcome to Inbox Pro! We're excited to have you on board.</p><p>Your account has been successfully activated with all premium features enabled.</p><p>If you have any questions, please don't hesitate to contact our support team.</p>",
-        to: ["user@example.com"],
-        cc: [],
-        bcc: [],
-        labels: ["work"],
-        size: "1.2 MB",
-        deleted: false,
-        deletedDate: null,
-        originalFolder: "inbox"
-    },
-    {
-        id: 2,
-        sender: "John Smith",
-        senderEmail: "john.smith@business.com",
-        subject: "Meeting Tomorrow - Important Updates",
-        preview: "Hi, let's discuss the project updates...",
-        date: "Today, 09:15 AM",
-        unread: true,
-        important: true,
-        folder: "inbox",
-        attachments: 3,
-        body: "<p>Hi team,</p><p>Let's meet tomorrow at 11 AM to discuss the project updates.</p><p>Please bring the latest reports and be prepared to present your findings.</p><p>Best regards,<br>John</p>",
-        to: ["team@company.com"],
-        cc: ["manager@company.com"],
-        bcc: [],
-        labels: ["work", "important"],
-        size: "2.4 MB",
-        deleted: false,
-        deletedDate: null,
-        originalFolder: "inbox"
-    },
-    {
-        id: 3,
-        sender: "Newsletter",
-        senderEmail: "news@tech.com",
-        subject: "Weekly Tech Digest",
-        preview: "Latest news in technology and innovation...",
-        date: "Yesterday, 14:20",
-        unread: true,
-        important: false,
-        folder: "inbox",
-        attachments: 0,
-        body: "<p>This week in tech:</p><ul><li>New AI breakthroughs announced</li><li>Latest smartphone releases reviewed</li><li>Cybersecurity updates and patches</li></ul><p>Stay tuned for more updates!</p>",
-        to: ["subscribers@tech.com"],
-        cc: [],
-        bcc: [],
-        labels: ["social"],
-        size: "0.8 MB",
-        deleted: false,
-        deletedDate: null,
-        originalFolder: "inbox"
-    },
-    {
-        id: 4,
-        sender: "Alice Johnson",
-        senderEmail: "alice@design.com",
-        subject: "Design Mockups Ready for Review",
-        preview: "I've completed the design mockups for review...",
-        date: "Yesterday, 11:45",
-        unread: false,
-        important: true,
-        folder: "inbox",
-        attachments: 1,
-        body: "<p>Hello,</p><p>The design mockups are ready for your review. Please check the attachment.</p><p>Looking forward to your feedback.</p><p>Best,<br>Alice</p>",
-        to: ["review@design.com"],
-        cc: [],
-        bcc: [],
-        labels: ["work", "travel"],
-        size: "3.1 MB",
-        deleted: false,
-        deletedDate: null,
-        originalFolder: "inbox"
-    },
-    {
-        id: 5,
-        sender: "System Alert",
-        senderEmail: "noreply@system.com",
-        subject: "Security Update Required",
-        preview: "Your account requires a security update...",
-        date: "Mar 12, 08:30",
-        unread: false,
-        important: false,
-        folder: "inbox",
-        attachments: 1,
-        body: "<p>Security Update Required</p><p>Please update your security settings to continue using all features.</p><p>Click the link below to proceed with the update.</p>",
-        to: ["user@example.com"],
-        cc: [],
-        bcc: [],
-        labels: ["finance"],
-        size: "1.5 MB",
-        deleted: false,
-        deletedDate: null,
-        originalFolder: "inbox"
-    }
-];
-
-// ====================== MODELS DATA ======================
-const attachmentModels = [
-    {
-        id: 1,
-        name: "Project_Report.pdf",
-        size: "2.4 MB",
-        type: "pdf",
-        icon: "fa-file-pdf",
-        color: "#FF6B6B",
-        date: "Today, 10:30 AM"
-    },
-    {
-        id: 2,
-        name: "Design_Mockup.fig",
-        size: "5.7 MB",
-        type: "figma",
-        icon: "fa-figma",
-        color: "#9D4EDD",
-        date: "Today, 09:15 AM"
-    },
-    {
-        id: 3,
-        name: "Meeting_Notes.docx",
-        size: "1.2 MB",
-        type: "word",
-        icon: "fa-file-word",
-        color: "#2B579A",
-        date: "Yesterday, 14:20"
-    },
-    {
-        id: 4,
-        name: "Budget_Spreadsheet.xlsx",
-        size: "3.8 MB",
-        type: "excel",
-        icon: "fa-file-excel",
-        color: "#217346",
-        date: "Yesterday, 11:45"
-    },
-    {
-        id: 5,
-        name: "Presentation.pptx",
-        size: "8.9 MB",
-        type: "powerpoint",
-        icon: "fa-file-powerpoint",
-        color: "#D24726",
-        date: "Mar 12, 08:30"
-    }
-];
-
-const emailModels = [
-    {
-        id: 101,
-        sender: "AI Assistant",
-        senderEmail: "ai@inboxpro.com",
-        subject: "Your Weekly Productivity Report",
-        preview: "Here's how you used Inbox Pro this week...",
-        date: "Today, 08:00",
-        unread: true,
-        important: true,
-        folder: "inbox",
-        attachments: 3,
-        body: `<div style="font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6;">
-            <h2 style="color: #667eea; margin-bottom: 20px;">📊 Weekly Productivity Report</h2>
-            
-            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
-                <h3 style="margin: 0 0 10px 0;">Hello ${currentUser ? currentUser.name : 'User'}!</h3>
-                <p style="margin: 0; opacity: 0.9;">Here's your productivity overview for this week</p>
-            </div>
-            
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px;">
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center;">
-                    <div style="font-size: 24px; font-weight: bold; color: #667eea;">42</div>
-                    <div style="font-size: 14px; color: #666;">Emails Processed</div>
-                </div>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center;">
-                    <div style="font-size: 24px; font-weight: bold; color: #10b981;">8h 15m</div>
-                    <div style="font-size: 14px; color: #666;">Time Saved</div>
-                </div>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center;">
-                    <div style="font-size: 24px; font-weight: bold; color: #f59e0b;">94%</div>
-                    <div style="font-size: 14px; color: #666;">Inbox Clean</div>
-                </div>
-            </div>
-            
-            <h3 style="color: #333; margin-bottom: 15px;">🎯 Top Achievements</h3>
-            <ul style="padding-left: 20px; margin-bottom: 25px;">
-                <li>Cleared 15 spam emails automatically</li>
-                <li>Sorted 8 important emails with AI</li>
-                <li>Responded to 12 emails with smart replies</li>
-                <li>Organized 5 projects with labels</li>
-            </ul>
-            
-            <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 25px;">
-                <h4 style="margin: 0 0 10px 0; color: #1976d2;">💡 Pro Tip</h4>
-                <p style="margin: 0;">Use the "Snooze" feature for emails that need attention later. This keeps your inbox focused on what matters now.</p>
-            </div>
-            
-            <p style="color: #666; font-size: 14px;">Keep up the great work!<br>Your AI Assistant 🤖</p>
-        </div>`,
-        to: ["user@example.com"],
-        cc: [],
-        bcc: [],
-        labels: ["work", "ai"],
-        size: "2.1 MB",
-        deleted: false,
-        deletedDate: null,
-        originalFolder: "inbox"
-    }
-];
-
-// ====================== LANGUAGE TRANSLATIONS ======================
-const translations = {
-    en: {
-        welcomeBack: "Welcome Back",
-        emailAddress: "Email Address",
-        password: "Password",
-        rememberMe: "Remember me",
-        forgotPassword: "Forgot password?",
-        signIn: "Sign In",
-        newUser: "New user?",
-        createAccount: "Create account",
-        fullName: "Full Name",
-        confirmPassword: "Confirm Password",
-        passwordHint: "Min. 8 characters with letters & numbers",
-        createAccountBtn: "Create Account",
-        alreadyHaveAccount: "Already have an account?",
-        aiFilter: "AI Spam Filter",
-        smartSorting: "Smart Sorting",
-        securePrivate: "Secure & Private",
-        aiActive: "AI Active",
-        searchPlaceholder: "Search emails, contacts, subjects...",
-        refresh: "Refresh",
-        lightTheme: "Light",
-        darkTheme: "Dark",
-        oledTheme: "OLED",
-        blueTheme: "Ocean",
-        aiOrganizing: "AI is organizing your inbox. <strong>15</strong> emails sorted automatically.",
-        compose: "Compose",
-        archive: "Archive",
-        important: "Important",
-        delete: "Delete",
-        snooze: "Snooze",
-        folders: "Folders",
-        inbox: "Inbox",
-        sent: "Sent",
-        drafts: "Drafts",
-        spam: "Spam",
-        trash: "Trash",
-        labels: "Labels",
-        work: "Work",
-        personal: "Personal",
-        travel: "Travel",
-        finance: "Finance",
-        social: "Social",
-        emailStats: "Email Stats",
-        total: "Total",
-        unread: "Unread",
-        storage: "Storage",
-        kyiv: "Kyiv, UA",
-        newest: "Newest first",
-        oldest: "Oldest first",
-        importantFirst: "Important first",
-        unreadFirst: "Unread first",
-        all: "All",
-        withAttachments: "With Attachments",
-        moreFilters: "More Filters",
-        back: "Back",
-        selectEmail: "Select an email",
-        verified: "Verified",
-        secure: "Secure",
-        to: "To:",
-        cc: "CC:",
-        selectEmailDesc: "Select an email to read its content",
-        attachments: "Attachments",
-        downloadAll: "Download All",
-        quickReply: "Quick Reply",
-        print: "Print",
-        report: "Report",
-        replyPlaceholder: "Type your reply...",
-        send: "Send",
-        cancel: "Cancel",
-        previous: "Previous",
-        next: "Next",
-        systemOperational: "All systems operational",
-        syncing: "Syncing...",
-        loading: "Loading...",
-        userSettings: "User Settings",
-        profile: "Profile",
-        appearance: "Appearance",
-        notifications: "Notifications",
-        security: "Security",
-        advanced: "Advanced",
-        saveChanges: "Save Changes",
-        newMessage: "New Message",
-        addAttachment: "Add Attachment",
-        maxSize: "Max 25MB each",
-        urgent: "Mark as Urgent",
-        readReceipt: "Request read receipt",
-        encrypt: "Encrypt message",
-        schedule: "Schedule",
-        discard: "Discard",
-        emptyTrash: "Empty Trash",
-        signOut: "Sign Out",
-        confirmDelete: "Confirm Delete",
-        deleteMessage: "Are you sure you want to delete this email?",
-        deleteMultipleMessage: "Are you sure you want to delete {count} emails?",
-        deleteWarning: "Deleted emails will be moved to Trash and stored for 30 days before permanent deletion.",
-        permanentlyDelete: "Permanently Delete",
-        restore: "Restore",
-        models: "Models",
-        documents: "Documents",
-        images: "Images",
-        archives: "Archives",
-        allFiles: "All Files",
-        recent: "Recent",
-        starred: "Starred",
-        shared: "Shared"
-    },
-    ua: {
-        welcomeBack: "З поверненням",
-        emailAddress: "Електронна адреса",
-        password: "Пароль",
-        rememberMe: "Запам'ятати мене",
-        forgotPassword: "Забули пароль?",
-        signIn: "Увійти",
-        newUser: "Новий користувач?",
-        createAccount: "Створити акаунт",
-        fullName: "Повне ім'я",
-        confirmPassword: "Підтвердіть пароль",
-        passwordHint: "Мін. 8 символів з буквами та цифрами",
-        createAccountBtn: "Створити акаунт",
-        alreadyHaveAccount: "Вже є акаунт?",
-        aiFilter: "AI-фільтр спаму",
-        smartSorting: "Розумне сортування",
-        securePrivate: "Безпечно та приватно",
-        aiActive: "AI активний",
-        searchPlaceholder: "Пошук листів, контактів, тем...",
-        refresh: "Оновити",
-        lightTheme: "Світла",
-        darkTheme: "Темна",
-        oledTheme: "OLED",
-        blueTheme: "Океан",
-        aiOrganizing: "AI організовує вашу пошту. <strong>15</strong> листів відсортовано.",
-        compose: "Написати",
-        archive: "Архів",
-        important: "Важливі",
-        delete: "Видалити",
-        snooze: "Відкласти",
-        folders: "Папки",
-        inbox: "Вхідні",
-        sent: "Надіслані",
-        drafts: "Чернетки",
-        spam: "Спам",
-        trash: "Сміття",
-        labels: "Мітки",
-        work: "Робота",
-        personal: "Особисте",
-        travel: "Подорожі",
-        finance: "Фінанси",
-        social: "Соціальне",
-        emailStats: "Статистика",
-        total: "Всього",
-        unread: "Непрочитані",
-        storage: "Сховище",
-        kyiv: "Київ, UA",
-        newest: "Спочатку нові",
-        oldest: "Спочатку старі",
-        importantFirst: "Спочатку важливі",
-        unreadFirst: "Спочатку непрочитані",
-        all: "Всі",
-        withAttachments: "З вкладеннями",
-        moreFilters: "Більше фільтрів",
-        back: "Назад",
-        selectEmail: "Виберіть лист",
-        verified: "Підтверджено",
-        secure: "Безпечно",
-        to: "Кому:",
-        cc: "Копія:",
-        selectEmailDesc: "Виберіть лист для перегляду",
-        attachments: "Вкладення",
-        downloadAll: "Завантажити все",
-        quickReply: "Швидка відповідь",
-        print: "Друк",
-        report: "Поскаржитися",
-        replyPlaceholder: "Введіть вашу відповідь...",
-        send: "Надіслати",
-        cancel: "Скасувати",
-        previous: "Назад",
-        next: "Далі",
-        systemOperational: "Всі системи працюють",
-        syncing: "Синхронізація...",
-        loading: "Завантаження...",
-        userSettings: "Налаштування",
-        profile: "Профіль",
-        appearance: "Зовнішній вигляд",
-        notifications: "Сповіщення",
-        security: "Безпека",
-        advanced: "Додатково",
-        saveChanges: "Зберегти зміни",
-        newMessage: "Нове повідомлення",
-        addAttachment: "Додати файл",
-        maxSize: "Макс. 25MB кожен",
-        urgent: "Позначити як термінове",
-        readReceipt: "Запит підтвердження прочитання",
-        encrypt: "Зашифрувати повідомлення",
-        schedule: "Запланувати",
-        discard: "Скасувати",
-        emptyTrash: "Очистити сміття",
-        signOut: "Вийти",
-        confirmDelete: "Підтвердити видалення",
-        deleteMessage: "Ви впевнені, що хочете видалити цей лист?",
-        deleteMultipleMessage: "Ви впевнені, що хочете видалити {count} листів?",
-        deleteWarning: "Видалені листи будуть переміщені в кошик та зберігатимуться 30 днів перед остаточним видаленням.",
-        permanentlyDelete: "Видалити назавжди",
-        restore: "Відновити",
-        models: "Моделі",
-        documents: "Документи",
-        images: "Зображення",
-        archives: "Архіви",
-        allFiles: "Всі файли",
-        recent: "Нещодавні",
-        starred: "Помічені",
-        shared: "Спільні"
-    }
-};
-
-// ====================== UTILITY FUNCTIONS ======================
-function showToast(message, type = 'info') {
-    const toastContainer = document.getElementById('toastContainer');
-    if (!toastContainer) return;
+/* ====================== ІНІЦІАЛІЗАЦІЯ ====================== */
+function initializeApp() {
+    if (isInitialized) return;
     
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    const icon = type === 'success' ? 'check-circle' : 
-                 type === 'error' ? 'exclamation-circle' : 
-                 type === 'warning' ? 'exclamation-triangle' : 'info-circle';
+    console.log('🚀 Ініціалізація Inbox Pro...');
     
-    toast.innerHTML = `
-        <i class="fas fa-${icon}"></i>
-        <span>${message}</span>
-    `;
+    // Ініціалізація Firebase (вже в HTML)
+    auth = window.firebaseAuth;
+    db = window.firebaseFirestore;
     
-    toastContainer.appendChild(toast);
+    if (!auth || !db) {
+        console.error('❌ Firebase не ініціалізовано');
+        showToast('Помилка підключення до сервера', 'error');
+        setTimeout(() => location.reload(), 3000);
+        return;
+    }
     
-    setTimeout(() => {
-        toast.style.animation = 'toastOut 0.3s ease forwards';
-        setTimeout(() => toast.remove(), 300);
-    }, 5000);
+    // Ініціалізація EmailJS
+    if (typeof emailjs !== 'undefined') {
+        emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY);
+        console.log('✅ EmailJS ініціалізовано');
+    }
+    
+    // Налаштування слухачів подій
+    setupEventListeners();
+    
+    // Перевірка стану автентифікації
+    checkAuthState();
+    
+    isInitialized = true;
+    console.log('✅ Inbox Pro ініціалізовано');
 }
 
-function showLoading() {
-    const overlay = document.getElementById('loadingOverlay');
-    if (overlay) overlay.style.display = 'flex';
-}
-
-function hideLoading() {
-    const overlay = document.getElementById('loadingOverlay');
-    if (overlay) overlay.style.display = 'none';
-}
-
-function updateLanguage(lang) {
-    currentLanguage = lang;
-    const langSelect = document.getElementById('langSelect');
-    if (langSelect) langSelect.value = lang;
-    
-    document.querySelectorAll('[data-i18n]').forEach(element => {
-        const key = element.getAttribute('data-i18n');
-        if (translations[lang] && translations[lang][key]) {
-            element.innerHTML = translations[lang][key];
-        }
-    });
-    
-    document.querySelectorAll('[data-i18n-ph]').forEach(element => {
-        const key = element.getAttribute('data-i18n-ph');
-        if (translations[lang] && translations[lang][key]) {
-            element.placeholder = translations[lang][key];
-        }
-    });
-    
-    document.querySelectorAll('[data-i18n-title]').forEach(element => {
-        const key = element.getAttribute('data-i18n-title');
-        if (translations[lang] && translations[lang][key]) {
-            element.title = translations[lang][key];
+/* ====================== АВТЕНТИФІКАЦІЯ ====================== */
+function checkAuthState() {
+    auth.onAuthStateChanged((user) => {
+        const initialLoading = document.getElementById('initialLoading');
+        if (initialLoading) initialLoading.style.display = 'none';
+        
+        if (user) {
+            // Користувач авторизований
+            handleUserSignedIn(user);
+        } else {
+            // Користувач не авторизований
+            handleUserSignedOut();
         }
     });
 }
 
-function updateTheme(theme) {
-    currentTheme = theme;
-    document.body.className = `${theme}-theme`;
+async function handleUserSignedIn(user) {
+    console.log('✅ Користувач авторизований:', user.email);
     
-    document.querySelectorAll('.theme-option').forEach(option => {
-        option.classList.remove('active');
-        if (option.dataset.theme === theme) {
-            option.classList.add('active');
-        }
-    });
+    currentUser = {
+        uid: user.uid,
+        email: user.email,
+        name: user.displayName || user.email.split('@')[0],
+        emailVerified: user.emailVerified
+    };
     
+    // Оновлення профілю користувача
+    await updateUserProfile(user.uid);
+    
+    // Завантаження додаткових даних користувача
+    await loadUserProfile(user.uid);
+    
+    // Оновлення інтерфейсу
+    updateUserInterface();
+    
+    // Показати головний додаток
+    showApp();
+    
+    // Налаштування реального часу для листів
+    setupRealtimeEmails();
+    
+    // Показати повідомлення про успішний вхід
+    if (user.metadata.creationTime === user.metadata.lastSignInTime) {
+        showToast('Ласкаво просимо до Inbox Pro!', 'success');
+    } else {
+        showToast('З поверненням!', 'success');
+    }
+}
+
+function handleUserSignedOut() {
+    console.log('🔒 Користувач не авторизований');
+    currentUser = null;
+    
+    // Зупинити слухач реального часу
+    if (unsubscribeEmails) {
+        unsubscribeEmails();
+        unsubscribeEmails = null;
+    }
+    
+    // Показати екран входу
+    showLoginScreen();
+}
+
+async function registerUser(email, password, name) {
     try {
-        localStorage.setItem('inboxProTheme', theme);
-    } catch (e) {
-        console.log('Could not save theme to localStorage:', e);
+        showLoading('Реєстрація...');
+        
+        // Перевірка чи email вже існує
+        const emailExists = await checkEmailExists(email);
+        if (emailExists) {
+            hideLoading();
+            showError('registerEmailError', 'Ця електронна пошта вже використовується');
+            return false;
+        }
+        
+        // Створення користувача
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        
+        // Оновлення профілю
+        await userCredential.user.updateProfile({ displayName: name });
+        
+        // Збереження додаткових даних користувача
+        await db.collection('users').doc(userCredential.user.uid).set({
+            email: email.toLowerCase(),
+            name: name,
+            createdAt: new Date().toISOString(),
+            lastLogin: new Date().toISOString(),
+            emailVerified: false,
+            storageUsed: 0,
+            plan: 'free',
+            settings: {
+                theme: 'dark',
+                language: 'ua',
+                notifications: true,
+                autoSave: true
+            },
+            profile: {
+                avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=667eea&color=fff`,
+                bio: '',
+                location: '',
+                website: ''
+            }
+        });
+        
+        // Відправлення листа з підтвердженням
+        await sendVerificationEmail(userCredential.user);
+        
+        hideLoading();
+        showToast('Акаунт успішно створено! Перевірте пошту для підтвердження.', 'success');
+        
+        // Автоматичний вхід після реєстрації
+        await loginUser(email, password, true);
+        
+        return true;
+    } catch (error) {
+        hideLoading();
+        handleAuthError(error, 'register');
+        return false;
     }
 }
 
-function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    if (sidebar) sidebar.classList.toggle('active');
+async function loginUser(email, password, rememberMe) {
+    try {
+        showLoading('Вхід в систему...');
+        
+        // Налаштування персистентності сесії
+        const persistence = rememberMe ? 
+            firebase.auth.Auth.Persistence.LOCAL : 
+            firebase.auth.Auth.Persistence.SESSION;
+        
+        await auth.setPersistence(persistence);
+        
+        // Авторизація
+        await auth.signInWithEmailAndPassword(email, password);
+        
+        hideLoading();
+        return true;
+    } catch (error) {
+        hideLoading();
+        handleAuthError(error, 'login');
+        return false;
+    }
 }
 
-// ====================== EMAIL MANAGEMENT ======================
-function initializeEmails() {
-    Object.keys(emailsData).forEach(folder => {
-        emailsData[folder] = [];
+async function logoutUser() {
+    try {
+        showLoading('Вихід...');
+        
+        // Зупинити слухач реального часу
+        if (unsubscribeEmails) {
+            unsubscribeEmails();
+            unsubscribeEmails = null;
+        }
+        
+        // Вийти з системи
+        await auth.signOut();
+        
+        // Очистити дані користувача
+        currentUser = null;
+        localStorage.removeItem('userPreferences');
+        
+        hideLoading();
+        showToast('Ви успішно вийшли з системи', 'success');
+        
+        // Показати екран входу
+        showLoginScreen();
+    } catch (error) {
+        console.error('Помилка виходу:', error);
+        showToast('Помилка при виході з системи', 'error');
+        hideLoading();
+    }
+}
+
+async function sendPasswordResetEmail(email) {
+    try {
+        showLoading('Надсилання листа...');
+        await auth.sendPasswordResetEmail(email);
+        hideLoading();
+        showToast('Лист для відновлення пароля надіслано на вашу пошту', 'success');
+        return true;
+    } catch (error) {
+        hideLoading();
+        handleAuthError(error, 'reset');
+        return false;
+    }
+}
+
+async function checkEmailExists(email) {
+    try {
+        const methods = await auth.fetchSignInMethodsForEmail(email);
+        return methods.length > 0;
+    } catch (error) {
+        console.error('Помилка перевірки email:', error);
+        return false;
+    }
+}
+
+async function sendVerificationEmail(user) {
+    try {
+        await user.sendEmailVerification();
+        console.log('Лист з підтвердженням надіслано');
+    } catch (error) {
+        console.error('Помилка відправлення листа з підтвердженням:', error);
+    }
+}
+
+async function updateUserProfile(uid) {
+    try {
+        await db.collection('users').doc(uid).update({
+            lastLogin: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        });
+    } catch (error) {
+        console.error('Помилка оновлення профілю:', error);
+    }
+}
+
+async function loadUserProfile(uid) {
+    try {
+        const userDoc = await db.collection('users').doc(uid).get();
+        if (userDoc.exists) {
+            const userData = userDoc.data();
+            currentUser = { ...currentUser, ...userData };
+            
+            // Застосування налаштувань користувача
+            applyUserSettings(userData.settings);
+            
+            console.log('Профіль користувача завантажено:', currentUser);
+        }
+    } catch (error) {
+        console.error('Помилка завантаження профілю:', error);
+    }
+}
+
+function applyUserSettings(settings) {
+    if (!settings) return;
+    
+    // Тема
+    if (settings.theme) {
+        document.body.className = `${settings.theme}-theme`;
+        localStorage.setItem('theme', settings.theme);
+    }
+    
+    // Мова
+    if (settings.language) {
+        const langSelect = document.getElementById('langSelect');
+        if (langSelect) langSelect.value = settings.language;
+        localStorage.setItem('language', settings.language);
+    }
+}
+
+/* ====================== УПРАВЛІННЯ ЛИСТАМИ ====================== */
+function setupRealtimeEmails() {
+    if (!currentUser || !db) return;
+    
+    // Зупинити попередній слухач
+    if (unsubscribeEmails) {
+        unsubscribeEmails();
+    }
+    
+    unsubscribeEmails = db.collection('emails')
+        .where('userId', '==', currentUser.uid)
+        .where('folder', '==', currentFolder)
+        .orderBy('createdAt', 'desc')
+        .limit(50)
+        .onSnapshot((snapshot) => {
+            const emails = [];
+            snapshot.forEach((doc) => {
+                emails.push({ id: doc.id, ...doc.data() });
+            });
+            
+            updateEmailsList(emails);
+            updateEmailCounts(emails);
+            
+            console.log('Оновлено список листів:', emails.length);
+        }, (error) => {
+            console.error('Помилка підписки на листи:', error);
+            showToast('Помилка синхронізації листів', 'error');
+        });
+}
+
+async function getEmailsFromDatabase(folder = 'inbox', limit = 50) {
+    try {
+        if (!currentUser || !db) return [];
+        
+        let query = db.collection('emails')
+            .where('userId', '==', currentUser.uid)
+            .orderBy('createdAt', 'desc')
+            .limit(limit);
+        
+        if (folder !== 'all') {
+            query = query.where('folder', '==', folder);
+        }
+        
+        const snapshot = await query.get();
+        const emails = [];
+        
+        snapshot.forEach((doc) => {
+            emails.push({ id: doc.id, ...doc.data() });
+        });
+        
+        return emails;
+    } catch (error) {
+        console.error('Помилка отримання листів:', error);
+        showToast('Помилка завантаження листів', 'error');
+        return [];
+    }
+}
+
+async function saveEmailToDatabase(emailData) {
+    try {
+        if (!currentUser || !db) return null;
+        
+        const email = {
+            ...emailData,
+            userId: currentUser.uid,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            read: false,
+            folder: 'sent',
+            important: emailData.important || false,
+            starred: false,
+            labels: emailData.labels || [],
+            attachments: emailData.attachments || []
+        };
+        
+        const docRef = await db.collection('emails').add(email);
+        
+        // Оновлення статистики сховища
+        const emailSize = JSON.stringify(email).length;
+        await updateUserStorage(currentUser.uid, emailSize);
+        
+        console.log('Лист збережено з ID:', docRef.id);
+        return docRef.id;
+    } catch (error) {
+        console.error('Помилка збереження листа:', error);
+        throw error;
+    }
+}
+
+async function updateUserStorage(uid, size) {
+    try {
+        const userRef = db.collection('users').doc(uid);
+        const userDoc = await userRef.get();
+        
+        if (userDoc.exists) {
+            const currentStorage = userDoc.data().storageUsed || 0;
+            await userRef.update({
+                storageUsed: currentStorage + size,
+                updatedAt: new Date().toISOString()
+            });
+            
+            updateStorageInfo();
+        }
+    } catch (error) {
+        console.error('Помилка оновлення сховища:', error);
+    }
+}
+
+async function sendRealEmail(emailData) {
+    return new Promise((resolve, reject) => {
+        if (typeof emailjs === 'undefined') {
+            reject(new Error('EmailJS не завантажений'));
+            return;
+        }
+
+        const templateParams = {
+            from_name: emailData.fromName || currentUser?.name || 'Користувач Inbox Pro',
+            from_email: emailData.fromEmail || currentUser?.email || 'noreply@inboxpro.com',
+            to_email: emailData.toEmail,
+            subject: emailData.subject,
+            message: emailData.message,
+            reply_to: emailData.replyTo || emailData.fromEmail || currentUser?.email
+        };
+
+        emailjs.send(
+            EMAILJS_CONFIG.SERVICE_ID,
+            EMAILJS_CONFIG.TEMPLATE_ID,
+            templateParams
+        )
+        .then(async (response) => {
+            console.log('Лист відправлено успішно:', response);
+            
+            // Збереження листа в базі даних
+            try {
+                await saveEmailToDatabase({
+                    from: emailData.fromEmail || currentUser?.email,
+                    to: emailData.toEmail,
+                    subject: emailData.subject,
+                    body: emailData.message,
+                    cc: emailData.cc,
+                    bcc: emailData.bcc,
+                    important: emailData.important || false
+                });
+            } catch (dbError) {
+                console.warn('Не вдалося зберегти лист в базу даних:', dbError);
+            }
+            
+            resolve(response);
+        })
+        .catch((error) => {
+            console.error('Помилка відправлення листа:', error);
+            reject(error);
+        });
+    });
+}
+
+async function updateEmailStatus(emailId, updates) {
+    try {
+        await db.collection('emails').doc(emailId).update({
+            ...updates,
+            updatedAt: new Date().toISOString()
+        });
+        return true;
+    } catch (error) {
+        console.error('Помилка оновлення листа:', error);
+        return false;
+    }
+}
+
+/* ====================== ІНТЕРФЕЙС ====================== */
+function showLoginScreen() {
+    const loginScreen = document.getElementById('loginScreen');
+    const app = document.getElementById('app');
+    const initialLoading = document.getElementById('initialLoading');
+    
+    if (initialLoading) initialLoading.style.display = 'none';
+    if (loginScreen) loginScreen.style.display = 'flex';
+    if (app) {
+        app.style.display = 'none';
+        app.style.opacity = '0';
+    }
+    
+    resetAllForms();
+}
+
+function showApp() {
+    const loginScreen = document.getElementById('loginScreen');
+    const app = document.getElementById('app');
+    const initialLoading = document.getElementById('initialLoading');
+    
+    if (initialLoading) initialLoading.style.display = 'none';
+    if (loginScreen) loginScreen.style.display = 'none';
+    if (app) {
+        app.style.display = 'flex';
+        setTimeout(() => {
+            app.style.opacity = '1';
+        }, 10);
+    }
+    
+    initializeAppInterface();
+}
+
+function updateUserInterface() {
+    if (!currentUser) return;
+    
+    // Оновлення імені користувача
+    const userNameElements = document.querySelectorAll('#userName, .user-name');
+    userNameElements.forEach(el => {
+        if (el) el.textContent = currentUser.name;
     });
     
-    emailsData.inbox = [...sampleEmails, ...emailModels];
+    // Оновлення email
+    const userEmailElements = document.querySelectorAll('#userEmail, .user-email');
+    userEmailElements.forEach(el => {
+        if (el) el.textContent = currentUser.email;
+    });
     
-    emailsData.sent = [
-        {
-            id: 6,
-            sender: currentUser ? currentUser.name : "You",
-            senderEmail: currentUser ? currentUser.email : "you@example.com",
-            subject: "Project Update",
-            preview: "Here's the latest update on the project...",
-            date: "Today, 08:00",
-            unread: false,
-            important: false,
-            folder: "sent",
-            attachments: 1,
-            body: "<p>Hi team,</p><p>Here's the latest project update as promised.</p><p>Best regards,<br>" + (currentUser ? currentUser.name : "You") + "</p>",
-            to: ["team@company.com"],
-            cc: [],
-            bcc: [],
-            labels: ["work"],
-            size: "1.8 MB",
-            deleted: false,
-            deletedDate: null,
-            originalFolder: "sent"
+    // Оновлення аватара
+    const userAvatar = document.getElementById('userAvatar');
+    if (userAvatar) {
+        userAvatar.textContent = currentUser.name.charAt(0).toUpperCase();
+        if (currentUser.profile?.avatar) {
+            userAvatar.style.backgroundImage = `url(${currentUser.profile.avatar})`;
+            userAvatar.textContent = '';
         }
-    ];
-    
-    emailsData.drafts = [
-        {
-            id: 7,
-            sender: currentUser ? currentUser.name : "You",
-            senderEmail: currentUser ? currentUser.email : "you@example.com",
-            subject: "Draft: Meeting Notes",
-            preview: "Notes from yesterday's meeting...",
-            date: "Yesterday, 16:30",
-            unread: false,
-            important: false,
-            folder: "drafts",
-            attachments: 0,
-            body: "<p>Meeting notes from yesterday...</p>",
-            to: ["colleague@company.com"],
-            cc: [],
-            bcc: [],
-            labels: ["work"],
-            size: "0.5 MB",
-            deleted: false,
-            deletedDate: null,
-            originalFolder: "drafts"
-        }
-    ];
-    
-    emailsData.spam = [
-        {
-            id: 8,
-            sender: "Spammer",
-            senderEmail: "spam@fake.com",
-            subject: "You won a prize!",
-            preview: "Congratulations! You won $1,000,000...",
-            date: "Mar 10, 23:45",
-            unread: false,
-            important: false,
-            folder: "spam",
-            attachments: 0,
-            body: "<p>This is a spam email.</p>",
-            to: ["user@example.com"],
-            cc: [],
-            bcc: [],
-            labels: [],
-            size: "0.2 MB",
-            deleted: false,
-            deletedDate: null,
-            originalFolder: "spam"
-        }
-    ];
-    
-    emailsData.important = emailsData.inbox.filter(email => email.important);
-    emailsData.trash = [];
-}
-
-function updateEmailCounts() {
-    const inboxCount = document.getElementById('inboxCount');
-    const importantCount = document.getElementById('importantCount');
-    const sentCount = document.getElementById('sentCount');
-    const draftsCount = document.getElementById('draftsCount');
-    const spamCount = document.getElementById('spamCount');
-    const trashCount = document.getElementById('trashCount');
-    
-    if (inboxCount) inboxCount.textContent = emailsData.inbox.filter(e => e.unread).length;
-    if (importantCount) importantCount.textContent = emailsData.important.length;
-    if (sentCount) sentCount.textContent = emailsData.sent.length;
-    if (draftsCount) draftsCount.textContent = emailsData.drafts.length;
-    if (spamCount) spamCount.textContent = emailsData.spam.length;
-    if (trashCount) trashCount.textContent = emailsData.trash.length;
-    
-    const totalEmails = document.getElementById('totalEmails');
-    const unreadEmails = document.getElementById('unreadEmails');
-    const importantEmails = document.getElementById('importantEmails');
-    
-    if (totalEmails) totalEmails.textContent = emailsData.inbox.length;
-    if (unreadEmails) unreadEmails.textContent = emailsData.inbox.filter(e => e.unread).length;
-    if (importantEmails) importantEmails.textContent = emailsData.important.length;
-    
-    const folderEmails = emailsData[currentFolder] || [];
-    
-    const allFilter = document.querySelector('[data-filter="all"] .filter-count');
-    const unreadFilter = document.querySelector('[data-filter="unread"] .filter-count');
-    const importantFilter = document.querySelector('[data-filter="important"] .filter-count');
-    const attachmentsFilter = document.querySelector('[data-filter="attachments"] .filter-count');
-    
-    if (allFilter) allFilter.textContent = folderEmails.length;
-    if (unreadFilter) unreadFilter.textContent = folderEmails.filter(e => e.unread).length;
-    if (importantFilter) importantFilter.textContent = folderEmails.filter(e => e.important).length;
-    if (attachmentsFilter) attachmentsFilter.textContent = folderEmails.filter(e => e.attachments > 0).length;
-    
-    const emailCount = document.getElementById('emailCount');
-    const unreadCount = document.getElementById('unreadCount');
-    
-    if (emailCount) emailCount.textContent = `${folderEmails.length} emails`;
-    if (unreadCount) unreadCount.textContent = `${folderEmails.filter(e => e.unread).length} unread`;
-}
-
-function getFilteredEmails() {
-    let folderEmails = emailsData[currentFolder] || [];
-    
-    if (currentEmailFilter === 'unread') {
-        folderEmails = folderEmails.filter(email => email.unread);
-    } else if (currentEmailFilter === 'important') {
-        folderEmails = folderEmails.filter(email => email.important);
-    } else if (currentEmailFilter === 'attachments') {
-        folderEmails = folderEmails.filter(email => email.attachments > 0);
     }
     
-    return folderEmails;
+    // Оновлення інформації про сховище
+    updateStorageInfo();
 }
 
-function displayEmails() {
-    const emailsList = document.getElementById('emailsList');
-    const folderEmails = getFilteredEmails();
+function updateStorageInfo() {
+    if (!currentUser) return;
     
+    const storageUsed = currentUser.storageUsed || 0;
+    const storageLimit = currentUser.plan === 'free' ? 10 * 1024 * 1024 : 50 * 1024 * 1024;
+    const percent = Math.min((storageUsed / storageLimit) * 100, 100);
+    
+    // Оновлення відсотка використаного сховища
+    const storagePercentElements = document.querySelectorAll('.storage-percent');
+    storagePercentElements.forEach(el => {
+        if (el) el.textContent = `${Math.round(percent)}%`;
+    });
+    
+    // Оновлення прогрес-бару
+    const storageProgressElements = document.querySelectorAll('.storage-progress');
+    storageProgressElements.forEach(el => {
+        if (el) el.style.width = `${percent}%`;
+    });
+    
+    // Оновлення тексту
+    const storageTextElements = document.querySelectorAll('.storage-text');
+    storageTextElements.forEach(el => {
+        if (el) {
+            const usedMB = (storageUsed / (1024 * 1024)).toFixed(1);
+            const totalMB = (storageLimit / (1024 * 1024)).toFixed(0);
+            el.textContent = `${usedMB}GB / ${totalMB}GB використано`;
+        }
+    });
+}
+
+function updateEmailsList(emails) {
+    const emailsList = document.getElementById('emailsList');
     if (!emailsList) return;
     
     emailsList.innerHTML = '';
     
-    if (folderEmails.length === 0) {
+    if (emails.length === 0) {
         emailsList.innerHTML = `
             <div class="empty-state">
-                <i class="fas fa-envelope-open"></i>
-                <h3>No emails</h3>
-                <p>${translations[currentLanguage].selectEmailDesc}</p>
+                <i class="fas fa-inbox"></i>
+                <h3>Немає листів</h3>
+                <p>Натисніть "Написати" для створення нового листа</p>
             </div>
         `;
         return;
     }
     
-    folderEmails.forEach(email => {
-        const emailElement = document.createElement('div');
-        emailElement.className = 'email';
-        if (email.unread) emailElement.classList.add('unread');
-        if (email.important) emailElement.classList.add('important');
-        if (selectedEmails.has(email.id)) emailElement.classList.add('selected');
-        
-        const initials = email.sender.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
-        const hasAI = email.labels && email.labels.includes('ai');
-        
-        emailElement.innerHTML = `
-            <div class="email-checkbox">
-                <input type="checkbox" class="email-select" data-id="${email.id}" ${selectedEmails.has(email.id) ? 'checked' : ''}>
-            </div>
-            <div class="email-avatar" style="${hasAI ? 'background: linear-gradient(135deg, #667eea, #9d4edd);' : ''}">
-                ${initials}
-                ${hasAI ? '<div class="ai-badge"><i class="fas fa-robot"></i></div>' : ''}
-            </div>
-            <div class="email-content">
-                <div class="email-header">
-                    <div class="email-sender">${email.sender}</div>
-                    <div class="email-date">${email.date}</div>
-                </div>
-                <div class="email-subject">${email.subject}</div>
-                <div class="email-preview">${email.preview}</div>
-                ${email.attachments > 0 ? `<div class="email-attachment"><i class="fas fa-paperclip"></i> ${email.attachments}</div>` : ''}
-            </div>
-        `;
-        
-        emailElement.addEventListener('click', (e) => {
-            if (!e.target.classList.contains('email-select')) {
-                selectEmail(email.id);
-                displayEmailContent(email);
-            }
-        });
-        
+    emails.forEach((email, index) => {
+        const emailElement = createEmailElement(email, index);
         emailsList.appendChild(emailElement);
     });
-    
-    updateEmailCheckboxes();
 }
 
-function displayEmailContent(email) {
+function createEmailElement(email, index) {
+    const div = document.createElement('div');
+    div.className = `email ${email.read ? '' : 'unread'} ${email.important ? 'important' : ''}`;
+    div.style.animationDelay = `${index * 0.05}s`;
+    div.dataset.id = email.id;
+    
+    const avatarText = email.from ? email.from.charAt(0).toUpperCase() : '?';
+    const date = formatDate(email.createdAt);
+    const preview = email.body ? email.body.substring(0, 100) + (email.body.length > 100 ? '...' : '') : '';
+    
+    div.innerHTML = `
+        <div class="email-checkbox">
+            <input type="checkbox" class="email-select" data-id="${email.id}">
+        </div>
+        <div class="email-avatar">${avatarText}</div>
+        <div class="email-content">
+            <div class="email-header">
+                <div class="email-sender">${email.from || 'Невідомий відправник'}</div>
+                <div class="email-date">${date}</div>
+            </div>
+            <div class="email-subject">${email.subject || 'Без теми'}</div>
+            <div class="email-preview">${preview}</div>
+        </div>
+        ${email.attachments && email.attachments.length > 0 ? 
+            '<div class="email-attachment"><i class="fas fa-paperclip"></i></div>' : ''}
+    `;
+    
+    div.addEventListener('click', (e) => {
+        if (!e.target.classList.contains('email-select')) {
+            showEmailDetails(email);
+        }
+    });
+    
+    return div;
+}
+
+function showEmailDetails(email) {
+    const reader = document.getElementById('reader');
     const readerTitle = document.getElementById('readerTitle');
     const readerSender = document.getElementById('readerSender');
     const readerSenderEmail = document.getElementById('readerSenderEmail');
@@ -748,1589 +629,914 @@ function displayEmailContent(email) {
     const readerText = document.getElementById('readerText');
     const emailTo = document.getElementById('emailTo');
     const emailCc = document.getElementById('emailCc');
+    
+    if (!reader || !readerTitle) return;
+    
+    // Оновлення заголовка
+    readerTitle.textContent = email.subject || 'Без теми';
+    
+    // Оновлення інформації про відправника
+    readerSender.textContent = email.fromName || email.from || 'Невідомий відправник';
+    readerSenderEmail.textContent = email.from || '';
+    
+    // Оновлення дати
+    const dateElement = readerDate.querySelector('span');
+    if (dateElement) dateElement.textContent = formatDate(email.createdAt);
+    
+    // Оновлення теми та тіла листа
+    readerSubject.textContent = email.subject || 'Без теми';
+    readerText.innerHTML = `<p>${email.body || ''}</p>`;
+    
+    // Оновлення одержувачів
+    if (emailTo) emailTo.textContent = email.to || '';
+    if (emailCc) emailCc.textContent = email.cc || '';
+    
+    // Оновлення аватара
     const readerAvatar = document.getElementById('readerAvatar');
-    const emailSize = document.getElementById('emailSize');
-    
-    if (!readerTitle || !readerSender || !readerText) return;
-    
-    readerTitle.textContent = email.subject;
-    readerSender.textContent = email.sender;
-    if (readerSenderEmail) readerSenderEmail.textContent = email.senderEmail;
-    if (readerDate) {
-        const dateSpan = readerDate.querySelector('span');
-        if (dateSpan) dateSpan.textContent = email.date;
-    }
-    if (readerSubject) readerSubject.textContent = email.subject;
-    readerText.innerHTML = email.body || `<p>${translations[currentLanguage].selectEmailDesc}</p>`;
-    if (emailTo) emailTo.textContent = email.to.join(', ');
-    if (emailCc) emailCc.textContent = email.cc && email.cc.length > 0 ? email.cc.join(', ') : '—';
-    
-    const initials = email.sender.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
-    const hasAI = email.labels && email.labels.includes('ai');
-    
     if (readerAvatar) {
-        readerAvatar.textContent = initials;
-        if (hasAI) {
-            readerAvatar.style.background = 'linear-gradient(135deg, #667eea, #9d4edd)';
-            readerAvatar.innerHTML = `${initials}<div class="ai-badge"><i class="fas fa-robot"></i></div>`;
-        }
+        const avatarText = email.from ? email.from.charAt(0).toUpperCase() : '?';
+        readerAvatar.textContent = avatarText;
     }
     
-    if (emailSize) {
-        const sizeSpan = emailSize.querySelector('span');
-        if (sizeSpan && email.size) sizeSpan.textContent = email.size;
+    // Позначити лист як прочитаний
+    if (!email.read) {
+        updateEmailStatus(email.id, { read: true });
+        div.classList.remove('unread');
     }
     
-    const attachmentsList = document.getElementById('attachmentsList');
-    const attachmentCount = document.querySelector('.attachment-count');
-    
-    if (email.attachments > 0) {
-        if (attachmentCount) attachmentCount.textContent = `(${email.attachments})`;
-        if (attachmentsList) {
-            attachmentsList.innerHTML = '';
-            
-            for (let i = 0; i < Math.min(email.attachments, attachmentModels.length); i++) {
-                const model = attachmentModels[i];
-                const attachmentItem = document.createElement('div');
-                attachmentItem.className = 'attachment-item';
-                attachmentItem.innerHTML = `
-                    <div class="attachment-info">
-                        <div class="attachment-icon" style="color: ${model.color};">
-                            <i class="fas ${model.icon}"></i>
-                        </div>
-                        <div class="attachment-details">
-                            <div class="attachment-name">${model.name}</div>
-                            <div class="attachment-size">${model.size} • ${model.date}</div>
-                        </div>
-                    </div>
-                    <div class="attachment-actions">
-                        <button class="action-btn download-attachment-btn" data-filename="${model.name}" title="Download">
-                            <i class="fas fa-download"></i>
-                        </button>
-                        <button class="action-btn preview-attachment-btn" title="Preview">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                `;
-                attachmentsList.appendChild(attachmentItem);
-            }
-            
-            document.querySelectorAll('.download-attachment-btn').forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    const filename = this.getAttribute('data-filename');
-                    downloadAttachment(filename);
-                });
-            });
-            
-            document.querySelectorAll('.preview-attachment-btn').forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    showToast(`Previewing ${this.closest('.attachment-item').querySelector('.attachment-name').textContent}`, 'info');
-                });
-            });
-        }
-    } else {
-        if (attachmentCount) attachmentCount.textContent = '(0)';
-        if (attachmentsList) attachmentsList.innerHTML = '<p class="no-attachments">No attachments</p>';
-    }
-    
-    const emailLabels = document.getElementById('emailLabels');
-    if (emailLabels && email.labels && email.labels.length > 0) {
-        emailLabels.innerHTML = email.labels.map(label => 
-            `<span class="label ${label}-label">${translations[currentLanguage][label] || label}</span>`
-        ).join('');
-    }
-    
-    if (email.unread) {
-        email.unread = false;
-        updateEmailCounts();
-        displayEmails();
-    }
-    
-    const starBtn = document.getElementById('starBtn');
-    if (starBtn) {
-        if (email.important) {
-            starBtn.innerHTML = '<i class="fas fa-star"></i>';
-            starBtn.style.color = 'var(--warning)';
-        } else {
-            starBtn.innerHTML = '<i class="far fa-star"></i>';
-            starBtn.style.color = '';
-        }
-    }
-    
-    starBtn.dataset.emailId = email.id;
-    const deleteEmailBtn = document.getElementById('deleteEmailBtn');
-    if (deleteEmailBtn) deleteEmailBtn.dataset.emailId = email.id;
-    
+    // На мобільних пристроях показуємо тільки переглядач
     if (window.innerWidth <= 768) {
-        const emailsDiv = document.querySelector('.emails');
-        const emailReader = document.querySelector('.email-reader');
-        const backToList = document.querySelector('.back-to-list');
+        document.querySelector('.emails').style.display = 'none';
+        reader.style.display = 'flex';
+        const backBtn = document.getElementById('backToList');
+        if (backBtn) backBtn.style.display = 'flex';
+    }
+}
+
+function updateEmailCounts(emails) {
+    if (!emails) return;
+    
+    const inboxCount = emails.filter(e => e.folder === 'inbox' && !e.read).length;
+    const importantCount = emails.filter(e => e.important).length;
+    const unreadCount = emails.filter(e => !e.read).length;
+    const totalCount = emails.length;
+    
+    // Оновлення бейджів
+    const inboxBadge = document.getElementById('inboxCount');
+    const importantBadge = document.getElementById('importantCount');
+    const unreadBadge = document.getElementById('unreadCount');
+    
+    if (inboxBadge) inboxBadge.textContent = inboxCount > 0 ? inboxCount : '';
+    if (importantBadge) importantBadge.textContent = importantCount > 0 ? importantCount : '';
+    
+    // Оновлення заголовків
+    const emailCountElement = document.getElementById('emailCount');
+    const unreadCountElement = document.getElementById('unreadCount');
+    
+    if (emailCountElement) {
+        emailCountElement.textContent = `${totalCount} ${pluralize(totalCount, 'лист', 'листи', 'листів')}`;
+    }
+    
+    if (unreadCountElement) {
+        unreadCountElement.textContent = `${unreadCount} ${pluralize(unreadCount, 'непрочитаний', 'непрочитаних', 'непрочитаних')}`;
+    }
+    
+    // Оновлення статистики в віджетах
+    const totalEmailsElement = document.getElementById('totalEmails');
+    const unreadEmailsElement = document.getElementById('unreadEmails');
+    const importantEmailsElement = document.getElementById('importantEmails');
+    
+    if (totalEmailsElement) totalEmailsElement.textContent = totalCount;
+    if (unreadEmailsElement) unreadEmailsElement.textContent = unreadCount;
+    if (importantEmailsElement) importantEmailsElement.textContent = importantCount;
+}
+
+/* ====================== ДОПОМІЖНІ ФУНКЦІЇ ====================== */
+function showLoading(text = 'Завантаження...') {
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const loadingText = loadingOverlay?.querySelector('.loading-text');
+    
+    if (loadingOverlay) {
+        loadingOverlay.style.display = 'flex';
+        if (loadingText) loadingText.textContent = text;
+    }
+}
+
+function hideLoading() {
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    if (loadingOverlay) {
+        loadingOverlay.style.display = 'none';
+    }
+}
+
+function showError(elementId, message) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+        element.classList.add('show');
         
-        if (emailsDiv) emailsDiv.style.display = 'none';
-        if (emailReader) emailReader.style.display = 'flex';
-        if (backToList) backToList.style.display = 'flex';
+        // Автоматичне приховування через 5 секунд
+        setTimeout(() => {
+            element.classList.remove('show');
+        }, 5000);
     }
 }
 
-function downloadAttachment(filename) {
-    showToast(`Downloading ${filename}...`, 'info');
+function clearAllErrors() {
+    const errorElements = document.querySelectorAll('.error-message');
+    errorElements.forEach(el => {
+        el.classList.remove('show');
+        el.innerHTML = '';
+    });
+}
+
+function showToast(message, type = 'info') {
+    const toastContainer = document.getElementById('toastContainer');
+    if (!toastContainer) return;
     
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    
+    const icons = {
+        success: 'check-circle',
+        error: 'exclamation-circle',
+        warning: 'exclamation-triangle',
+        info: 'info-circle'
+    };
+    
+    toast.innerHTML = `
+        <i class="fas fa-${icons[type] || 'info-circle'}"></i>
+        <span>${message}</span>
+    `;
+    
+    toastContainer.appendChild(toast);
+    
+    // Автоматичне видалення через 5 секунд
     setTimeout(() => {
-        showToast(`${filename} downloaded successfully`, 'success');
-        const link = document.createElement('a');
-        link.href = 'data:application/pdf;base64,' + btoa('fake pdf content for demo');
-        link.download = filename;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }, 1000);
-}
-
-function downloadAllAttachments() {
-    const attachmentsList = document.getElementById('attachmentsList');
-    if (!attachmentsList) return;
-    
-    const attachmentItems = attachmentsList.querySelectorAll('.attachment-item');
-    if (attachmentItems.length === 0) {
-        showToast('No attachments to download', 'info');
-        return;
-    }
-    
-    showLoading();
-    showToast(`Downloading ${attachmentItems.length} attachments...`, 'info');
-    
-    setTimeout(() => {
-        hideLoading();
-        showToast(`All ${attachmentItems.length} attachments downloaded`, 'success');
-    }, 2000);
-}
-
-function selectEmail(emailId) {
-    if (selectedEmails.has(emailId)) {
-        selectedEmails.delete(emailId);
-    } else {
-        selectedEmails.add(emailId);
-    }
-    displayEmails();
-}
-
-function selectAllEmails() {
-    const folderEmails = getFilteredEmails();
-    if (selectedEmails.size === folderEmails.length) {
-        selectedEmails.clear();
-    } else {
-        selectedEmails.clear();
-        folderEmails.forEach(email => selectedEmails.add(email.id));
-    }
-    displayEmails();
-}
-
-function updateEmailCheckboxes() {
-    document.querySelectorAll('.email-select').forEach(checkbox => {
-        const emailId = parseInt(checkbox.dataset.id);
-        checkbox.checked = selectedEmails.has(emailId);
-        
-        checkbox.addEventListener('change', (e) => {
-            e.stopPropagation();
-            if (checkbox.checked) {
-                selectedEmails.add(emailId);
-            } else {
-                selectedEmails.delete(emailId);
+        toast.style.animation = 'toastOut 0.3s ease';
+        setTimeout(() => {
+            if (toast.parentNode === toastContainer) {
+                toastContainer.removeChild(toast);
             }
-            displayEmails();
+        }, 300);
+    }, 5000);
+}
+
+function formatDate(dateString) {
+    if (!dateString) return 'Невідомо';
+    
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+    
+    if (diffMins < 1) {
+        return 'щойно';
+    } else if (diffMins < 60) {
+        return `${diffMins} хв тому`;
+    } else if (diffHours < 24) {
+        return `${diffHours} год тому`;
+    } else if (diffDays < 7) {
+        return `${diffDays} дн тому`;
+    } else {
+        return date.toLocaleDateString('uk-UA', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric'
         });
-    });
+    }
 }
 
-function markAsRead() {
-    const folderEmails = getFilteredEmails();
-    let markedCount = 0;
-    
-    folderEmails.forEach(email => {
-        if (selectedEmails.has(email.id) && email.unread) {
-            email.unread = false;
-            markedCount++;
-        }
-    });
-    
-    if (markedCount > 0) {
-        selectedEmails.clear();
-        updateEmailCounts();
-        displayEmails();
-        showToast(`Marked ${markedCount} email(s) as read`, 'success');
+function pluralize(number, one, few, many) {
+    if (number % 10 === 1 && number % 100 !== 11) {
+        return one;
+    } else if ([2, 3, 4].includes(number % 10) && ![12, 13, 14].includes(number % 100)) {
+        return few;
     } else {
-        showToast('No unread emails selected', 'info');
+        return many;
     }
 }
 
-function markAsImportant() {
-    const folderEmails = getFilteredEmails();
-    let markedCount = 0;
-    
-    folderEmails.forEach(email => {
-        if (selectedEmails.has(email.id)) {
-            email.important = !email.important;
-            markedCount++;
+function resetAllForms() {
+    const forms = ['loginForm', 'registerForm', 'resetForm'];
+    forms.forEach(formId => {
+        const form = document.getElementById(formId);
+        if (form) {
+            const inputs = form.querySelectorAll('input, textarea');
+            inputs.forEach(input => {
+                input.value = '';
+                input.classList.remove('error');
+            });
         }
     });
     
-    emailsData.important = emailsData.inbox.filter(email => email.important);
+    clearAllErrors();
+}
+
+function validateEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+}
+
+function validatePassword(password) {
+    return password.length >= 6;
+}
+
+function checkPasswordStrength(password) {
+    let strength = 0;
     
-    if (markedCount > 0) {
-        selectedEmails.clear();
-        updateEmailCounts();
-        displayEmails();
-        
-        const starBtn = document.getElementById('starBtn');
-        if (starBtn && starBtn.dataset.emailId) {
-            const emailId = parseInt(starBtn.dataset.emailId);
-            const currentEmail = emailsData.inbox.find(e => e.id === emailId) || 
-                               emailsData.sent.find(e => e.id === emailId) ||
-                               emailsData.drafts.find(e => e.id === emailId);
-            if (currentEmail) {
-                if (currentEmail.important) {
-                    starBtn.innerHTML = '<i class="fas fa-star"></i>';
-                    starBtn.style.color = 'var(--warning)';
-                } else {
-                    starBtn.innerHTML = '<i class="far fa-star"></i>';
-                    starBtn.style.color = '';
-                }
-            }
+    if (password.length >= 8) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/[0-9]/.test(password)) strength++;
+    if (/[^A-Za-z0-9]/.test(password)) strength++;
+    
+    return strength;
+}
+
+function handleAuthError(error, context) {
+    console.error('Помилка автентифікації:', error);
+    
+    const errorMap = {
+        'auth/email-already-in-use': { 
+            register: ['registerEmailError', 'Ця електронна пошта вже використовується']
+        },
+        'auth/invalid-email': {
+            login: ['loginEmailError', 'Невірний формат електронної пошти'],
+            register: ['registerEmailError', 'Невірний формат електронної пошти'],
+            reset: ['resetEmailError', 'Невірний формат електронної пошти']
+        },
+        'auth/user-not-found': {
+            login: ['loginEmailError', 'Користувача з такою поштою не знайдено'],
+            reset: ['resetEmailError', 'Користувача з такою поштою не знайдено']
+        },
+        'auth/wrong-password': {
+            login: ['loginPasswordError', 'Невірний пароль']
+        },
+        'auth/weak-password': {
+            register: ['registerPasswordError', 'Пароль занадто слабкий. Мінімум 6 символів']
+        },
+        'auth/user-disabled': {
+            login: ['loginEmailError', 'Акаунт заблоковано']
+        },
+        'auth/too-many-requests': {
+            login: ['loginEmailError', 'Забагато невдалих спроб. Спробуйте пізніше'],
+            register: ['registerEmailError', 'Забагато спроб. Спробуйте пізніше']
         }
+    };
+    
+    const errorConfig = errorMap[error.code];
+    if (errorConfig && errorConfig[context]) {
+        const [elementId, message] = errorConfig[context];
+        showError(elementId, message);
+    } else {
+        const defaultMessages = {
+            login: 'Невірний email або пароль',
+            register: 'Помилка реєстрації. Спробуйте ще раз',
+            reset: 'Помилка відновлення пароля'
+        };
         
-        showToast(`Marked ${markedCount} email(s) as important`, 'success');
+        const defaultElement = context === 'login' ? 'loginEmailError' : 
+                              context === 'register' ? 'registerEmailError' : 'resetEmailError';
+        
+        showError(defaultElement, defaultMessages[context] || 'Сталася помилка. Спробуйте ще раз');
     }
 }
 
-function showDeleteConfirmation(emailCount = 1, permanent = false) {
-    return new Promise((resolve) => {
-        let deleteModal = document.getElementById('deleteConfirmationModal');
-        if (!deleteModal) {
-            deleteModal = document.createElement('div');
-            deleteModal.id = 'deleteConfirmationModal';
-            deleteModal.className = 'modal';
-            deleteModal.innerHTML = `
-                <div class="modal-box delete-modal">
-                    <div class="modal-header">
-                        <h3><i class="fas fa-trash"></i> <span>${translations[currentLanguage].confirmDelete}</span></h3>
-                        <button class="modal-close" id="closeDeleteModal">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    <div class="modal-content">
-                        <div class="delete-icon">
-                            <i class="fas fa-exclamation-triangle"></i>
-                        </div>
-                        <h4 id="deleteMessage"></h4>
-                        <p id="deleteWarning" style="color: var(--text-secondary); margin: 15px 0; line-height: 1.5;"></p>
-                    </div>
-                    <div class="modal-actions">
-                        <button class="btn-secondary" id="cancelDelete">
-                            <span>${translations[currentLanguage].cancel}</span>
-                        </button>
-                        <button class="btn-primary danger" id="confirmDeleteBtn" style="background: var(--danger);">
-                            <i class="fas fa-trash"></i> <span>${permanent ? translations[currentLanguage].permanentlyDelete : translations[currentLanguage].delete}</span>
-                        </button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(deleteModal);
-            
-            document.getElementById('closeDeleteModal')?.addEventListener('click', () => {
-                deleteModal.style.display = 'none';
-                resolve(false);
-            });
-            
-            document.getElementById('cancelDelete')?.addEventListener('click', () => {
-                deleteModal.style.display = 'none';
-                resolve(false);
-            });
-            
-            document.getElementById('confirmDeleteBtn')?.addEventListener('click', () => {
-                deleteModal.style.display = 'none';
-                resolve(true);
-            });
-            
-            deleteModal.addEventListener('click', (e) => {
-                if (e.target === deleteModal) {
-                    deleteModal.style.display = 'none';
-                    resolve(false);
-                }
-            });
-        }
-        
-        const deleteMessage = document.getElementById('deleteMessage');
-        const deleteWarning = document.getElementById('deleteWarning');
-        const confirmBtn = document.getElementById('confirmDeleteBtn');
-        
-        if (emailCount === 1) {
-            deleteMessage.textContent = translations[currentLanguage].deleteMessage;
-        } else {
-            deleteMessage.textContent = translations[currentLanguage].deleteMultipleMessage.replace('{count}', emailCount);
-        }
-        
-        deleteWarning.textContent = translations[currentLanguage].deleteWarning;
-        
-        if (permanent) {
-            confirmBtn.innerHTML = `<i class="fas fa-trash"></i> <span>${translations[currentLanguage].permanentlyDelete}</span>`;
-            deleteWarning.textContent = "This action cannot be undone. Emails will be permanently deleted.";
-        }
-        
-        deleteModal.style.display = 'flex';
-    });
+/* ====================== НАЛАШТУВАННЯ СЛУХАЧІВ ПОДІЙ ====================== */
+function setupEventListeners() {
+    // Перемикання форм автентифікації
+    setupAuthForms();
+    
+    // Кнопка виходу
+    setupLogout();
+    
+    // Модальні вікна
+    setupModals();
+    
+    // Бокове меню
+    setupMenu();
+    
+    // Пошук
+    setupSearch();
+    
+    // Темы
+    setupThemes();
+    
+    // Мови
+    setupLanguages();
+    
+    // Написати лист
+    setupCompose();
+    
+    // Фільтри листів
+    setupFilters();
+    
+    // Вибір папки
+    setupFolderSelection();
+    
+    // Відкриття листа
+    setupEmailReader();
+    
+    // Глобальні події
+    setupGlobalEvents();
 }
 
-async function deleteSelectedEmails() {
-    let emailsToDelete = [];
+function setupAuthForms() {
+    // Перемикання між формами
+    document.getElementById('showRegister')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        switchAuthForm('registerForm');
+    });
     
-    if (selectedEmails.size === 0) {
-        const deleteBtn = document.getElementById('deleteEmailBtn');
-        if (deleteBtn && deleteBtn.dataset.emailId) {
-            const emailId = parseInt(deleteBtn.dataset.emailId);
-            selectedEmails.add(emailId);
-        } else {
-            showToast('No emails selected', 'info');
+    document.getElementById('showLogin')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        switchAuthForm('loginForm');
+    });
+    
+    document.getElementById('forgotPasswordBtn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        switchAuthForm('resetForm');
+    });
+    
+    document.getElementById('showLoginFromReset')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        switchAuthForm('loginForm');
+    });
+    
+    // Вхід
+    document.getElementById('loginBtn')?.addEventListener('click', async () => {
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value;
+        const rememberMe = document.getElementById('rememberMe').checked;
+        
+        clearAllErrors();
+        
+        // Валідація
+        if (!validateEmail(email)) {
+            showError('loginEmailError', 'Введіть коректну електронну пошту');
             return;
         }
+        
+        if (!validatePassword(password)) {
+            showError('loginPasswordError', 'Пароль повинен містити мінімум 6 символів');
+            return;
+        }
+        
+        await loginUser(email, password, rememberMe);
+    });
+    
+    // Реєстрація
+    document.getElementById('registerBtn')?.addEventListener('click', async () => {
+        const name = document.getElementById('registerName').value.trim();
+        const email = document.getElementById('registerEmail').value.trim();
+        const password = document.getElementById('registerPassword').value;
+        const confirmPassword = document.getElementById('registerConfirm').value;
+        const acceptTerms = document.getElementById('acceptTerms').checked;
+        
+        clearAllErrors();
+        
+        // Валідація
+        if (!name) {
+            showError('registerNameError', 'Введіть ваше ім\'я');
+            return;
+        }
+        
+        if (!validateEmail(email)) {
+            showError('registerEmailError', 'Введіть коректну електронну пошту');
+            return;
+        }
+        
+        if (!validatePassword(password)) {
+            showError('registerPasswordError', 'Пароль повинен містити мінімум 6 символів');
+            return;
+        }
+        
+        if (password !== confirmPassword) {
+            showError('registerConfirmError', 'Паролі не співпадають');
+            return;
+        }
+        
+        if (!acceptTerms) {
+            showError('termsError', 'Ви повинні прийняти умови використання');
+            return;
+        }
+        
+        await registerUser(email, password, name);
+    });
+    
+    // Відновлення пароля
+    document.getElementById('sendResetBtn')?.addEventListener('click', async () => {
+        const email = document.getElementById('resetEmail').value.trim();
+        
+        clearAllErrors();
+        
+        if (!validateEmail(email)) {
+            showError('resetEmailError', 'Введіть коректну електронну пошту');
+            return;
+        }
+        
+        await sendPasswordResetEmail(email);
+    });
+    
+    // Індикатор сили пароля
+    const passwordInput = document.getElementById('registerPassword');
+    const passwordStrength = document.getElementById('passwordStrength');
+    
+    if (passwordInput && passwordStrength) {
+        passwordInput.addEventListener('input', () => {
+            const strength = checkPasswordStrength(passwordInput.value);
+            passwordStrength.className = 'password-strength';
+            
+            if (passwordInput.value.length === 0) {
+                return;
+            }
+            
+            if (strength <= 1) {
+                passwordStrength.classList.add('weak');
+            } else if (strength <= 2) {
+                passwordStrength.classList.add('medium');
+            } else {
+                passwordStrength.classList.add('strong');
+            }
+        });
     }
     
-    const folderEmails = emailsData[currentFolder] || [];
-    emailsToDelete = folderEmails.filter(email => selectedEmails.has(email.id));
+    // Enter для форм
+    const forms = ['loginForm', 'registerForm', 'resetForm'];
+    forms.forEach(formId => {
+        const form = document.getElementById(formId);
+        if (form) {
+            form.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const submitBtn = form.querySelector('button[type="button"]');
+                    if (submitBtn) submitBtn.click();
+                }
+            });
+        }
+    });
+}
+
+function setupLogout() {
+    document.getElementById('logoutBtn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (confirm('Ви дійсно хочете вийти з акаунту?')) {
+            logoutUser();
+        }
+    });
+}
+
+function setupModals() {
+    // Політика конфіденційності
+    document.getElementById('privacyPolicyBtn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        showModal('privacyModal');
+    });
     
-    if (emailsToDelete.length === 0) {
-        showToast('No emails to delete', 'info');
-        return;
-    }
+    document.getElementById('privacyBtn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        showModal('privacyModal');
+    });
     
-    const confirmed = await showDeleteConfirmation(emailsToDelete.length, currentFolder === 'trash');
+    document.getElementById('closePrivacy')?.addEventListener('click', () => {
+        hideModal('privacyModal');
+    });
     
-    if (!confirmed) {
-        showToast('Deletion cancelled', 'info');
-        return;
-    }
+    document.getElementById('acceptPrivacyBtn')?.addEventListener('click', () => {
+        hideModal('privacyModal');
+        const termsCheckbox = document.getElementById('acceptTerms');
+        if (termsCheckbox) termsCheckbox.checked = true;
+    });
     
-    if (currentFolder === 'trash') {
-        emailsData.trash = emailsData.trash.filter(email => !selectedEmails.has(email.id));
-        showToast(`Permanently deleted ${emailsToDelete.length} email(s)`, 'success');
-    } else {
-        emailsToDelete.forEach(email => {
-            email.originalFolder = currentFolder;
-            email.folder = 'trash';
-            email.deleted = true;
-            email.deletedDate = new Date().toISOString();
-            emailsData.trash.push(email);
+    // Умови використання
+    document.getElementById('termsBtn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        showModal('termsModal');
+    });
+    
+    document.getElementById('closeTerms')?.addEventListener('click', () => {
+        hideModal('termsModal');
+    });
+    
+    document.getElementById('acceptTermsBtn')?.addEventListener('click', () => {
+        hideModal('termsModal');
+        const termsCheckbox = document.getElementById('acceptTerms');
+        if (termsCheckbox) termsCheckbox.checked = true;
+    });
+    
+    // Налаштування
+    document.getElementById('userSettingsBtn')?.addEventListener('click', () => {
+        showModal('settingsModal');
+    });
+    
+    document.getElementById('closeSettings')?.addEventListener('click', () => {
+        hideModal('settingsModal');
+    });
+    
+    // Допомога
+    document.getElementById('helpBtn')?.addEventListener('click', () => {
+        showToast('Допомога скоро буде доступна', 'info');
+    });
+    
+    // Зворотній зв'язок
+    document.getElementById('feedbackBtn')?.addEventListener('click', () => {
+        showToast('Форма зворотного зв\'язку скоро буде доступна', 'info');
+    });
+}
+
+function setupMenu() {
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    
+    if (menuToggle && sidebar) {
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
         });
         
-        emailsData[currentFolder] = folderEmails.filter(email => !selectedEmails.has(email.id));
-        showToast(`Moved ${emailsToDelete.length} email(s) to trash`, 'success');
+        // Закриття меню при кліку поза ним (на мобільних)
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 992 && 
+                !sidebar.contains(e.target) && 
+                !menuToggle.contains(e.target) &&
+                sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+            }
+        });
     }
-    
-    selectedEmails.clear();
-    updateEmailCounts();
-    displayEmails();
-    
-    const readerTitle = document.getElementById('readerTitle');
-    const readerText = document.getElementById('readerText');
-    
-    if (readerTitle) readerTitle.textContent = translations[currentLanguage].selectEmail;
-    if (readerText) readerText.innerHTML = `<p>${translations[currentLanguage].selectEmailDesc}</p>`;
 }
 
-function emptyTrash() {
-    if (emailsData.trash.length === 0) {
-        showToast('Trash is already empty', 'info');
-        return;
-    }
+function setupSearch() {
+    const searchInput = document.getElementById('searchInput');
+    const searchClear = document.getElementById('searchClear');
     
-    showDeleteConfirmation(emailsData.trash.length, true).then(confirmed => {
-        if (confirmed) {
-            emailsData.trash = [];
-            updateEmailCounts();
-            displayEmails();
-            showToast('Trash emptied', 'success');
-        }
-    });
-}
-
-// ====================== FOLDER MANAGEMENT ======================
-function switchFolder(folder) {
-    currentFolder = folder;
-    selectedEmails.clear();
-    currentEmailFilter = 'all';
-    
-    document.querySelectorAll('.menu-item').forEach(item => {
-        item.classList.remove('active');
-        if (item.dataset.folder === folder) {
-            item.classList.add('active');
-        }
-    });
-    
-    const folderTitle = document.getElementById('currentFolder');
-    const folderIcon = folder === 'inbox' ? 'fa-inbox' :
-                      folder === 'important' ? 'fa-star' :
-                      folder === 'sent' ? 'fa-paper-plane' :
-                      folder === 'drafts' ? 'fa-file-alt' :
-                      folder === 'spam' ? 'fa-ban' : 'fa-trash';
-    
-    if (folderTitle) {
-        folderTitle.innerHTML = `<i class="fas ${folderIcon}"></i> <span data-i18n="${folder}">${translations[currentLanguage][folder]}</span>`;
-    }
-    
-    const emptyTrashBtn = document.getElementById('emptyTrashBtn');
-    if (emptyTrashBtn) {
-        emptyTrashBtn.style.display = folder === 'trash' ? 'flex' : 'none';
-    }
-    
-    document.querySelectorAll('.filter-tag').forEach(tag => {
-        tag.classList.remove('active');
-        if (tag.dataset.filter === currentEmailFilter) {
-            tag.classList.add('active');
-        }
-    });
-    
-    updateEmailCounts();
-    displayEmails();
-    
-    const readerTitle = document.getElementById('readerTitle');
-    const readerText = document.getElementById('readerText');
-    
-    if (readerTitle) readerTitle.textContent = translations[currentLanguage].selectEmail;
-    if (readerText) readerText.innerHTML = `<p>${translations[currentLanguage].selectEmailDesc}</p>`;
-    
-    if (window.innerWidth <= 768) {
-        const emailsDiv = document.querySelector('.emails');
-        const emailReader = document.querySelector('.email-reader');
-        const backToList = document.querySelector('.back-to-list');
+    if (searchInput && searchClear) {
+        searchInput.addEventListener('input', () => {
+            if (searchInput.value.trim()) {
+                searchClear.style.display = 'flex';
+            } else {
+                searchClear.style.display = 'none';
+            }
+        });
         
-        if (emailsDiv) emailsDiv.style.display = 'flex';
-        if (emailReader) emailReader.style.display = 'none';
-        if (backToList) backToList.style.display = 'none';
+        searchClear.addEventListener('click', () => {
+            searchInput.value = '';
+            searchClear.style.display = 'none';
+            searchInput.focus();
+        });
+        
+        // Пошук при натисканні Enter
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                performSearch(searchInput.value);
+            }
+        });
     }
 }
 
-// ====================== COMPOSE EMAIL ======================
-function openComposeModal() {
-    const modal = document.getElementById('composeModal');
-    if (modal) modal.style.display = 'flex';
+function setupThemes() {
+    const themeToggle = document.getElementById('themeToggle');
+    const themeMenu = document.getElementById('themeMenu');
+    const themeOptions = document.querySelectorAll('.theme-option');
     
+    if (themeToggle && themeMenu) {
+        themeToggle.addEventListener('click', () => {
+            themeMenu.classList.toggle('show');
+        });
+        
+        // Закриття меню при кліку поза ним
+        document.addEventListener('click', (e) => {
+            if (!themeToggle.contains(e.target) && !themeMenu.contains(e.target)) {
+                themeMenu.classList.remove('show');
+            }
+        });
+        
+        themeOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                const theme = option.dataset.theme;
+                changeTheme(theme);
+                themeMenu.classList.remove('show');
+            });
+        });
+        
+        // Відновлення збереженої теми
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        changeTheme(savedTheme);
+    }
+}
+
+function setupLanguages() {
+    const langSelect = document.getElementById('langSelect');
+    if (langSelect) {
+        const savedLang = localStorage.getItem('language') || 'ua';
+        langSelect.value = savedLang;
+        
+        langSelect.addEventListener('change', () => {
+            const lang = langSelect.value;
+            localStorage.setItem('language', lang);
+            showToast('Мову змінено. Оновіть сторінку для застосування змін.', 'info');
+        });
+    }
+}
+
+function setupCompose() {
+    const composeBtn = document.getElementById('composeBtn');
+    const composeModal = document.getElementById('composeModal');
+    const closeCompose = document.getElementById('closeCompose');
+    const sendMailBtn = document.getElementById('sendMail');
+    const discardBtn = document.getElementById('discardBtn');
+    
+    if (!composeBtn || !composeModal) return;
+    
+    composeBtn.addEventListener('click', () => {
+        showModal('composeModal');
+        setTimeout(() => {
+            document.getElementById('mailTo')?.focus();
+        }, 100);
+    });
+    
+    closeCompose?.addEventListener('click', () => {
+        hideModal('composeModal');
+        clearComposeForm();
+    });
+    
+    sendMailBtn?.addEventListener('click', async () => {
+        const toEmail = document.getElementById('mailTo')?.value.trim();
+        const subject = document.getElementById('mailSubject')?.value.trim();
+        const message = document.getElementById('mailText')?.value.trim();
+        
+        if (!toEmail || !subject || !message) {
+            showToast('Будь ласка, заповніть всі обов\'язкові поля', 'error');
+            return;
+        }
+        
+        if (!validateEmail(toEmail)) {
+            showToast('Невірний email одержувача', 'error');
+            return;
+        }
+        
+        try {
+            sendMailBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Відправка...';
+            sendMailBtn.disabled = true;
+            
+            const emailData = {
+                fromName: currentUser?.name || 'Користувач Inbox Pro',
+                fromEmail: currentUser?.email || '',
+                toEmail: toEmail,
+                subject: subject,
+                message: message,
+                important: document.getElementById('urgentCheck')?.checked || false
+            };
+            
+            await sendRealEmail(emailData);
+            
+            showToast('Лист успішно відправлено!', 'success');
+            hideModal('composeModal');
+            clearComposeForm();
+            
+        } catch (error) {
+            console.error('Помилка відправки:', error);
+            showToast('Помилка відправки листа: ' + (error.text || error.message), 'error');
+        } finally {
+            sendMailBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Надіслати';
+            sendMailBtn.disabled = false;
+        }
+    });
+    
+    discardBtn?.addEventListener('click', () => {
+        if (confirm('Ви дійсно хочете скасувати написання листа? Всі зміни будуть втрачені.')) {
+            clearComposeForm();
+            hideModal('composeModal');
+        }
+    });
+}
+
+function setupFilters() {
+    const filterTags = document.querySelectorAll('.filter-tag');
+    filterTags.forEach(tag => {
+        tag.addEventListener('click', () => {
+            filterTags.forEach(t => t.classList.remove('active'));
+            tag.classList.add('active');
+            // Тут можна додати логіку фільтрації листів
+        });
+    });
+    
+    const filterToggle = document.getElementById('filterToggle');
+    if (filterToggle) {
+        filterToggle.addEventListener('click', () => {
+            showToast('Додаткові фільтри скоро будуть доступні', 'info');
+        });
+    }
+}
+
+function setupFolderSelection() {
+    const menuItems = document.querySelectorAll('.menu-item[data-folder]');
+    menuItems.forEach(item => {
+        item.addEventListener('click', async () => {
+            const folder = item.dataset.folder;
+            
+            // Оновлення активного елемента меню
+            menuItems.forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+            
+            // Оновлення поточної папки
+            currentFolder = folder;
+            
+            // Оновлення заголовка
+            const folderTitle = document.getElementById('currentFolder');
+            if (folderTitle) {
+                const iconMap = {
+                    inbox: 'fa-inbox',
+                    important: 'fa-star',
+                    sent: 'fa-paper-plane',
+                    drafts: 'fa-file-alt',
+                    spam: 'fa-ban',
+                    trash: 'fa-trash'
+                };
+                
+                const folderName = item.querySelector('span')?.textContent || 'Папка';
+                const icon = iconMap[folder] || 'fa-folder';
+                
+                folderTitle.innerHTML = `<i class="fas ${icon}"></i> <span>${folderName}</span>`;
+            }
+            
+            // Показати/сховати кнопку очищення кошика
+            const emptyTrashBtn = document.getElementById('emptyTrashBtn');
+            if (emptyTrashBtn) {
+                emptyTrashBtn.style.display = folder === 'trash' ? 'flex' : 'none';
+            }
+            
+            // Перезавантажити листи
+            if (unsubscribeEmails) {
+                unsubscribeEmails();
+                unsubscribeEmails = null;
+            }
+            
+            // Завантажити листи для нової папки
+            const emails = await getEmailsFromDatabase(folder, 50);
+            updateEmailsList(emails);
+            updateEmailCounts(emails);
+            
+            // Налаштувати слухач реального часу для нової папки
+            setupRealtimeEmails();
+        });
+    });
+}
+
+function setupEmailReader() {
+    const backToList = document.getElementById('backToList');
+    if (backToList) {
+        backToList.addEventListener('click', () => {
+            document.querySelector('.emails').style.display = 'flex';
+            document.getElementById('reader').style.display = 'none';
+            backToList.style.display = 'none';
+        });
+    }
+}
+
+function setupGlobalEvents() {
+    // Оновлення при зміні розміру вікна
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) {
+            document.querySelector('.emails').style.display = 'flex';
+            document.getElementById('reader').style.display = 'flex';
+            const backBtn = document.getElementById('backToList');
+            if (backBtn) backBtn.style.display = 'none';
+        }
+    });
+    
+    // Статус підключення до мережі
+    window.addEventListener('online', () => {
+        showToast('Підключення до інтернету відновлено', 'success');
+        document.getElementById('statusText').textContent = 'All systems operational';
+    });
+    
+    window.addEventListener('offline', () => {
+        showToast('Втрачено підключення до інтернету', 'warning');
+        document.getElementById('statusText').textContent = 'Connection lost';
+    });
+    
+    // Обробка глобальних помилок
+    window.addEventListener('error', (event) => {
+        console.error('Глобальна помилка:', event.error);
+        showToast('Сталася несподівана помилка', 'error');
+    });
+}
+
+/* ====================== ДОПОМІЖНІ ФУНКЦІЇ ІНТЕРФЕЙСУ ====================== */
+function switchAuthForm(formId) {
+    const forms = ['loginForm', 'registerForm', 'resetForm'];
+    forms.forEach(id => {
+        const form = document.getElementById(id);
+        if (form) {
+            if (id === formId) {
+                form.classList.add('active');
+            } else {
+                form.classList.remove('active');
+            }
+        }
+    });
+    clearAllErrors();
+}
+
+function showModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'flex';
+        setTimeout(() => {
+            modal.classList.add('visible');
+        }, 10);
+    }
+}
+
+function hideModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.remove('visible');
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300);
+    }
+}
+
+function clearComposeForm() {
     const mailTo = document.getElementById('mailTo');
     const mailSubject = document.getElementById('mailSubject');
     const mailText = document.getElementById('mailText');
-    const filePreview = document.getElementById('filePreview');
+    const urgentCheck = document.getElementById('urgentCheck');
     
     if (mailTo) mailTo.value = '';
     if (mailSubject) mailSubject.value = '';
     if (mailText) mailText.value = '';
-    if (filePreview) filePreview.innerHTML = '';
+    if (urgentCheck) urgentCheck.checked = false;
+}
+
+function changeTheme(theme) {
+    document.body.className = `${theme}-theme`;
+    localStorage.setItem('theme', theme);
     
-    setTimeout(() => {
-        if (mailTo) mailTo.focus();
-    }, 100);
-}
-
-function sendEmail() {
-    const to = document.getElementById('mailTo')?.value;
-    const subject = document.getElementById('mailSubject')?.value;
-    const body = document.getElementById('mailText')?.value;
-    
-    if (!to || !subject || !body) {
-        showToast('Please fill in all required fields', 'error');
-        return;
-    }
-    
-    const newEmail = {
-        id: Date.now(),
-        sender: currentUser ? currentUser.name : "You",
-        senderEmail: currentUser ? currentUser.email : "you@example.com",
-        subject: subject,
-        preview: body.substring(0, 100) + '...',
-        date: "Just now",
-        unread: false,
-        important: document.getElementById('urgentCheck')?.checked || false,
-        folder: "sent",
-        attachments: document.querySelectorAll('.file-preview-item').length,
-        body: `<p>${body.replace(/\n/g, '</p><p>')}</p>`,
-        to: to.split(',').map(e => e.trim()),
-        cc: [],
-        bcc: [],
-        labels: [],
-        size: `${(Math.random() * 3 + 0.5).toFixed(1)} MB`,
-        deleted: false,
-        deletedDate: null,
-        originalFolder: "sent"
-    };
-    
-    emailsData.sent.unshift(newEmail);
-    closeComposeModal();
-    showToast('Email sent successfully', 'success');
-    switchFolder('sent');
-}
-
-function closeComposeModal() {
-    const modal = document.getElementById('composeModal');
-    if (modal) modal.style.display = 'none';
-}
-
-function toggleCcField() {
-    const ccField = document.getElementById('ccField');
-    if (ccField) {
-        ccField.style.display = ccField.style.display === 'none' ? 'block' : 'none';
-        if (ccField.style.display === 'block') {
-            const mailCc = document.getElementById('mailCc');
-            if (mailCc) mailCc.focus();
-        }
-    }
-}
-
-function toggleBccField() {
-    const bccField = document.getElementById('bccField');
-    if (bccField) {
-        bccField.style.display = bccField.style.display === 'none' ? 'block' : 'none';
-        if (bccField.style.display === 'block') {
-            const mailBcc = document.getElementById('mailBcc');
-            if (mailBcc) mailBcc.focus();
-        }
-    }
-}
-
-// ====================== SETTINGS ======================
-function openSettingsModal() {
-    const modal = document.getElementById('settingsModal');
-    if (modal) {
-        modal.style.display = 'flex';
-        showTab('profile');
-    }
-}
-
-function closeSettingsModal() {
-    const modal = document.getElementById('settingsModal');
-    if (modal) modal.style.display = 'none';
-}
-
-function showTab(tabName) {
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('active');
-        if (btn.dataset.tab === tabName) {
-            btn.classList.add('active');
+    // Оновлення активної опції в меню
+    const themeOptions = document.querySelectorAll('.theme-option');
+    themeOptions.forEach(option => {
+        if (option.dataset.theme === theme) {
+            option.classList.add('active');
+        } else {
+            option.classList.remove('active');
         }
     });
-    
-    const modalContent = document.querySelector('.modal-content');
-    if (!modalContent) return;
-    
-    switch(tabName) {
-        case 'profile':
-            modalContent.innerHTML = `
-                <div class="tab-content">
-                    <div class="form-group">
-                        <label for="settingsName"><i class="fas fa-user"></i> Full Name</label>
-                        <input type="text" id="settingsName" value="${currentUser ? currentUser.name : ''}" placeholder="Your name">
-                    </div>
-                    <div class="form-group">
-                        <label for="settingsEmail"><i class="fas fa-envelope"></i> Email Address</label>
-                        <input type="email" id="settingsEmail" value="${currentUser ? currentUser.email : ''}" placeholder="your@email.com">
-                    </div>
-                    <div class="form-group">
-                        <label for="settingsAvatar"><i class="fas fa-image"></i> Profile Picture</label>
-                        <input type="file" id="settingsAvatar" accept="image/*">
-                    </div>
-                </div>
-            `;
-            break;
-            
-        case 'appearance':
-            modalContent.innerHTML = `
-                <div class="tab-content">
-                    <h4>Theme</h4>
-                    <div class="theme-options-settings">
-                        <button class="theme-option-btn ${currentTheme === 'light' ? 'active' : ''}" data-theme="light">
-                            <i class="fas fa-sun"></i> Light
-                        </button>
-                        <button class="theme-option-btn ${currentTheme === 'dark' ? 'active' : ''}" data-theme="dark">
-                            <i class="fas fa-moon"></i> Dark
-                        </button>
-                        <button class="theme-option-btn ${currentTheme === 'oled' ? 'active' : ''}" data-theme="oled">
-                            <i class="fas fa-circle"></i> OLED
-                        </button>
-                        <button class="theme-option-btn ${currentTheme === 'blue' ? 'active' : ''}" data-theme="blue">
-                            <i class="fas fa-water"></i> Ocean
-                        </button>
-                    </div>
-                    <h4>Density</h4>
-                    <select id="densitySelect" class="settings-select">
-                        <option value="comfortable">Comfortable</option>
-                        <option value="compact">Compact</option>
-                        <option value="cozy">Cozy</option>
-                    </select>
-                </div>
-            `;
-            
-            document.querySelectorAll('.theme-option-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('.theme-option-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    updateTheme(btn.dataset.theme);
-                });
-            });
-            break;
-    }
 }
 
-function saveSettings() {
-    if (currentUser) {
-        const nameInput = document.getElementById('settingsName');
-        const emailInput = document.getElementById('settingsEmail');
-        
-        if (nameInput) currentUser.name = nameInput.value;
-        if (emailInput) currentUser.email = emailInput.value;
-        
-        const userName = document.getElementById('userName');
-        const userEmail = document.getElementById('userEmail');
-        const userAvatar = document.getElementById('userAvatar');
-        
-        if (userName) userName.textContent = currentUser.name;
-        if (userEmail) userEmail.textContent = currentUser.email;
-        if (userAvatar) {
-            const initials = currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
-            userAvatar.innerHTML = `<span>${initials}</span><div class="user-status online"></div>`;
-        }
-    }
+function performSearch(query) {
+    if (!query.trim()) return;
     
-    showToast('Settings saved successfully', 'success');
-    closeSettingsModal();
+    showToast(`Пошук: "${query}"`, 'info');
+    // Тут можна додати логіку пошуку листів
 }
 
-// ====================== AI FEATURES ======================
-function simulateAISorting() {
-    setTimeout(() => {
-        emailsData.inbox.forEach(email => {
-            if (email.subject.toLowerCase().includes('important') || 
-                email.subject.toLowerCase().includes('urgent') ||
-                email.subject.toLowerCase().includes('meeting') ||
-                email.sender.toLowerCase().includes('support') ||
-                email.sender.toLowerCase().includes('team')) {
-                email.important = true;
-            }
-            
-            if (!email.labels) email.labels = [];
-            
-            if (email.subject.toLowerCase().includes('meeting') || 
-                email.subject.toLowerCase().includes('project') ||
-                email.sender.toLowerCase().includes('company')) {
-                if (!email.labels.includes('work')) email.labels.push('work');
-            }
-            
-            if (email.subject.toLowerCase().includes('travel') || 
-                email.subject.toLowerCase().includes('flight') ||
-                email.subject.toLowerCase().includes('hotel')) {
-                if (!email.labels.includes('travel')) email.labels.push('travel');
-            }
-            
-            if (email.subject.toLowerCase().includes('finance') || 
-                email.subject.toLowerCase().includes('invoice') ||
-                email.subject.toLowerCase().includes('payment')) {
-                if (!email.labels.includes('finance')) email.labels.push('finance');
-            }
-        });
-        
-        emailsData.important = emailsData.inbox.filter(email => email.important);
-        
-        updateEmailCounts();
-        if (currentFolder === 'inbox' || currentFolder === 'important') {
-            displayEmails();
-        }
-        
-        showToast('AI has sorted your emails', 'success');
-    }, 2000);
-}
-
-// ====================== EVENT LISTENERS ======================
-function initializeEventListeners() {
-    // Login/Register
-    const loginBtn = document.getElementById('loginBtn');
-    const registerBtn = document.getElementById('registerBtn');
-    const showRegister = document.getElementById('showRegister');
-    const showLogin = document.getElementById('showLogin');
+function initializeAppInterface() {
+    // Завантажити початкові листи
+    loadInitialEmails();
     
-    if (loginBtn) loginBtn.addEventListener('click', handleLogin);
-    if (registerBtn) registerBtn.addEventListener('click', handleRegister);
-    if (showRegister) showRegister.addEventListener('click', showRegisterForm);
-    if (showLogin) showLogin.addEventListener('click', showLoginForm);
-    
-    // Theme toggle
-    const themeToggle = document.getElementById('themeToggle');
-    if (themeToggle) {
-        themeToggle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const themeMenu = document.getElementById('themeMenu');
-            if (themeMenu) themeMenu.classList.toggle('show');
-        });
-    }
-    
-    // Theme options
-    document.querySelectorAll('.theme-option').forEach(option => {
-        option.addEventListener('click', () => {
-            updateTheme(option.dataset.theme);
-            const themeMenu = document.getElementById('themeMenu');
-            if (themeMenu) themeMenu.classList.remove('show');
-        });
-    });
-    
-    // Close theme menu when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.theme-selector')) {
-            const themeMenu = document.getElementById('themeMenu');
-            if (themeMenu) themeMenu.classList.remove('show');
-        }
-    });
-    
-    // Menu toggle for mobile
-    const menuToggle = document.getElementById('menuToggle');
-    if (menuToggle) menuToggle.addEventListener('click', toggleSidebar);
-    
-    // Compose button
-    const composeBtn = document.getElementById('composeBtn');
-    if (composeBtn) composeBtn.addEventListener('click', openComposeModal);
-    
-    // Compose modal
-    const closeCompose = document.getElementById('closeCompose');
-    const sendMail = document.getElementById('sendMail');
-    const addCcBtn = document.getElementById('addCcBtn');
-    const addBccBtn = document.getElementById('addBccBtn');
-    
-    if (closeCompose) closeCompose.addEventListener('click', closeComposeModal);
-    if (sendMail) sendMail.addEventListener('click', sendEmail);
-    if (addCcBtn) addCcBtn.addEventListener('click', toggleCcField);
-    if (addBccBtn) addBccBtn.addEventListener('click', toggleBccField);
-    
-    // File upload for compose
-    const mailFile = document.getElementById('mailFile');
-    if (mailFile) {
-        mailFile.addEventListener('change', function(e) {
-            const files = Array.from(e.target.files);
-            const preview = document.getElementById('filePreview');
-            
-            if (preview) {
-                files.forEach(file => {
-                    const item = document.createElement('div');
-                    item.className = 'file-preview-item';
-                    item.innerHTML = `
-                        <span>${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)</span>
-                        <button class="remove-file" data-name="${file.name}">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    `;
-                    preview.appendChild(item);
-                });
-            }
-        });
-    }
-    
-    // Settings
-    const settingsBtn = document.getElementById('settingsBtn');
-    const closeSettings = document.getElementById('closeSettings');
-    const saveSettingsBtn = document.getElementById('saveSettings');
-    const cancelSettings = document.getElementById('cancelSettings');
-    
-    if (settingsBtn) settingsBtn.addEventListener('click', openSettingsModal);
-    if (closeSettings) closeSettings.addEventListener('click', closeSettingsModal);
-    if (saveSettingsBtn) saveSettingsBtn.addEventListener('click', saveSettings);
-    if (cancelSettings) cancelSettings.addEventListener('click', closeSettingsModal);
-    
-    // User dropdown menu
-    const userMenu = document.getElementById('userMenu');
-    const userDropdown = document.getElementById('userDropdown');
-    const userSettingsBtn = document.getElementById('userSettingsBtn');
-    const logoutBtn = document.getElementById('logoutBtn');
-    
-    if (userMenu && userDropdown) {
-        userMenu.addEventListener('click', function(e) {
-            e.stopPropagation();
-            userDropdown.classList.toggle('show');
-            
-            const notificationDropdown = document.getElementById('notificationDropdown');
-            if (notificationDropdown) notificationDropdown.classList.remove('show');
-        });
-    }
-    
-    if (userSettingsBtn) {
-        userSettingsBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            openSettingsModal();
-            if (userDropdown) userDropdown.classList.remove('show');
-        });
-    }
-    
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            handleLogout();
-        });
-    }
-    
-    // Close dropdowns when clicking outside
-    document.addEventListener('click', function() {
-        if (userDropdown) userDropdown.classList.remove('show');
-        const notificationDropdown = document.getElementById('notificationDropdown');
-        if (notificationDropdown) notificationDropdown.classList.remove('show');
-        const moreActionsMenu = document.getElementById('moreActionsMenu');
-        if (moreActionsMenu) moreActionsMenu.classList.remove('show');
-    });
-    
-    // Notification bell
-    const notificationBell = document.getElementById('notificationBell');
-    if (notificationBell) {
-        notificationBell.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const notificationDropdown = document.getElementById('notificationDropdown');
-            if (notificationDropdown) {
-                notificationDropdown.classList.toggle('show');
-                if (userDropdown) userDropdown.classList.remove('show');
-            }
-        });
-    }
-    
-    // More actions dropdown
-    const moreActionsBtn = document.getElementById('moreActionsBtn');
-    if (moreActionsBtn) {
-        moreActionsBtn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const moreActionsMenu = document.getElementById('moreActionsMenu');
-            if (moreActionsMenu) {
-                moreActionsMenu.classList.toggle('show');
-            }
-        });
-    }
-    
-    // Settings tabs
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', () => showTab(btn.dataset.tab));
-    });
-    
-    // Email actions
-    const selectAllBtn = document.getElementById('selectAllBtn');
-    const markReadBtn = document.getElementById('markReadBtn');
-    const archiveBtn = document.getElementById('archiveBtn');
-    const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
-    const emptyTrashBtn = document.getElementById('emptyTrashBtn');
-    
-    if (selectAllBtn) selectAllBtn.addEventListener('click', selectAllEmails);
-    if (markReadBtn) markReadBtn.addEventListener('click', markAsRead);
-    if (archiveBtn) archiveBtn.addEventListener('click', () => showToast('Archived', 'success'));
-    if (deleteSelectedBtn) deleteSelectedBtn.addEventListener('click', deleteSelectedEmails);
-    if (emptyTrashBtn) emptyTrashBtn.addEventListener('click', emptyTrash);
-    
-    // Star button
-    const starBtn = document.getElementById('starBtn');
-    if (starBtn) starBtn.addEventListener('click', markAsImportant);
-    
-    // Delete email button
-    const deleteEmailBtn = document.getElementById('deleteEmailBtn');
-    if (deleteEmailBtn) deleteEmailBtn.addEventListener('click', deleteSelectedEmails);
-    
-    // Download all attachments button
-    const downloadAllBtn = document.getElementById('downloadAllBtn');
-    if (downloadAllBtn) downloadAllBtn.addEventListener('click', downloadAllAttachments);
-    
-    // Back to list (mobile)
-    const backToList = document.getElementById('backToList');
-    if (backToList) {
-        backToList.addEventListener('click', () => {
-            const emailsDiv = document.querySelector('.emails');
-            const emailReader = document.querySelector('.email-reader');
-            
-            if (emailsDiv) emailsDiv.style.display = 'flex';
-            if (emailReader) emailReader.style.display = 'none';
-            if (backToList) backToList.style.display = 'none';
-        });
-    }
-    
-    // Quick actions in sidebar
-    document.querySelectorAll('.quick-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const action = this.dataset.action;
-            switch(action) {
-                case 'archive':
-                    showToast('Archived', 'success');
-                    break;
-                case 'important':
-                    markAsImportant();
-                    break;
-                case 'delete':
-                    deleteSelectedEmails();
-                    break;
-                case 'snooze':
-                    showToast('Snoozed until tomorrow', 'info');
-                    break;
-            }
-        });
-    });
-    
-    // Folder navigation
-    document.querySelectorAll('.menu-item[data-folder]').forEach(item => {
-        item.addEventListener('click', () => switchFolder(item.dataset.folder));
-    });
-    
-    // View toggle
-    document.querySelectorAll('.view-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            emailView = this.dataset.view;
-            showToast(`Switched to ${emailView} view`, 'info');
-        });
-    });
-    
-    // Filter tags
-    document.querySelectorAll('.filter-tag').forEach(tag => {
-        tag.addEventListener('click', function() {
-            document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
-            this.classList.add('active');
-            currentEmailFilter = this.dataset.filter;
-            
-            const filteredCount = document.getElementById('filteredCount');
-            if (filteredCount) {
-                if (currentEmailFilter === 'all') {
-                    filteredCount.textContent = 'All';
-                } else if (currentEmailFilter === 'unread') {
-                    filteredCount.textContent = 'Unread';
-                } else if (currentEmailFilter === 'important') {
-                    filteredCount.textContent = 'Important';
-                } else if (currentEmailFilter === 'attachments') {
-                    filteredCount.textContent = 'With Attachments';
-                }
-            }
-            
-            displayEmails();
-            showToast(`Filter: ${currentEmailFilter}`, 'info');
-        });
-    });
-    
-    // Language selector
-    const langSelect = document.getElementById('langSelect');
-    if (langSelect) {
-        langSelect.addEventListener('change', function() {
-            updateLanguage(this.value);
-            updateEmailCounts();
-            if (currentFolder) {
-                switchFolder(currentFolder);
-            }
-        });
-    }
-    
-    // Sort selector
+    // Налаштувати сортування
     const sortSelect = document.getElementById('sortSelect');
     if (sortSelect) {
-        sortSelect.addEventListener('change', function() {
-            showToast(`Sorted by: ${this.options[this.selectedIndex].text}`, 'info');
+        sortSelect.addEventListener('change', () => {
+            showToast('Сортування змінено', 'info');
+            // Тут можна додати логіку сортування
         });
     }
     
-    // Refresh button
-    const refreshBtn = document.getElementById('refreshBtn');
-    if (refreshBtn) {
-        refreshBtn.addEventListener('click', () => {
-            showLoading();
-            setTimeout(() => {
-                hideLoading();
-                simulateAISorting();
-                showToast('Inbox refreshed', 'success');
-            }, 1000);
+    // Налаштувати вибір розміру сторінки
+    const pageSizeSelect = document.getElementById('pageSizeSelect');
+    if (pageSizeSelect) {
+        pageSizeSelect.addEventListener('change', () => {
+            showToast('Кількість листів на сторінці змінено', 'info');
+            // Тут можна додати логіку пагінації
         });
     }
-    
-    // Search
-    const searchInput = document.getElementById('searchInput');
-    const searchClear = document.getElementById('searchClear');
-    
-    if (searchInput) {
-        searchInput.addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
-            if (searchTerm.length > 0) {
-                if (searchClear) searchClear.style.display = 'flex';
-                showToast(`Searching for: ${searchTerm}`, 'info');
-            } else {
-                if (searchClear) searchClear.style.display = 'none';
-            }
-        });
-    }
-    
-    if (searchClear) {
-        searchClear.addEventListener('click', function() {
-            if (searchInput) searchInput.value = '';
-            this.style.display = 'none';
-            showToast('Search cleared', 'info');
-        });
-    }
-    
-    // AI dismiss
-    const aiDismiss = document.getElementById('aiDismiss');
-    if (aiDismiss) {
-        aiDismiss.addEventListener('click', function() {
-            const aiStatusBar = document.getElementById('aiStatusBar');
-            if (aiStatusBar) aiStatusBar.style.display = 'none';
-        });
-    }
-    
-    // Close modals when clicking outside
-    document.querySelectorAll('.modal').forEach(modal => {
-        modal.addEventListener('click', function(e) {
-            if (e.target === this) {
-                this.style.display = 'none';
-            }
-        });
-    });
-    
-    // Handle window resize
-    window.addEventListener('resize', () => {
-        if (window.innerWidth > 768) {
-            const sidebar = document.querySelector('.sidebar');
-            const emailsDiv = document.querySelector('.emails');
-            const emailReader = document.querySelector('.email-reader');
-            const backToList = document.querySelector('.back-to-list');
-            
-            if (sidebar) sidebar.classList.remove('active');
-            if (emailsDiv) emailsDiv.style.display = 'flex';
-            if (emailReader) emailReader.style.display = 'flex';
-            if (backToList) backToList.style.display = 'none';
-        }
-    });
 }
 
-// ====================== LOGIN/REGISTER ======================
-function handleLogin() {
-    const emailInput = document.getElementById('loginEmail');
-    const passwordInput = document.getElementById('loginPassword');
-    
-    if (!emailInput || !passwordInput) return;
-    
-    const email = emailInput.value;
-    const password = passwordInput.value;
-    
-    if (!email || !password) {
-        showToast('Please enter email and password', 'error');
-        return;
-    }
-    
-    showLoading();
-    
-    setTimeout(() => {
-        currentUser = {
-            name: "John Doe",
-            email: email,
-            avatar: "JD"
-        };
-        
-        const loginScreen = document.getElementById('loginScreen');
-        const app = document.getElementById('app');
-        
-        if (loginScreen) loginScreen.style.display = 'none';
-        if (app) {
-            app.style.opacity = '1';
-            app.style.display = 'flex';
-        }
-        
-        initializeApp();
-        
+async function loadInitialEmails() {
+    showLoading('Завантаження листів...');
+    try {
+        const emails = await getEmailsFromDatabase('inbox', 20);
+        updateEmailsList(emails);
+        updateEmailCounts(emails);
+    } catch (error) {
+        console.error('Помилка завантаження листів:', error);
+        showToast('Помилка завантаження листів', 'error');
+    } finally {
         hideLoading();
-        showToast('Login successful', 'success');
-        
-        try {
-            localStorage.setItem('inboxProDemoLogin', 'true');
-            localStorage.setItem('inboxProUserEmail', email);
-        } catch (e) {
-            console.log('Could not save to localStorage:', e);
-        }
-    }, 1500);
+    }
 }
 
-function handleRegister() {
-    const nameInput = document.getElementById('registerName');
-    const emailInput = document.getElementById('registerEmail');
-    const passwordInput = document.getElementById('registerPassword');
-    const confirmInput = document.getElementById('registerConfirm');
-    
-    if (!nameInput || !emailInput || !passwordInput || !confirmInput) return;
-    
-    const name = nameInput.value;
-    const email = emailInput.value;
-    const password = passwordInput.value;
-    const confirm = confirmInput.value;
-    
-    if (!name || !email || !password || !confirm) {
-        showToast('Please fill in all fields', 'error');
-        return;
-    }
-    
-    if (password !== confirm) {
-        showToast('Passwords do not match', 'error');
-        return;
-    }
-    
-    if (password.length < 8) {
-        showToast('Password must be at least 8 characters', 'error');
-        return;
-    }
-    
-    showLoading();
-    
-    setTimeout(() => {
-        currentUser = {
-            name: name,
-            email: email,
-            avatar: name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)
-        };
-        
-        const loginScreen = document.getElementById('loginScreen');
-        const app = document.getElementById('app');
-        
-        if (loginScreen) loginScreen.style.display = 'none';
-        if (app) {
-            app.style.opacity = '1';
-            app.style.display = 'flex';
-        }
-        
-        initializeApp();
-        
-        hideLoading();
-        showToast('Registration successful', 'success');
-        
-        try {
-            localStorage.setItem('inboxProDemoLogin', 'true');
-            localStorage.setItem('inboxProUserName', name);
-            localStorage.setItem('inboxProUserEmail', email);
-        } catch (e) {
-            console.log('Could not save to localStorage:', e);
-        }
-    }, 1500);
-}
+/* ====================== ЗАПУСК ДОДАТКУ ====================== */
+document.addEventListener('DOMContentLoaded', initializeApp);
 
-function handleLogout() {
-    showLoading();
-    
-    setTimeout(() => {
-        currentUser = null;
-        
-        try {
-            localStorage.removeItem('inboxProDemoLogin');
-            localStorage.removeItem('inboxProUserName');
-            localStorage.removeItem('inboxProUserEmail');
-        } catch (e) {
-            console.log('Could not clear localStorage:', e);
-        }
-        
-        const loginScreen = document.getElementById('loginScreen');
-        const app = document.getElementById('app');
-        
-        if (loginScreen) {
-            loginScreen.style.display = 'flex';
-            const loginForm = document.getElementById('loginForm');
-            const registerForm = document.getElementById('registerForm');
-            if (loginForm) loginForm.classList.add('active');
-            if (registerForm) registerForm.classList.remove('active');
-        }
-        if (app) {
-            app.style.opacity = '0';
-            app.style.display = 'none';
-        }
-        
-        hideLoading();
-        showToast('Logged out successfully', 'success');
-    }, 1000);
-}
-
-function showRegisterForm(e) {
-    e.preventDefault();
-    const loginForm = document.getElementById('loginForm');
-    const registerForm = document.getElementById('registerForm');
-    
-    if (loginForm) loginForm.classList.remove('active');
-    if (registerForm) registerForm.classList.add('active');
-}
-
-function showLoginForm(e) {
-    e.preventDefault();
-    const registerForm = document.getElementById('registerForm');
-    const loginForm = document.getElementById('loginForm');
-    
-    if (registerForm) registerForm.classList.remove('active');
-    if (loginForm) loginForm.classList.add('active');
-}
-
-// ====================== INITIALIZE APP ======================
-function initializeApp() {
-    console.log('Inbox Pro starting...');
-    
-    try {
-        const savedTheme = localStorage.getItem('inboxProTheme');
-        if (savedTheme) {
-            updateTheme(savedTheme);
-        }
-    } catch (e) {
-        console.log('Could not load theme from localStorage:', e);
-    }
-    
-    try {
-        const savedLang = localStorage.getItem('inboxProLanguage');
-        if (savedLang && translations[savedLang]) {
-            currentLanguage = savedLang;
-        }
-    } catch (e) {
-        console.log('Could not load language from localStorage:', e);
-    }
-    
-    updateLanguage(currentLanguage);
-    initializeEmails();
-    updateEmailCounts();
-    displayEmails();
-    
-    if (currentUser) {
-        const userName = document.getElementById('userName');
-        const userEmail = document.getElementById('userEmail');
-        const userAvatar = document.getElementById('userAvatar');
-        
-        if (userName) userName.textContent = currentUser.name;
-        if (userEmail) userEmail.textContent = currentUser.email;
-        if (userAvatar) {
-            const initials = currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
-            userAvatar.innerHTML = `<span>${initials}</span><div class="user-status online"></div>`;
-        }
-    }
-    
-    initializeEventListeners();
-    
-    setTimeout(() => {
-        showToast('Welcome to Inbox Pro!', 'success');
-        simulateAISorting();
-    }, 1000);
-    
-    console.log('Inbox Pro ready');
-}
-
-// ====================== ON LOAD ======================
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM loaded');
-    
-    // Add necessary CSS
-    const style = document.createElement('style');
-    style.textContent = `
-        .theme-options-settings {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .theme-option-btn {
-            padding: 15px;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            color: var(--text);
-            cursor: pointer;
-            transition: var(--transition);
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .theme-option-btn:hover {
-            border-color: var(--accent);
-            transform: translateY(-2px);
-        }
-        
-        .theme-option-btn.active {
-            background: var(--accent);
-            color: white;
-            border-color: var(--accent);
-        }
-        
-        .theme-option-btn i {
-            font-size: 1.5rem;
-        }
-        
-        .settings-select {
-            width: 100%;
-            padding: 10px;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            color: var(--text);
-            margin-bottom: 20px;
-        }
-        
-        .tab-content h4 {
-            margin-bottom: 15px;
-            color: var(--text);
-        }
-        
-        .no-attachments {
-            text-align: center;
-            color: var(--text-secondary);
-            padding: 20px;
-            font-style: italic;
-        }
-        
-        .email-checkbox {
-            margin-right: 10px;
-            display: flex;
-            align-items: center;
-        }
-        
-        .email-checkbox input {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
-        
-        .email-attachment {
-            position: absolute;
-            right: 15px;
-            bottom: 15px;
-            color: var(--accent);
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        
-        .remove-file {
-            background: none;
-            border: none;
-            color: var(--danger);
-            cursor: pointer;
-            padding: 5px;
-        }
-        
-        .remove-file:hover {
-            color: var(--danger-hover);
-        }
-        
-        .email-labels {
-            display: flex;
-            gap: 5px;
-            margin-top: 10px;
-        }
-        
-        .email-labels .label {
-            padding: 4px 8px;
-            font-size: 0.75rem;
-            border-radius: 12px;
-        }
-        
-        .login-form {
-            display: none;
-        }
-        
-        .login-form.active {
-            display: block;
-        }
-        
-        .modal {
-            display: none;
-        }
-        
-        @keyframes pulseInfinite {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        
-        .animate__pulse {
-            animation-name: pulseInfinite;
-        }
-        
-        .delete-modal {
-            max-width: 400px;
-        }
-        
-        .delete-icon {
-            text-align: center;
-            font-size: 48px;
-            color: var(--warning);
-            margin-bottom: 20px;
-        }
-        
-        .ai-badge {
-            position: absolute;
-            bottom: -5px;
-            right: -5px;
-            background: var(--success);
-            color: white;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            border: 2px solid var(--panel);
-        }
-        
-        .email-avatar {
-            position: relative;
-        }
-    `;
-    document.head.appendChild(style);
-    
-    let demoLogin = false;
-    try {
-        demoLogin = localStorage.getItem('inboxProDemoLogin') === 'true';
-    } catch (e) {
-        console.log('Could not read from localStorage:', e);
-    }
-    
-    if (demoLogin) {
-        const savedName = localStorage.getItem('inboxProUserName');
-        const savedEmail = localStorage.getItem('inboxProUserEmail');
-        
-        currentUser = {
-            name: savedName || "John Doe",
-            email: savedEmail || "john@example.com",
-            avatar: (savedName || "John Doe").split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)
-        };
-        
-        const loginScreen = document.getElementById('loginScreen');
-        const app = document.getElementById('app');
-        
-        if (loginScreen) loginScreen.style.display = 'none';
-        if (app) {
-            app.style.opacity = '1';
-            app.style.display = 'flex';
-        }
-        initializeApp();
-    } else {
-        const loginScreen = document.getElementById('loginScreen');
-        const app = document.getElementById('app');
-        
-        if (loginScreen) {
-            loginScreen.style.display = 'flex';
-            const loginForm = document.getElementById('loginForm');
-            const registerForm = document.getElementById('registerForm');
-            if (loginForm) loginForm.classList.add('active');
-            if (registerForm) registerForm.classList.remove('active');
-        }
-        if (app) {
-            app.style.opacity = '0';
-            app.style.display = 'none';
-        }
-        
-        const loginEmail = document.getElementById('loginEmail');
-        const loginPassword = document.getElementById('loginPassword');
-        
-        if (loginEmail) loginEmail.value = 'demo@example.com';
-        if (loginPassword) loginPassword.value = 'password123';
-    }
-});
-
-// ====================== ERROR HANDLING ======================
-window.addEventListener('error', function(e) {
-    console.error('Global error:', e.error);
-    showToast('An error occurred. Please refresh the page.', 'error');
-});
-
-// ====================== SAVE LANGUAGE PREFERENCE ======================
-document.getElementById('langSelect')?.addEventListener('change', function() {
-    try {
-        localStorage.setItem('inboxProLanguage', this.value);
-    } catch (e) {
-        console.log('Could not save language to localStorage:', e);
-    }
-});
-
-// ====================== FIX FOR FONT AWESOME ICONS ======================
-// Додамо стилі для іконок, які не завантажились
-document.head.insertAdjacentHTML('beforeend', `
-    <style>
-        /* Fallback icons if Font Awesome fails */
-        .fa:before {
-            font-family: 'Font Awesome 6 Free';
-            font-weight: 900;
-        }
-        
-        .far:before {
-            font-family: 'Font Awesome 6 Free';
-            font-weight: 400;
-        }
-        
-        /* Specific icons fallback */
-        .fa-mail-bulk:before { content: "📬"; }
-        .fa-envelope:before { content: "✉️"; }
-        .fa-inbox:before { content: "📥"; }
-        .fa-star:before { content: "⭐"; }
-        .fa-paper-plane:before { content: "✈️"; }
-        .fa-file-alt:before { content: "📄"; }
-        .fa-ban:before { content: "🚫"; }
-        .fa-trash:before { content: "🗑️"; }
-        .fa-bars:before { content: "☰"; }
-        .fa-search:before { content: "🔍"; }
-        .fa-sync-alt:before { content: "🔄"; }
-        .fa-bell:before { content: "🔔"; }
-        .fa-palette:before { content: "🎨"; }
-        .fa-sun:before { content: "☀️"; }
-        .fa-moon:before { content: "🌙"; }
-        .fa-circle:before { content: "⚫"; }
-        .fa-water:before { content: "💧"; }
-        .fa-cog:before { content: "⚙️"; }
-        .fa-robot:before { content: "🤖"; }
-        .fa-check-circle:before { content: "✅"; }
-        .fa-exclamation-circle:before { content: "⚠️"; }
-        .fa-exclamation-triangle:before { content: "❗"; }
-        .fa-info-circle:before { content: "ℹ️"; }
-        .fa-arrow-left:before { content: "←"; }
-        .fa-reply:before { content: "↩️"; }
-        .fa-reply-all:before { content: "↪️"; }
-        .fa-share:before { content: "↗️"; }
-        .fa-print:before { content: "🖨️"; }
-        .fa-flag:before { content: "🚩"; }
-        .fa-clock:before { content: "⏰"; }
-        .fa-folder:before { content: "📁"; }
-        .fa-ellipsis-v:before { content: "⋮"; }
-        .fa-weight-hanging:before { content: "⚖️"; }
-        .fa-shield-alt:before { content: "🛡️"; }
-        .fa-paperclip:before { content: "📎"; }
-        .fa-download:before { content: "📥"; }
-        .fa-eye:before { content: "👁️"; }
-        .fa-question-circle:before { content: "❓"; }
-        .fa-comment-alt:before { content: "💬"; }
-        .fa-user-cog:before { content: "👤⚙️"; }
-        .fa-save:before { content: "💾"; }
-        .fa-pen-alt:before { content: "✏️"; }
-        .fa-window-minimize:before { content: "🗕"; }
-        .fa-bold:before { content: "𝐁"; }
-        .fa-italic:before { content: "𝐼"; }
-        .fa-underline:before { content: "𝑈"; }
-        .fa-list:before { content: "☰"; }
-        .fa-link:before { content: "🔗"; }
-        .fa-image:before { content: "🖼️"; }
-        .fa-undo:before { content: "↶"; }
-        .fa-redo:before { content: "↷"; }
-        .fa-file-pdf:before { content: "📕"; }
-        .fa-file-word:before { content: "📘"; }
-        .fa-file-excel:before { content: "📗"; }
-        .fa-file-powerpoint:before { content: "📙"; }
-        .fa-file-archive:before { content: "🗜️"; }
-        .fa-file-image:before { content: "🖼️"; }
-        .fa-database:before { content: "🗄️"; }
-        .fa-chart-bar:before { content: "📊"; }
-        .fa-check:before { content: "✓"; }
-        .fa-times:before { content: "✕"; }
-        .fa-plus:before { content: "+"; }
-        .fa-archive:before { content: "📦"; }
-        .fa-bolt:before { content: "⚡"; }
-        .fa-user:before { content: "👤"; }
-        .fa-lock:before { content: "🔒"; }
-        .fa-sign-in-alt:before { content: "↪️"; }
-        .fa-user-plus:before { content: "👤+"; }
-        .fa-check-square:before { content: "☑️"; }
-        .fa-envelope-open:before { content: "📨"; }
-        .fa-chevron-left:before { content: "‹"; }
-        .fa-chevron-right:before { content: "›"; }
-        .fa-sign-out-alt:before { content: "↩️"; }
-        .fa-figma:before { content: "🎨"; }
-    </style>
-`);
+// Експорт функцій для глобального використання
+window.InboxPro = {
+    logout: logoutUser,
+    showToast: showToast,
+    getCurrentUser: () => currentUser
+};
