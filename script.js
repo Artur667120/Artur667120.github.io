@@ -37,7 +37,9 @@ const sampleEmails = [
         cc: [],
         bcc: [],
         labels: ["work"],
-        size: "1.2 MB"
+        size: "1.2 MB",
+        deleted: false,
+        deletedDate: null
     },
     {
         id: 2,
@@ -55,7 +57,9 @@ const sampleEmails = [
         cc: ["manager@company.com"],
         bcc: [],
         labels: ["work", "important"],
-        size: "2.4 MB"
+        size: "2.4 MB",
+        deleted: false,
+        deletedDate: null
     },
     {
         id: 3,
@@ -73,7 +77,9 @@ const sampleEmails = [
         cc: [],
         bcc: [],
         labels: ["social"],
-        size: "0.8 MB"
+        size: "0.8 MB",
+        deleted: false,
+        deletedDate: null
     },
     {
         id: 4,
@@ -91,7 +97,9 @@ const sampleEmails = [
         cc: [],
         bcc: [],
         labels: ["work", "travel"],
-        size: "3.1 MB"
+        size: "3.1 MB",
+        deleted: false,
+        deletedDate: null
     },
     {
         id: 5,
@@ -109,7 +117,302 @@ const sampleEmails = [
         cc: [],
         bcc: [],
         labels: ["finance"],
-        size: "1.5 MB"
+        size: "1.5 MB",
+        deleted: false,
+        deletedDate: null
+    }
+];
+
+// ====================== MODELS DATA ======================
+const attachmentModels = [
+    {
+        id: 1,
+        name: "Project_Report.pdf",
+        size: "2.4 MB",
+        type: "pdf",
+        icon: "fa-file-pdf",
+        color: "#FF6B6B",
+        date: "Today, 10:30 AM"
+    },
+    {
+        id: 2,
+        name: "Design_Mockup.fig",
+        size: "5.7 MB",
+        type: "figma",
+        icon: "fa-figma",
+        color: "#9D4EDD",
+        date: "Today, 09:15 AM"
+    },
+    {
+        id: 3,
+        name: "Meeting_Notes.docx",
+        size: "1.2 MB",
+        type: "word",
+        icon: "fa-file-word",
+        color: "#2B579A",
+        date: "Yesterday, 14:20"
+    },
+    {
+        id: 4,
+        name: "Budget_Spreadsheet.xlsx",
+        size: "3.8 MB",
+        type: "excel",
+        icon: "fa-file-excel",
+        color: "#217346",
+        date: "Yesterday, 11:45"
+    },
+    {
+        id: 5,
+        name: "Presentation.pptx",
+        size: "8.9 MB",
+        type: "powerpoint",
+        icon: "fa-file-powerpoint",
+        color: "#D24726",
+        date: "Mar 12, 08:30"
+    },
+    {
+        id: 6,
+        name: "Architecture_Diagram.zip",
+        size: "12.5 MB",
+        type: "archive",
+        icon: "fa-file-archive",
+        color: "#FFA726",
+        date: "Mar 11, 16:45"
+    },
+    {
+        id: 7,
+        name: "Screenshot.png",
+        size: "4.2 MB",
+        type: "image",
+        icon: "fa-file-image",
+        color: "#4CAF50",
+        date: "Mar 10, 12:30"
+    },
+    {
+        id: 8,
+        name: "Database_Backup.sql",
+        size: "25.3 MB",
+        type: "database",
+        icon: "fa-database",
+        color: "#2196F3",
+        date: "Mar 9, 22:15"
+    }
+];
+
+const emailModels = [
+    {
+        id: 101,
+        sender: "AI Assistant",
+        senderEmail: "ai@inboxpro.com",
+        subject: "Your Weekly Productivity Report",
+        preview: "Here's how you used Inbox Pro this week...",
+        date: "Today, 08:00",
+        unread: true,
+        important: true,
+        folder: "inbox",
+        attachments: 3,
+        body: `<div style="font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6;">
+            <h2 style="color: #667eea; margin-bottom: 20px;">📊 Weekly Productivity Report</h2>
+            
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                <h3 style="margin: 0 0 10px 0;">Hello ${currentUser ? currentUser.name : 'User'}!</h3>
+                <p style="margin: 0; opacity: 0.9;">Here's your productivity overview for this week</p>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px;">
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center;">
+                    <div style="font-size: 24px; font-weight: bold; color: #667eea;">42</div>
+                    <div style="font-size: 14px; color: #666;">Emails Processed</div>
+                </div>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center;">
+                    <div style="font-size: 24px; font-weight: bold; color: #10b981;">8h 15m</div>
+                    <div style="font-size: 14px; color: #666;">Time Saved</div>
+                </div>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center;">
+                    <div style="font-size: 24px; font-weight: bold; color: #f59e0b;">94%</div>
+                    <div style="font-size: 14px; color: #666;">Inbox Clean</div>
+                </div>
+            </div>
+            
+            <h3 style="color: #333; margin-bottom: 15px;">🎯 Top Achievements</h3>
+            <ul style="padding-left: 20px; margin-bottom: 25px;">
+                <li>Cleared 15 spam emails automatically</li>
+                <li>Sorted 8 important emails with AI</li>
+                <li>Responded to 12 emails with smart replies</li>
+                <li>Organized 5 projects with labels</li>
+            </ul>
+            
+            <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 25px;">
+                <h4 style="margin: 0 0 10px 0; color: #1976d2;">💡 Pro Tip</h4>
+                <p style="margin: 0;">Use the "Snooze" feature for emails that need attention later. This keeps your inbox focused on what matters now.</p>
+            </div>
+            
+            <p style="color: #666; font-size: 14px;">Keep up the great work!<br>Your AI Assistant 🤖</p>
+        </div>`,
+        to: ["user@example.com"],
+        cc: [],
+        bcc: [],
+        labels: ["work", "ai"],
+        size: "2.1 MB",
+        deleted: false,
+        deletedDate: null
+    },
+    {
+        id: 102,
+        sender: "Weather Service",
+        senderEmail: "weather@forecast.com",
+        subject: "Weather Alert: Storm Warning",
+        preview: "Important weather update for your area...",
+        date: "Today, 07:45",
+        unread: true,
+        important: true,
+        folder: "inbox",
+        attachments: 1,
+        body: `<div style="font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6;">
+            <div style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%); color: white; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                <h2 style="margin: 0 0 10px 0;">⚠️ WEATHER ALERT</h2>
+                <p style="margin: 0; opacity: 0.9;">Severe Storm Warning for Kyiv Area</p>
+            </div>
+            
+            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px; padding: 15px; background: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 24px; color: #ffc107;"></i>
+                <div>
+                    <h3 style="margin: 0 0 5px 0; color: #856404;">Warning Level: HIGH</h3>
+                    <p style="margin: 0; color: #856404;">Issued: Today at 07:30 | Valid until: 18:00</p>
+                </div>
+            </div>
+            
+            <h3 style="color: #333; margin-bottom: 15px;">🌩️ Expected Conditions</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px;">
+                <div style="text-align: center;">
+                    <div style="font-size: 32px; margin-bottom: 5px;">🌧️</div>
+                    <div style="font-weight: bold;">Heavy Rain</div>
+                    <div style="font-size: 14px; color: #666;">40-60 mm</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 32px; margin-bottom: 5px;">💨</div>
+                    <div style="font-weight: bold;">Strong Winds</div>
+                    <div style="font-size: 14px; color: #666;">70-90 km/h</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 32px; margin-bottom: 5px;">⚡</div>
+                    <div style="font-weight: bold;">Thunderstorms</div>
+                    <div style="font-size: 14px; color: #666;">Likely</div>
+                </div>
+            </div>
+            
+            <h3 style="color: #333; margin-bottom: 15px;">🛡️ Safety Recommendations</h3>
+            <ol style="padding-left: 20px; margin-bottom: 25px;">
+                <li>Avoid unnecessary travel</li>
+                <li>Secure outdoor objects</li>
+                <li>Stay away from windows</li>
+                <li>Keep electronic devices charged</li>
+                <li>Monitor local news for updates</li>
+            </ol>
+            
+            <div style="background: #e8f5e9; padding: 15px; border-radius: 8px;">
+                <h4 style="margin: 0 0 10px 0; color: #2e7d32;">ℹ️ Additional Information</h4>
+                <p style="margin: 0;">This alert will be updated as conditions change. For emergency assistance, call 112.</p>
+            </div>
+        </div>`,
+        to: ["residents@kyiv.ua"],
+        cc: [],
+        bcc: [],
+        labels: ["travel", "important"],
+        size: "1.8 MB",
+        deleted: false,
+        deletedDate: null
+    },
+    {
+        id: 103,
+        sender: "Finance Department",
+        senderEmail: "finance@company.com",
+        subject: "Monthly Expense Report & Invoice",
+        preview: "Your monthly financial summary is ready...",
+        date: "Yesterday, 16:30",
+        unread: false,
+        important: true,
+        folder: "inbox",
+        attachments: 2,
+        body: `<div style="font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6;">
+            <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                <h2 style="margin: 0 0 10px 0;">💰 Monthly Financial Report</h2>
+                <p style="margin: 0; opacity: 0.9;">March 2024 - Summary & Analysis</p>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px;">
+                <div style="background: #f3f4f6; padding: 15px; border-radius: 8px;">
+                    <div style="font-size: 12px; color: #666; margin-bottom: 5px;">Total Income</div>
+                    <div style="font-size: 24px; font-weight: bold; color: #10b981;">$12,450.00</div>
+                    <div style="font-size: 12px; color: #10b981;">↑ 8.5% from last month</div>
+                </div>
+                <div style="background: #f3f4f6; padding: 15px; border-radius: 8px;">
+                    <div style="font-size: 12px; color: #666; margin-bottom: 5px;">Total Expenses</div>
+                    <div style="font-size: 24px; font-weight: bold; color: #ef4444;">$8,720.50</div>
+                    <div style="font-size: 12px; color: #ef4444;">↑ 3.2% from last month</div>
+                </div>
+                <div style="background: #f3f4f6; padding: 15px; border-radius: 8px;">
+                    <div style="font-size: 12px; color: #666; margin-bottom: 5px;">Net Profit</div>
+                    <div style="font-size: 24px; font-weight: bold; color: #3b82f6;">$3,729.50</div>
+                    <div style="font-size: 12px; color: #3b82f6;">↑ 15.7% from last month</div>
+                </div>
+            </div>
+            
+            <h3 style="color: #333; margin-bottom: 15px;">📈 Expense Breakdown</h3>
+            <div style="margin-bottom: 25px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span>Office Supplies</span>
+                    <span style="font-weight: bold;">$450.00</span>
+                </div>
+                <div style="height: 8px; background: #e5e7eb; border-radius: 4px; margin-bottom: 12px;">
+                    <div style="width: 15%; height: 100%; background: #3b82f6; border-radius: 4px;"></div>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span>Software Subscriptions</span>
+                    <span style="font-weight: bold;">$1,250.00</span>
+                </div>
+                <div style="height: 8px; background: #e5e7eb; border-radius: 4px; margin-bottom: 12px;">
+                    <div style="width: 25%; height: 100%; background: #8b5cf6; border-radius: 4px;"></div>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span>Marketing & Advertising</span>
+                    <span style="font-weight: bold;">$3,500.00</span>
+                </div>
+                <div style="height: 8px; background: #e5e7eb; border-radius: 4px; margin-bottom: 12px;">
+                    <div style="width: 70%; height: 100%; background: #10b981; border-radius: 4px;"></div>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span>Travel & Entertainment</span>
+                    <span style="font-weight: bold;">$1,200.00</span>
+                </div>
+                <div style="height: 8px; background: #e5e7eb; border-radius: 4px; margin-bottom: 12px;">
+                    <div style="width: 24%; height: 100%; background: #f59e0b; border-radius: 4px;"></div>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span>Other Expenses</span>
+                    <span style="font-weight: bold;">$2,320.50</span>
+                </div>
+                <div style="height: 8px; background: #e5e7eb; border-radius: 4px; margin-bottom: 12px;">
+                    <div style="width: 46%; height: 100%; background: #ef4444; border-radius: 4px;"></div>
+                </div>
+            </div>
+            
+            <div style="background: #fef3c7; padding: 15px; border-radius: 8px;">
+                <h4 style="margin: 0 0 10px 0; color: #92400e;">📋 Action Required</h4>
+                <p style="margin: 0;">Please review the attached invoice and submit payment by <strong>March 31, 2024</strong>. Late payments may incur additional fees.</p>
+            </div>
+        </div>`,
+        to: ["accounting@company.com"],
+        cc: ["manager@company.com"],
+        bcc: [],
+        labels: ["finance", "work", "important"],
+        size: "3.5 MB",
+        deleted: false,
+        deletedDate: null
     }
 ];
 
@@ -231,7 +534,27 @@ const translations = {
         schedule: "Schedule",
         discard: "Discard",
         emptyTrash: "Empty Trash",
-        signOut: "Sign Out"
+        signOut: "Sign Out",
+        
+        // Delete confirmation
+        confirmDelete: "Confirm Delete",
+        deleteMessage: "Are you sure you want to delete this email?",
+        deleteMultipleMessage: "Are you sure you want to delete {count} emails?",
+        deleteWarning: "Deleted emails will be moved to Trash and stored for 30 days before permanent deletion.",
+        delete: "Delete",
+        cancel: "Cancel",
+        permanentlyDelete: "Permanently Delete",
+        restore: "Restore",
+        
+        // Models
+        models: "Models",
+        documents: "Documents",
+        images: "Images",
+        archives: "Archives",
+        allFiles: "All Files",
+        recent: "Recent",
+        starred: "Starred",
+        shared: "Shared"
     },
     ua: {
         welcomeBack: "З поверненням",
@@ -328,7 +651,23 @@ const translations = {
         schedule: "Запланувати",
         discard: "Скасувати",
         emptyTrash: "Очистити сміття",
-        signOut: "Вийти"
+        signOut: "Вийти",
+        confirmDelete: "Підтвердити видалення",
+        deleteMessage: "Ви впевнені, що хочете видалити цей лист?",
+        deleteMultipleMessage: "Ви впевнені, що хочете видалити {count} листів?",
+        deleteWarning: "Видалені листи будуть переміщені в кошик та зберігатимуться 30 днів перед остаточним видаленням.",
+        delete: "Видалити",
+        cancel: "Скасувати",
+        permanentlyDelete: "Видалити назавжди",
+        restore: "Відновити",
+        models: "Моделі",
+        documents: "Документи",
+        images: "Зображення",
+        archives: "Архіви",
+        allFiles: "Всі файли",
+        recent: "Нещодавні",
+        starred: "Помічені",
+        shared: "Спільні"
     },
     ru: {
         welcomeBack: "С возвращением",
@@ -425,7 +764,23 @@ const translations = {
         schedule: "Запланировать",
         discard: "Отмена",
         emptyTrash: "Очистить корзину",
-        signOut: "Выйти"
+        signOut: "Выйти",
+        confirmDelete: "Подтвердить удаление",
+        deleteMessage: "Вы уверены, что хотите удалить это письмо?",
+        deleteMultipleMessage: "Вы уверены, что хотите удалить {count} писем?",
+        deleteWarning: "Удаленные письма будут перемещены в корзину и храниться 30 дней перед окончательным удалением.",
+        delete: "Удалить",
+        cancel: "Отмена",
+        permanentlyDelete: "Удалить навсегда",
+        restore: "Восстановить",
+        models: "Модели",
+        documents: "Документы",
+        images: "Изображения",
+        archives: "Архивы",
+        allFiles: "Все файлы",
+        recent: "Недавние",
+        starred: "Отмеченные",
+        shared: "Общие"
     },
     de: {
         welcomeBack: "Willkommen zurück",
@@ -522,7 +877,23 @@ const translations = {
         schedule: "Planen",
         discard: "Verwerfen",
         emptyTrash: "Papierkorb leeren",
-        signOut: "Abmelden"
+        signOut: "Abmelden",
+        confirmDelete: "Löschen bestätigen",
+        deleteMessage: "Sind Sie sicher, dass Sie diese E-Mail löschen möchten?",
+        deleteMultipleMessage: "Sind Sie sicher, dass Sie {count} E-Mails löschen möchten?",
+        deleteWarning: "Gelöschte E-Mails werden in den Papierkorb verschoben und 30 Tage lang aufbewahrt, bevor sie endgültig gelöscht werden.",
+        delete: "Löschen",
+        cancel: "Abbrechen",
+        permanentlyDelete: "Endgültig löschen",
+        restore: "Wiederherstellen",
+        models: "Modelle",
+        documents: "Dokumente",
+        images: "Bilder",
+        archives: "Archive",
+        allFiles: "Alle Dateien",
+        recent: "Kürzlich",
+        starred: "Favorisiert",
+        shared: "Geteilt"
     }
 };
 
@@ -621,6 +992,9 @@ function initializeEmails() {
     // Add sample emails to inbox
     emailsData.inbox = [...sampleEmails];
     
+    // Add model emails
+    emailsData.inbox.push(...emailModels);
+    
     // Add some emails to other folders
     emailsData.sent = [
         {
@@ -639,7 +1013,9 @@ function initializeEmails() {
             cc: [],
             bcc: [],
             labels: ["work"],
-            size: "1.8 MB"
+            size: "1.8 MB",
+            deleted: false,
+            deletedDate: null
         }
     ];
     
@@ -660,7 +1036,9 @@ function initializeEmails() {
             cc: [],
             bcc: [],
             labels: ["work"],
-            size: "0.5 MB"
+            size: "0.5 MB",
+            deleted: false,
+            deletedDate: null
         }
     ];
     
@@ -681,7 +1059,9 @@ function initializeEmails() {
             cc: [],
             bcc: [],
             labels: [],
-            size: "0.2 MB"
+            size: "0.2 MB",
+            deleted: false,
+            deletedDate: null
         }
     ];
     
@@ -781,11 +1161,17 @@ function displayEmails() {
         // Get initials for avatar
         const initials = email.sender.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
         
+        // Check if email has AI label
+        const hasAI = email.labels && email.labels.includes('ai');
+        
         emailElement.innerHTML = `
             <div class="email-checkbox">
                 <input type="checkbox" class="email-select" data-id="${email.id}" ${selectedEmails.has(email.id) ? 'checked' : ''}>
             </div>
-            <div class="email-avatar">${initials}</div>
+            <div class="email-avatar" style="${hasAI ? 'background: linear-gradient(135deg, #667eea, #9d4edd);' : ''}">
+                ${initials}
+                ${hasAI ? '<div class="ai-badge"><i class="fas fa-robot"></i></div>' : ''}
+            </div>
             <div class="email-content">
                 <div class="email-header">
                     <div class="email-sender">${email.sender}</div>
@@ -840,7 +1226,15 @@ function displayEmailContent(email) {
     
     // Update avatar
     const initials = email.sender.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
-    if (readerAvatar) readerAvatar.textContent = initials;
+    if (readerAvatar) {
+        readerAvatar.textContent = initials;
+        // Check if email has AI label
+        const hasAI = email.labels && email.labels.includes('ai');
+        if (hasAI) {
+            readerAvatar.style.background = 'linear-gradient(135deg, #667eea, #9d4edd)';
+            readerAvatar.innerHTML = `${initials}<div class="ai-badge"><i class="fas fa-robot"></i></div>`;
+        }
+    }
     
     // Update email size
     if (emailSize) {
@@ -857,22 +1251,23 @@ function displayEmailContent(email) {
         if (attachmentsList) {
             attachmentsList.innerHTML = '';
             
-            // Create sample attachments
-            for (let i = 1; i <= email.attachments; i++) {
+            // Create attachments from models
+            for (let i = 0; i < Math.min(email.attachments, attachmentModels.length); i++) {
+                const model = attachmentModels[i];
                 const attachmentItem = document.createElement('div');
                 attachmentItem.className = 'attachment-item';
                 attachmentItem.innerHTML = `
                     <div class="attachment-info">
-                        <div class="attachment-icon">
-                            <i class="fas fa-file-pdf"></i>
+                        <div class="attachment-icon" style="color: ${model.color};">
+                            <i class="fas ${model.icon}"></i>
                         </div>
                         <div class="attachment-details">
-                            <div class="attachment-name">document_${i}.pdf</div>
-                            <div class="attachment-size">${Math.round(Math.random() * 2 + 0.5).toFixed(1)} MB</div>
+                            <div class="attachment-name">${model.name}</div>
+                            <div class="attachment-size">${model.size} • ${model.date}</div>
                         </div>
                     </div>
                     <div class="attachment-actions">
-                        <button class="action-btn download-attachment-btn" data-filename="document_${i}.pdf" title="Download">
+                        <button class="action-btn download-attachment-btn" data-filename="${model.name}" title="Download">
                             <i class="fas fa-download"></i>
                         </button>
                         <button class="action-btn preview-attachment-btn" title="Preview">
@@ -896,7 +1291,7 @@ function displayEmailContent(email) {
             document.querySelectorAll('.preview-attachment-btn').forEach(btn => {
                 btn.addEventListener('click', function(e) {
                     e.stopPropagation();
-                    showToast('Preview feature would open here', 'info');
+                    showToast(`Previewing ${this.closest('.attachment-item').querySelector('.attachment-name').textContent}`, 'info');
                 });
             });
         }
@@ -984,6 +1379,100 @@ function downloadAllAttachments() {
         hideLoading();
         showToast(`All ${attachmentItems.length} attachments downloaded`, 'success');
     }, 2000);
+}
+
+// ====================== DELETE CONFIRMATION MODAL ======================
+function showDeleteConfirmation(emailCount = 1, permanent = false) {
+    return new Promise((resolve) => {
+        // Create modal if it doesn't exist
+        let deleteModal = document.getElementById('deleteConfirmationModal');
+        if (!deleteModal) {
+            deleteModal = document.createElement('div');
+            deleteModal.id = 'deleteConfirmationModal';
+            deleteModal.className = 'modal';
+            deleteModal.innerHTML = `
+                <div class="modal-box delete-modal">
+                    <div class="modal-header">
+                        <h3><i class="fas fa-trash"></i> <span data-i18n="confirmDelete">Confirm Delete</span></h3>
+                        <button class="modal-close" id="closeDeleteModal">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="modal-content">
+                        <div class="delete-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <h4 id="deleteMessage"></h4>
+                        <p id="deleteWarning" style="color: var(--text-secondary); margin: 15px 0; line-height: 1.5;"></p>
+                        <div class="delete-options" style="margin-top: 20px;">
+                            <label class="checkbox" style="display: flex; align-items: center; gap: 10px;">
+                                <input type="checkbox" id="dontAskAgain">
+                                <span class="checkmark"></span>
+                                <span>Don't ask again</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn-secondary" id="cancelDelete">
+                            <span data-i18n="cancel">Cancel</span>
+                        </button>
+                        <button class="btn-primary danger" id="confirmDeleteBtn" style="background: var(--danger);">
+                            <i class="fas fa-trash"></i> <span data-i18n="${permanent ? 'permanentlyDelete' : 'delete'}">${permanent ? 'Permanently Delete' : 'Delete'}</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(deleteModal);
+            
+            // Add event listeners
+            document.getElementById('closeDeleteModal')?.addEventListener('click', () => {
+                deleteModal.style.display = 'none';
+                resolve(false);
+            });
+            
+            document.getElementById('cancelDelete')?.addEventListener('click', () => {
+                deleteModal.style.display = 'none';
+                resolve(false);
+            });
+            
+            document.getElementById('confirmDeleteBtn')?.addEventListener('click', () => {
+                deleteModal.style.display = 'none';
+                resolve(true);
+            });
+            
+            // Close on outside click
+            deleteModal.addEventListener('click', (e) => {
+                if (e.target === deleteModal) {
+                    deleteModal.style.display = 'none';
+                    resolve(false);
+                }
+            });
+        }
+        
+        // Update modal content
+        const deleteMessage = document.getElementById('deleteMessage');
+        const deleteWarning = document.getElementById('deleteWarning');
+        const confirmBtn = document.getElementById('confirmDeleteBtn');
+        
+        if (emailCount === 1) {
+            deleteMessage.textContent = translations[currentLanguage].deleteMessage;
+        } else {
+            deleteMessage.textContent = translations[currentLanguage].deleteMultipleMessage.replace('{count}', emailCount);
+        }
+        
+        deleteWarning.textContent = translations[currentLanguage].deleteWarning;
+        
+        if (permanent) {
+            confirmBtn.innerHTML = `<i class="fas fa-trash"></i> <span>${translations[currentLanguage].permanentlyDelete}</span>`;
+            deleteWarning.textContent = "This action cannot be undone. Emails will be permanently deleted.";
+        }
+        
+        // Show modal
+        deleteModal.style.display = 'flex';
+        
+        // Update translations
+        updateLanguage(currentLanguage);
+    });
 }
 
 function selectEmail(emailId) {
@@ -1085,7 +1574,9 @@ function markAsImportant() {
     }
 }
 
-function deleteSelectedEmails() {
+async function deleteSelectedEmails() {
+    let emailsToDelete = [];
+    
     if (selectedEmails.size === 0) {
         // Check if we're deleting a single email from reader
         const deleteBtn = document.getElementById('deleteEmailBtn');
@@ -1099,25 +1590,38 @@ function deleteSelectedEmails() {
     }
     
     const folderEmails = emailsData[currentFolder] || [];
-    const emailsToDelete = folderEmails.filter(email => selectedEmails.has(email.id));
+    emailsToDelete = folderEmails.filter(email => selectedEmails.has(email.id));
     
     if (emailsToDelete.length === 0) {
         showToast('No emails to delete', 'info');
         return;
     }
     
-    // Move to trash
-    emailsToDelete.forEach(email => {
-        email.folder = 'trash';
-        emailsData.trash.push(email);
-    });
+    // Show confirmation dialog
+    const confirmed = await showDeleteConfirmation(emailsToDelete.length, currentFolder === 'trash');
     
-    // Remove from current folder
-    emailsData[currentFolder] = folderEmails.filter(email => !selectedEmails.has(email.id));
+    if (!confirmed) {
+        showToast('Deletion cancelled', 'info');
+        return;
+    }
     
-    // If we're in trash folder, actually delete
     if (currentFolder === 'trash') {
+        // Permanently delete from trash
         emailsData.trash = emailsData.trash.filter(email => !selectedEmails.has(email.id));
+        showToast(`Permanently deleted ${emailsToDelete.length} email(s)`, 'success');
+    } else {
+        // Move to trash
+        emailsToDelete.forEach(email => {
+            email.folder = 'trash';
+            email.deleted = true;
+            email.deletedDate = new Date().toISOString();
+            emailsData.trash.push(email);
+        });
+        
+        // Remove from current folder
+        emailsData[currentFolder] = folderEmails.filter(email => !selectedEmails.has(email.id));
+        
+        showToast(`Moved ${emailsToDelete.length} email(s) to trash`, 'success');
     }
     
     selectedEmails.clear();
@@ -1130,8 +1634,6 @@ function deleteSelectedEmails() {
     
     if (readerTitle) readerTitle.textContent = translations[currentLanguage].selectEmail;
     if (readerText) readerText.innerHTML = `<p>${translations[currentLanguage].selectEmailDesc}</p>`;
-    
-    showToast(`Moved ${emailsToDelete.length} email(s) to trash`, 'success');
 }
 
 function emptyTrash() {
@@ -1140,12 +1642,40 @@ function emptyTrash() {
         return;
     }
     
-    if (confirm(`Are you sure you want to permanently delete ${emailsData.trash.length} email(s)?`)) {
-        emailsData.trash = [];
-        updateEmailCounts();
-        displayEmails();
-        showToast('Trash emptied', 'success');
+    // Show confirmation for permanent deletion
+    showDeleteConfirmation(emailsData.trash.length, true).then(confirmed => {
+        if (confirmed) {
+            emailsData.trash = [];
+            updateEmailCounts();
+            displayEmails();
+            showToast('Trash emptied', 'success');
+        }
+    });
+}
+
+function restoreEmail(emailId) {
+    const email = emailsData.trash.find(e => e.id === emailId);
+    if (!email) return;
+    
+    // Move back to original folder (default to inbox)
+    const originalFolder = email.originalFolder || 'inbox';
+    email.folder = originalFolder;
+    email.deleted = false;
+    email.deletedDate = null;
+    
+    // Remove from trash
+    emailsData.trash = emailsData.trash.filter(e => e.id !== emailId);
+    
+    // Add to original folder
+    if (emailsData[originalFolder]) {
+        emailsData[originalFolder].push(email);
+    } else {
+        emailsData.inbox.push(email);
     }
+    
+    updateEmailCounts();
+    displayEmails();
+    showToast('Email restored', 'success');
 }
 
 // ====================== FOLDER MANAGEMENT ======================
@@ -1260,7 +1790,9 @@ function sendEmail() {
         cc: [],
         bcc: [],
         labels: [],
-        size: `${(Math.random() * 3 + 0.5).toFixed(1)} MB`
+        size: `${(Math.random() * 3 + 0.5).toFixed(1)} MB`,
+        deleted: false,
+        deletedDate: null
     };
     
     // Add to sent folder
@@ -1635,7 +2167,7 @@ function initializeEventListeners() {
     if (saveSettingsBtn) saveSettingsBtn.addEventListener('click', saveSettings);
     if (cancelSettings) cancelSettings.addEventListener('click', closeSettingsModal);
     
-    // User dropdown menu - FIXED: додано обробку кліку на аватар
+    // User dropdown menu
     const userMenu = document.getElementById('userMenu');
     const userDropdown = document.getElementById('userDropdown');
     const userSettingsBtn = document.getElementById('userSettingsBtn');
@@ -1782,7 +2314,7 @@ function initializeEventListeners() {
         });
     });
     
-    // Filter tags - FIXED: тепер працюють правильно
+    // Filter tags
     document.querySelectorAll('.filter-tag').forEach(tag => {
         tag.addEventListener('click', function() {
             document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
@@ -1808,7 +2340,7 @@ function initializeEventListeners() {
         });
     });
     
-    // Language selector - FIXED: тепер працює для всіх мов
+    // Language selector
     const langSelect = document.getElementById('langSelect');
     if (langSelect) {
         langSelect.addEventListener('change', function() {
@@ -2146,7 +2678,7 @@ function initializeApp() {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM loaded');
     
-    // Add CSS for settings theme buttons
+    // Add CSS for delete confirmation modal and AI badges
     const style = document.createElement('style');
     style.textContent = `
         .theme-options-settings {
@@ -2283,133 +2815,17 @@ document.addEventListener('DOMContentLoaded', function() {
         .animate__pulse {
             animation-name: pulseInfinite;
         }
-    `;
-    document.head.appendChild(style);
-    
-    // Check if user is already logged in (for demo purposes)
-    let demoLogin = false;
-    try {
-        demoLogin = localStorage.getItem('inboxProDemoLogin') === 'true';
-    } catch (e) {
-        console.log('Could not read from localStorage:', e);
-    }
-    
-    if (demoLogin) {
-        // Auto-login for demo
-        const savedName = localStorage.getItem('inboxProUserName');
-        const savedEmail = localStorage.getItem('inboxProUserEmail');
         
-        currentUser = {
-            name: savedName || "John Doe",
-            email: savedEmail || "john@example.com",
-            avatar: (savedName || "John Doe").split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)
-        };
-        
-        const loginScreen = document.getElementById('loginScreen');
-        const app = document.getElementById('app');
-        
-        if (loginScreen) loginScreen.style.display = 'none';
-        if (app) {
-            app.style.opacity = '1';
-            app.style.display = 'flex';
-        }
-        initializeApp();
-    } else {
-        // Show login screen
-        const loginScreen = document.getElementById('loginScreen');
-        const app = document.getElementById('app');
-        
-        if (loginScreen) {
-            loginScreen.style.display = 'flex';
-            // Ensure login form is active
-            const loginForm = document.getElementById('loginForm');
-            const registerForm = document.getElementById('registerForm');
-            if (loginForm) loginForm.classList.add('active');
-            if (registerForm) registerForm.classList.remove('active');
-        }
-        if (app) {
-            app.style.opacity = '0';
-            app.style.display = 'none';
+        /* Delete confirmation modal */
+        .delete-modal {
+            max-width: 400px;
         }
         
-        // For demo purposes, pre-fill login form
-        const loginEmail = document.getElementById('loginEmail');
-        const loginPassword = document.getElementById('loginPassword');
-        
-        if (loginEmail) loginEmail.value = 'demo@example.com';
-        if (loginPassword) loginPassword.value = 'password123';
-    }
-});
-
-// ====================== ERROR HANDLING ======================
-window.addEventListener('error', function(e) {
-    console.error('Global error:', e.error);
-    showToast('An error occurred. Please refresh the page.', 'error');
-});
-
-// ====================== PWA SUPPORT (FIXED) ======================
-// Conditional Service Worker registration
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function() {
-        // Only register if we're on HTTPS or localhost
-        if (window.location.protocol === 'https:' || window.location.hostname === 'localhost') {
-            navigator.serviceWorker.register('/sw.js').then(function(registration) {
-                console.log('ServiceWorker registration successful with scope:', registration.scope);
-            }).catch(function(err) {
-                console.log('ServiceWorker registration failed:', err);
-                // Silent fail - it's okay if Service Worker doesn't work
-            });
+        .delete-icon {
+            text-align: center;
+            font-size: 48px;
+            color: var(--warning);
+            margin-bottom: 20px;
         }
-    });
-}
-
-// ====================== OFFLINE SUPPORT ======================
-window.addEventListener('online', function() {
-    showToast('You are back online', 'success');
-    const statusText = document.getElementById('statusText');
-    if (statusText) statusText.textContent = translations[currentLanguage].systemOperational;
-});
-
-window.addEventListener('offline', function() {
-    showToast('You are offline', 'warning');
-    const statusText = document.getElementById('statusText');
-    if (statusText) statusText.textContent = 'Offline - Some features may be unavailable';
-});
-
-// ====================== NOTIFICATIONS ======================
-function showNotification(title, message) {
-    if ("Notification" in window && Notification.permission === "granted") {
-        new Notification(title, {
-            body: message,
-            icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📬</text></svg>"
-        });
-    }
-}
-
-// Request notification permission
-if ("Notification" in window && Notification.permission === "default") {
-    // Запитуємо дозвіл тільки після взаємодії з користувачем
-    document.addEventListener('click', function() {
-        Notification.requestPermission();
-    }, { once: true });
-}
-
-// Save language preference when changed
-document.getElementById('langSelect')?.addEventListener('change', function() {
-    try {
-        localStorage.setItem('inboxProLanguage', this.value);
-    } catch (e) {
-        console.log('Could not save language to localStorage:', e);
-    }
-});
-
-// Auto-save theme when changed
-const originalUpdateTheme = updateTheme;
-updateTheme = function(theme) {
-    originalUpdateTheme(theme);
-    try {
-        localStorage.setItem('inboxProTheme', theme);
-    } catch (e) {
-        console.log('Could not save theme to localStorage:', e);
-    }
-};
+        
+        .delete-modal h4
