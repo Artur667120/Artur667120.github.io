@@ -1,54 +1,110 @@
 :root {
-  --bg: #0f1117;
-  --panel: #1c1f26;
-  --text: #e4e4e7;
-  --text-secondary: #a1a1aa;
-  --accent: #667eea;
-  --accent-hover: #5a67d8;
-  --danger: #ef4444;
-  --danger-hover: #dc2626;
-  --success: #10b981;
-  --success-hover: #059669;
-  --warning: #f59e0b;
-  --border: #2d2d3a;
-  --shadow: rgba(0, 0, 0, 0.3);
-  --unread-bg: rgba(102, 126, 234, 0.15);
-  --transition: all 0.3s ease;
+  --bg:#0f1117;
+  --panel:#1c1f26;
+  --text:#fff;
+  --accent:#667eea;
 }
 
 .light {
-  --bg: #f8fafc;
-  --panel: #ffffff;
-  --text: #1e293b;
-  --text-secondary: #64748b;
-  --accent: #4f46e5;
-  --accent-hover: #4338ca;
-  --danger: #dc2626;
-  --danger-hover: #b91c1c;
-  --success: #059669;
-  --success-hover: #047857;
-  --warning: #d97706;
-  --border: #e2e8f0;
-  --shadow: rgba(0, 0, 0, 0.1);
-  --unread-bg: rgba(79, 70, 229, 0.1);
+  --bg:#f5f7fb;
+  --panel:#fff;
+  --text:#000;
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+* { box-sizing:border-box; }
 
 body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen','Ubuntu','Cantarell','Fira Sans','Droid Sans','Helvetica Neue',sans-serif;
-  line-height: 1.5;
-  transition: var(--transition);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  min-height: 100vh;
-  overflow-x: hidden;
+  margin:0;
+  font-family:Arial;
+  background:var(--bg);
+  color:var(--text);
 }
 
-/* Ті ж стилі для header, sidebar, emails, модалок та кнопок, але зі змінами для анімацій та UX */
+.hidden { display:none; }
+
+header {
+  display:flex;
+  justify-content:space-between;
+  padding:15px;
+  background:var(--panel);
+}
+
+.main {
+  display:flex;
+  height:calc(100vh - 70px);
+}
+
+aside {
+  width:200px;
+  background:var(--panel);
+  padding:10px;
+}
+
+.menu-item {
+  padding:10px;
+  cursor:pointer;
+}
+.menu-item.active {
+  background:var(--accent);
+}
+
+.content {
+  flex:1;
+  padding:10px;
+  display:flex;
+}
+
+#emails {
+  width:40%;
+}
+
+.email {
+  padding:10px;
+  border-bottom:1px solid #333;
+  cursor:pointer;
+  animation:fade .3s;
+}
+
+.reader {
+  flex:1;
+  padding:20px;
+  background:var(--panel);
+}
+
+.login {
+  position:fixed;
+  inset:0;
+  background:#000;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.login-box {
+  background:#111;
+  padding:30px;
+  width:300px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.modal {
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.7);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.modal-box {
+  background:var(--panel);
+  padding:20px;
+  width:300px;
+}
+
+@keyframes fade {
+  from{opacity:0;transform:translateY(10px)}
+  to{opacity:1}
+}
