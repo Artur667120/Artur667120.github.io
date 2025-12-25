@@ -1,252 +1,30 @@
-/* Reset */
-* {
+/* Основні стилі */
+body, html {
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #f5f5f5;
+  font-family: Arial, sans-serif;
+  background-color: #f1f1f1;
   color: #333;
 }
-
-.app {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-/* Header */
-header.top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #4a76a8;
-  color: white;
-  padding: 10px 15px;
-}
-
-header.top h1 {
-  font-size: 1.4rem;
-}
-
-.top-actions button {
-  background: none;
-  border: none;
-  color: white;
-  margin-left: 10px;
-  font-size: 1.2rem;
-  cursor: pointer;
-}
-
-/* Sidebar */
-.main {
-  display: flex;
-  flex: 1;
-  overflow: hidden;
-}
-
-.sidebar {
-  width: 250px;
-  background: #2c3e50;
-  color: white;
-  padding: 10px;
-  flex-shrink: 0;
-}
-
-.sidebar-menu {
-  margin-top: 20px;
-}
-
-.menu-item {
-  display: flex;
-  align-items: center;
-  padding: 10px;
-  cursor: pointer;
-  border-radius: 5px;
-}
-
-.menu-item i {
-  margin-right: 10px;
-}
-
-.menu-item.active, .menu-item:hover {
-  background: #34495e;
-}
-
-/* Content */
-.content {
-  flex: 1;
-  padding: 15px;
-  overflow-y: auto;
-  position: relative;
-}
-
-.emails-container {
-  display: flex;
-  gap: 15px;
-  flex-direction: column;
-}
-
-.emails .email-item {
-  background: white;
-  padding: 10px;
-  border-radius: 5px;
-  cursor: pointer;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  margin-bottom: 10px;
-}
-
-/* Reader */
-.email-reader {
-  background: #fff;
-  border-radius: 5px;
-  padding: 10px;
-  display: none;
-  flex-direction: column;
-}
-
-.reader-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.reader-meta {
-  font-size: 0.85rem;
-  color: #666;
-  margin: 5px 0;
-}
-
-.reader-body p {
-  margin-top: 10px;
-}
-
-/* Modal */
-.modal {
-  position: fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  display:none;
-  justify-content:center;
-  align-items:center;
-  background: rgba(0,0,0,0.5);
-  z-index: 1000;
-}
-
-.modal-box {
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  width: 90%;
-  max-width: 500px;
-  max-height: 90%;
-  overflow-y: auto;
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 15px;
-}
-
-.btn-primary {
-  background: #4a76a8;
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.btn-secondary {
-  background: #bdc3c7;
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-/* Drag & Drop */
-.file-drop-area {
-  border: 2px dashed #4a76a8;
-  padding: 20px;
-  text-align: center;
-  margin-top: 10px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.file-drop-area.dragover {
-  background: #e3f2fd;
-}
-
-/* File Preview */
-.file-preview {
-  margin-top: 10px;
-}
-
-.file-preview div {
-  margin-bottom: 5px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-/* Progress Bar */
-.progress-bar {
-  width: 100%;
-  background: #eee;
-  height: 8px;
-  border-radius: 5px;
-  margin-top: 10px;
-}
-
-.progress-fill {
-  height: 100%;
-  width: 0%;
-  background: #4a76a8;
-  border-radius: 5px;
-  transition: width 0.3s;
-}
-
-/* Toast Notification */
-.toast {
-  position: fixed;
-  bottom: 20px;
-  left:50%;
-  transform: translateX(-50%);
-  background: #333;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 10px;
-  display: none;
-}
-
-/* Mobile */
-@media (max-width: 768px) {
-  .main {
-    flex-direction: column;
-  }
-
-  .sidebar {
-    width: 100%;
-    display: flex;
-    overflow-x: auto;
-  }
-
-  .menu-item {
-    flex: 1;
-    justify-content: center;
-  }
-
-  .emails-container {
-    flex-direction: column;
-  }
+.app { display: flex; flex-direction: column; height: 100vh; }
+.top { display: flex; justify-content: space-between; align-items: center; padding: 10px; background-color: #4a90e2; color: #fff; }
+.main { display: flex; flex: 1; overflow: hidden; }
+.sidebar { width: 220px; background: #2c3e50; color: #ecf0f1; flex-shrink: 0; display: flex; flex-direction: column; }
+.sidebar-menu { flex: 1; overflow-y: auto; }
+.menu-item { padding: 10px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+.menu-item.active, .menu-item:hover { background: #34495e; }
+.content { flex: 1; padding: 10px; overflow-y: auto; }
+.emails { display: flex; flex-direction: column; }
+.email-reader { display: none; flex-direction: column; background: #fff; padding: 10px; margin-top: 10px; border-radius: 6px; }
+.reader-header { display: flex; justify-content: space-between; align-items: center; }
+.modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); justify-content:center; align-items:center; }
+.modal-box { background:#fff; padding:20px; border-radius:8px; max-width:500px; width:90%; }
+.file-preview { display:flex; flex-wrap:wrap; gap:5px; margin-top:5px; }
+.progress-bar { width:100%; height:6px; background:#ddd; margin-top:5px; border-radius:3px; overflow:hidden; }
+.progress-fill { width:0%; height:100%; background:#4a90e2; }
+.lang { position: fixed; bottom: 10px; right: 10px; }
+@media(max-width:768px){
+  .main { flex-direction: column; }
+  .sidebar { width: 100%; display:flex; flex-direction:row; overflow-x:auto; }
+  .menu-item { flex:1; justify-content:center; }
 }
