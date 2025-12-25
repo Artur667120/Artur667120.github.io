@@ -1,66 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Inbox Pro</title>
 
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
 <body>
 
-<div class="app" id="app">
-  <header class="top">
-    <button class="menu-toggle" id="menuToggle">
-      <i class="fas fa-bars"></i>
-    </button>
-    <h1>📬 Inbox Pro</h1>
-    <div class="top-actions">
-      <button id="themeToggle"><i class="fas fa-moon"></i></button>
-      <span id="userEmail"></span>
-      <button id="settingsBtn"><i class="fas fa-user-edit"></i></button>
-    </div>
-  </header>
-
+<div class="app">
   <aside class="sidebar">
-    <button id="composeBtn">➕ Compose</button>
-    <div class="menu-item active" data-folder="inbox">Inbox</div>
-    <div class="menu-item" data-folder="sent">Sent</div>
-    <div class="menu-item" data-folder="trash">Trash</div>
+    <button id="composeBtn" class="compose">➕ Compose</button>
+    <div class="menu active">Inbox</div>
+    <div class="menu">Sent</div>
+    <div class="menu">Drafts</div>
+    <div class="menu">Trash</div>
   </aside>
 
-  <section class="content">
-    <div id="emailsList"></div>
-  </section>
+  <main class="content">
+    <h2>Inbox</h2>
+    <p class="empty">No messages yet</p>
+  </main>
 </div>
 
 <!-- COMPOSE MODAL -->
 <div class="modal" id="composeModal">
   <div class="modal-box">
-    <h3>New mail</h3>
+    <h3>New message</h3>
 
-    <input type="email" id="mailTo" placeholder="To">
-    <input id="mailSubject" placeholder="Subject">
+    <input id="mailTo" type="email" placeholder="To" />
+    <input id="mailSubject" placeholder="Subject" />
     <textarea id="mailText" rows="6" placeholder="Message"></textarea>
 
-    <label for="mailFile" class="file-btn">
+    <label class="file-btn" for="mailFile">
       <i class="fas fa-paperclip"></i> Add attachment
     </label>
-    <input type="file" id="mailFile" multiple hidden>
+    <input id="mailFile" type="file" multiple hidden />
 
-    <div id="filePreview"></div>
+    <div id="filePreview" class="drop-zone">
+      Drag & drop files here
+    </div>
 
-    <div class="modal-actions">
-      <button id="sendMail">Send</button>
-      <button id="closeCompose">Cancel</button>
+    <div class="progress">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="actions">
+      <button id="sendMail" class="send">Send</button>
+      <button id="closeCompose" class="cancel">Cancel</button>
     </div>
   </div>
 </div>
-
-<div class="toast" id="toast"></div>
 
 <script src="script.js"></script>
 </body>
