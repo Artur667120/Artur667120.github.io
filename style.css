@@ -1,3 +1,7 @@
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   font-family: Arial, sans-serif;
@@ -11,25 +15,36 @@ body {
 }
 
 .sidebar {
-  width: 200px;
+  width: 220px;
   background: #181818;
   padding: 10px;
 }
 
-.menu-item {
+.compose {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.menu {
   padding: 10px;
   cursor: pointer;
 }
 
-.menu-item.active {
+.menu.active {
   background: #333;
 }
 
 .content {
   flex: 1;
-  padding: 15px;
+  padding: 20px;
 }
 
+.empty {
+  opacity: .6;
+}
+
+/* MODAL */
 .modal {
   position: fixed;
   inset: 0;
@@ -50,13 +65,73 @@ body {
   border-radius: 8px;
 }
 
+input, textarea {
+  width: 100%;
+  margin: 5px 0;
+  padding: 8px;
+}
+
 .file-btn {
   display: inline-block;
-  margin: 10px 0;
+  margin-top: 10px;
   cursor: pointer;
 }
 
-#filePreview div {
-  font-size: 14px;
-  opacity: .8;
+.drop-zone {
+  border: 2px dashed #555;
+  padding: 15px;
+  text-align: center;
+  margin-top: 10px;
+  border-radius: 6px;
+}
+
+.drop-zone.drag {
+  border-color: #4caf50;
+  background: rgba(76,175,80,.1);
+}
+
+.progress {
+  height: 6px;
+  background: #333;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 10px;
+  display: none;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background: #4caf50;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .app {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    display: flex;
+    overflow-x: auto;
+  }
+
+  .menu {
+    white-space: nowrap;
+  }
+
+  .modal-box {
+    width: 90%;
+  }
+
+  textarea {
+    font-size: 16px;
+  }
 }
