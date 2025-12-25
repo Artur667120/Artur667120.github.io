@@ -321,108 +321,14 @@ const translations = {
         schedule: "Запланувати",
         discard: "Скасувати",
         emptyTrash: "Очистити сміття"
-    },
-    ru: {
-        welcomeBack: "С возвращением",
-        emailAddress: "Электронная почта",
-        password: "Пароль",
-        rememberMe: "Запомнить меня",
-        forgotPassword: "Забыли пароль?",
-        signIn: "Войти",
-        newUser: "Новый пользователь?",
-        createAccount: "Создать аккаунт",
-        fullName: "Полное имя",
-        confirmPassword: "Подтвердите пароль",
-        passwordHint: "Мин. 8 символов с буквами и цифрами",
-        createAccountBtn: "Создать аккаунт",
-        alreadyHaveAccount: "Уже есть аккаунт?",
-        aiFilter: "AI-фильтр спама",
-        smartSorting: "Умная сортировка",
-        securePrivate: "Безопасно и приватно",
-        aiActive: "AI активен",
-        searchPlaceholder: "Поиск писем, контактов, тем...",
-        refresh: "Обновить",
-        lightTheme: "Светлая",
-        darkTheme: "Темная",
-        oledTheme: "OLED",
-        blueTheme: "Океан",
-        aiOrganizing: "AI организует вашу почту. <strong>15</strong> писем отсортировано.",
-        compose: "Написать",
-        archive: "Архив",
-        important: "Важные",
-        delete: "Удалить",
-        snooze: "Отложить",
-        folders: "Папки",
-        inbox: "Входящие",
-        sent: "Отправленные",
-        drafts: "Черновики",
-        spam: "Спам",
-        trash: "Корзина",
-        labels: "Метки",
-        work: "Работа",
-        personal: "Личное",
-        travel: "Путешествия",
-        finance: "Финансы",
-        social: "Социальное",
-        emailStats: "Статистика",
-        total: "Всего",
-        unread: "Непрочитанные",
-        storage: "Хранилище",
-        kyiv: "Киев, UA",
-        newest: "Сначала новые",
-        oldest: "Сначала старые",
-        importantFirst: "Сначала важные",
-        unreadFirst: "Сначала непрочитанные",
-        all: "Все",
-        withAttachments: "С вложениями",
-        moreFilters: "Больше фильтров",
-        back: "Назад",
-        selectEmail: "Выберите письмо",
-        verified: "Подтверждено",
-        secure: "Безопасно",
-        to: "Кому:",
-        cc: "Копия:",
-        selectEmailDesc: "Выберите письмо для просмотра",
-        attachments: "Вложения",
-        downloadAll: "Скачать все",
-        quickReply: "Быстрый ответ",
-        print: "Печать",
-        report: "Пожаловаться",
-        replyPlaceholder: "Введите ваш ответ...",
-        send: "Отправить",
-        cancel: "Отмена",
-        previous: "Назад",
-        next: "Далее",
-        systemOperational: "Все системы работают",
-        syncing: "Синхронизация...",
-        loading: "Загрузка...",
-        userSettings: "Настройки",
-        profile: "Профиль",
-        appearance: "Внешний вид",
-        notifications: "Уведомления",
-        security: "Безопасность",
-        advanced: "Дополнительно",
-        saveChanges: "Сохранить изменения",
-        newMessage: "Новое сообщение",
-        to: "Кому",
-        cc: "Копия",
-        bcc: "Скрытая копія",
-        subject: "Тема",
-        message: "Напишите ваше сообщение...",
-        addAttachment: "Добавить файл",
-        maxSize: "Макс. 25MB каждый",
-        urgent: "Пометить как срочное",
-        readReceipt: "Запрос подтверждения прочтения",
-        encrypt: "Зашифровать сообщение",
-        schedule: "Запланировать",
-        discard: "Отменить",
-        emptyTrash: "Очистить корзину"
     }
 };
 
 // ====================== UTILITY FUNCTIONS ======================
 function showToast(message, type = 'info') {
     const toastContainer = document.getElementById('toastContainer');
+    if (!toastContainer) return;
+    
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
     toast.innerHTML = `
@@ -491,7 +397,11 @@ function updateTheme(theme) {
     });
     
     // Save to localStorage
-    localStorage.setItem('inboxProTheme', theme);
+    try {
+        localStorage.setItem('inboxProTheme', theme);
+    } catch (e) {
+        console.log('Could not save theme to localStorage:', e);
+    }
 }
 
 function toggleSidebar() {
@@ -1249,16 +1159,32 @@ function simulateAISorting() {
 
 // ====================== EVENT LISTENERS ======================
 function initializeEventListeners() {
-    // Login/Register
-    const loginBtn = document.getElementById('loginBtn');
-    const registerBtn = document.getElementById('registerBtn');
-    const showRegister = document.getElementById('showRegister');
-    const showLogin = document.getElementById('showLogin');
-    
-    if (loginBtn) loginBtn.addEventListener('click', handleLogin);
-    if (registerBtn) registerBtn.addEventListener('click', handleRegister);
-    if (showRegister) showRegister.addEventListener('click', showRegisterForm);
-    if (showLogin) showLogin.addEventListener('click', showLoginForm);
+    // Login/Register - ВАЖНО: Використовуємо делегування подій
+    document.addEventListener('click', function(e) {
+        // Login button
+        if (e.target && (e.target.id === 'loginBtn' || e.target.closest('#loginBtn'))) {
+            e.preventDefault();
+            handleLogin();
+        }
+        
+        // Register button
+        if (e.target && (e.target.id === 'registerBtn' || e.target.closest('#registerBtn'))) {
+            e.preventDefault();
+            handleRegister();
+        }
+        
+        // Show register form
+        if (e.target && (e.target.id === 'showRegister' || e.target.closest('#showRegister'))) {
+            e.preventDefault();
+            showRegisterForm(e);
+        }
+        
+        // Show login form
+        if (e.target && (e.target.id === 'showLogin' || e.target.closest('#showLogin'))) {
+            e.preventDefault();
+            showLoginForm(e);
+        }
+    });
     
     // Theme toggle
     const themeToggle = document.getElementById('themeToggle');
@@ -1508,8 +1434,18 @@ function initializeEventListeners() {
 
 // ====================== LOGIN/REGISTER ======================
 function handleLogin() {
-    const email = document.getElementById('loginEmail')?.value;
-    const password = document.getElementById('loginPassword')?.value;
+    console.log('Login button clicked');
+    
+    const emailInput = document.getElementById('loginEmail');
+    const passwordInput = document.getElementById('loginPassword');
+    
+    if (!emailInput || !passwordInput) {
+        console.error('Login form elements not found');
+        return;
+    }
+    
+    const email = emailInput.value;
+    const password = passwordInput.value;
     
     if (!email || !password) {
         showToast('Please enter email and password', 'error');
@@ -1540,15 +1476,31 @@ function handleLogin() {
         showToast('Login successful', 'success');
         
         // Save demo login
-        localStorage.setItem('inboxProDemoLogin', 'true');
+        try {
+            localStorage.setItem('inboxProDemoLogin', 'true');
+        } catch (e) {
+            console.log('Could not save to localStorage:', e);
+        }
     }, 1500);
 }
 
 function handleRegister() {
-    const name = document.getElementById('registerName')?.value;
-    const email = document.getElementById('registerEmail')?.value;
-    const password = document.getElementById('registerPassword')?.value;
-    const confirm = document.getElementById('registerConfirm')?.value;
+    console.log('Register button clicked');
+    
+    const nameInput = document.getElementById('registerName');
+    const emailInput = document.getElementById('registerEmail');
+    const passwordInput = document.getElementById('registerPassword');
+    const confirmInput = document.getElementById('registerConfirm');
+    
+    if (!nameInput || !emailInput || !passwordInput || !confirmInput) {
+        console.error('Register form elements not found');
+        return;
+    }
+    
+    const name = nameInput.value;
+    const email = emailInput.value;
+    const password = passwordInput.value;
+    const confirm = confirmInput.value;
     
     if (!name || !email || !password || !confirm) {
         showToast('Please fill in all fields', 'error');
@@ -1589,7 +1541,11 @@ function handleRegister() {
         showToast('Registration successful', 'success');
         
         // Save demo login
-        localStorage.setItem('inboxProDemoLogin', 'true');
+        try {
+            localStorage.setItem('inboxProDemoLogin', 'true');
+        } catch (e) {
+            console.log('Could not save to localStorage:', e);
+        }
     }, 1500);
 }
 
@@ -1616,9 +1572,13 @@ function initializeApp() {
     console.log('Inbox Pro starting...');
     
     // Load saved theme
-    const savedTheme = localStorage.getItem('inboxProTheme');
-    if (savedTheme) {
-        updateTheme(savedTheme);
+    try {
+        const savedTheme = localStorage.getItem('inboxProTheme');
+        if (savedTheme) {
+            updateTheme(savedTheme);
+        }
+    } catch (e) {
+        console.log('Could not load theme from localStorage:', e);
     }
     
     // Set current language
@@ -1659,39 +1619,6 @@ function initializeApp() {
 // ====================== ON LOAD ======================
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM loaded');
-    
-    // Check if user is already logged in (for demo purposes)
-    const demoLogin = localStorage.getItem('inboxProDemoLogin');
-    
-    if (demoLogin === 'true') {
-        // Auto-login for demo
-        currentUser = {
-            name: "John Doe",
-            email: "john@example.com",
-            avatar: "JD"
-        };
-        
-        const loginScreen = document.getElementById('loginScreen');
-        const app = document.getElementById('app');
-        
-        if (loginScreen) loginScreen.style.display = 'none';
-        if (app) app.style.opacity = '1';
-        initializeApp();
-    } else {
-        // Show login screen
-        const loginScreen = document.getElementById('loginScreen');
-        const app = document.getElementById('app');
-        
-        if (loginScreen) loginScreen.style.display = 'flex';
-        if (app) app.style.opacity = '0';
-        
-        // For demo purposes, pre-fill login form
-        const loginEmail = document.getElementById('loginEmail');
-        const loginPassword = document.getElementById('loginPassword');
-        
-        if (loginEmail) loginEmail.value = 'demo@example.com';
-        if (loginPassword) loginPassword.value = 'password123';
-    }
     
     // Add CSS for settings theme buttons
     const style = document.createElement('style');
@@ -1798,8 +1725,99 @@ document.addEventListener('DOMContentLoaded', function() {
             font-size: 0.75rem;
             border-radius: 12px;
         }
+        
+        /* Fix for login/register forms */
+        .login-form {
+            display: none;
+        }
+        
+        .login-form.active {
+            display: block;
+        }
+        
+        /* Fix for modals */
+        .modal {
+            display: none;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
     `;
     document.head.appendChild(style);
+    
+    // Check if user is already logged in (for demo purposes)
+    let demoLogin = false;
+    try {
+        demoLogin = localStorage.getItem('inboxProDemoLogin') === 'true';
+    } catch (e) {
+        console.log('Could not read from localStorage:', e);
+    }
+    
+    if (demoLogin) {
+        // Auto-login for demo
+        currentUser = {
+            name: "John Doe",
+            email: "john@example.com",
+            avatar: "JD"
+        };
+        
+        const loginScreen = document.getElementById('loginScreen');
+        const app = document.getElementById('app');
+        
+        if (loginScreen) loginScreen.style.display = 'none';
+        if (app) {
+            app.style.opacity = '1';
+            app.style.display = 'flex';
+        }
+        initializeApp();
+    } else {
+        // Show login screen
+        const loginScreen = document.getElementById('loginScreen');
+        const app = document.getElementById('app');
+        
+        if (loginScreen) {
+            loginScreen.style.display = 'flex';
+            // Ensure login form is active
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            if (loginForm) loginForm.classList.add('active');
+            if (registerForm) registerForm.classList.remove('active');
+        }
+        if (app) {
+            app.style.opacity = '0';
+            app.style.display = 'none';
+        }
+        
+        // For demo purposes, pre-fill login form
+        const loginEmail = document.getElementById('loginEmail');
+        const loginPassword = document.getElementById('loginPassword');
+        
+        if (loginEmail) loginEmail.value = 'demo@example.com';
+        if (loginPassword) loginPassword.value = 'password123';
+    }
+    
+    // Add immediate event listeners for login/register buttons
+    const loginBtn = document.getElementById('loginBtn');
+    const registerBtn = document.getElementById('registerBtn');
+    const showRegister = document.getElementById('showRegister');
+    const showLogin = document.getElementById('showLogin');
+    
+    if (loginBtn) {
+        loginBtn.addEventListener('click', handleLogin);
+    }
+    
+    if (registerBtn) {
+        registerBtn.addEventListener('click', handleRegister);
+    }
+    
+    if (showRegister) {
+        showRegister.addEventListener('click', showRegisterForm);
+    }
+    
+    if (showLogin) {
+        showLogin.addEventListener('click', showLoginForm);
+    }
 });
 
 // ====================== ERROR HANDLING ======================
@@ -1808,12 +1826,45 @@ window.addEventListener('error', function(e) {
     showToast('An error occurred. Please refresh the page.', 'error');
 });
 
-// ====================== PWA SUPPORT ======================
-if ('serviceWorker' in navigator) {
+// ====================== PWA SUPPORT (FIXED) ======================
+// ВИДАЛИТИ файл sw.js або замінити його на правильний Service Worker
+// Ось правильний мінімальний Service Worker (створіть файл sw.js з цим вмістом):
+/*
+// sw.js - правильний Service Worker
+self.addEventListener('install', function(event) {
+    event.waitUntil(
+        caches.open('inbox-pro-v1').then(function(cache) {
+            return cache.addAll([
+                '/',
+                '/index.html',
+                '/style.css',
+                '/script.js'
+            ]);
+        })
+    );
+});
+
+self.addEventListener('fetch', function(event) {
+    event.respondWith(
+        caches.match(event.request).then(function(response) {
+            return response || fetch(event.request);
+        })
+    );
+});
+*/
+
+// Завантажуємо Service Worker тільки якщо він існує та на правильному origin
+if ('serviceWorker' in navigator && window.location.protocol === 'https:') {
     window.addEventListener('load', function() {
-        navigator.serviceWorker.register('/sw.js').catch(err => {
-            console.log('ServiceWorker registration failed: ', err);
-        });
+        // Перевіряємо, чи це GitHub Pages
+        if (window.location.hostname.includes('github.io')) {
+            navigator.serviceWorker.register('/sw.js').then(function(registration) {
+                console.log('ServiceWorker registration successful with scope:', registration.scope);
+            }).catch(function(err) {
+                console.log('ServiceWorker registration failed:', err);
+                // Якщо Service Worker не працює, просто ігноруємо це
+            });
+        }
     });
 }
 
@@ -1842,5 +1893,8 @@ function showNotification(title, message) {
 
 // Request notification permission
 if ("Notification" in window && Notification.permission === "default") {
-    Notification.requestPermission();
+    // Запитуємо дозвіл тільки після взаємодії з користувачем
+    document.addEventListener('click', function() {
+        Notification.requestPermission();
+    }, { once: true });
 }
