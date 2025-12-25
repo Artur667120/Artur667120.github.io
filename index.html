@@ -1,14 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Inbox Pro</title>
-<link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Inbox Pro</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 <div class="app" id="app">
@@ -24,7 +21,9 @@
 
   <div class="main">
     <aside class="sidebar" id="sidebar">
-      <button type="button" class="compose-btn" id="composeBtn"><i class="fas fa-plus"></i> <span data-i18n="compose">Compose</span></button>
+      <button type="button" class="compose-btn" id="composeBtn">
+        <i class="fas fa-plus"></i> <span data-i18n="compose">Compose</span>
+      </button>
       <div class="sidebar-menu">
         <div class="menu-item active" data-folder="inbox"><i class="fas fa-inbox"></i> <span data-i18n="inbox">Inbox</span> <span class="badge" id="inboxCount">0</span></div>
         <div class="menu-item" data-folder="sent"><i class="fas fa-paper-plane"></i> <span data-i18n="sent">Sent</span></div>
@@ -39,7 +38,6 @@
         <h2 id="currentFolder">Inbox</h2>
         <button class="delete-folder-btn" id="emptyTrashBtn" style="display:none;"><i class="fas fa-trash"></i> <span data-i18n="emptyTrash">Empty Trash</span></button>
       </div>
-      
       <div class="emails-container">
         <div class="emails" id="emailsList"></div>
         <div class="email-reader" id="reader">
@@ -67,7 +65,7 @@
   <div class="lang">
     <select id="langSelect">
       <option value="ua">🇺🇦 UA</option>
-      <option value="en">🇬🇧 EN</option>
+      <option value="en" selected>🇬🇧 EN</option>
       <option value="de">🇩🇪 DE</option>
       <option value="ru">🇷🇺 RU</option>
     </select>
@@ -108,16 +106,14 @@
         <i class="fas fa-paperclip"></i> <span data-i18n="addAttachment">Add Attachment</span>
       </label>
       <input type="file" id="mailFile" multiple style="display:none;">
-      <div class="file-drop-area" id="fileDropArea">Drag & Drop files here</div>
       <div class="file-preview" id="filePreview"></div>
-    </div>
-    <div class="progress-bar" id="uploadProgress" style="display:none;">
-      <div class="progress-fill" id="progressFill"></div>
+      <div class="progress-bar" id="uploadProgress" style="display:none;">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
     </div>
     <div class="modal-actions">
       <button type="button" id="sendMail" class="btn-primary"><i class="fas fa-paper-plane"></i> <span data-i18n="send">Send</span></button>
-      <button type="button" id="closeCompose" class="btn-secondary" data-i18n="close">Cancel</button>
-      <button type="button" id="saveDraft" class="btn-secondary">Save Draft</button>
+      <button type="button" id="cancelMail" class="btn-secondary" data-i18n="cancel">Cancel</button>
     </div>
   </div>
 </div>
@@ -135,9 +131,11 @@
   </div>
 </div>
 
-<!-- TOAST -->
+<!-- NOTIFICATION TOAST -->
 <div class="toast" id="toast"></div>
 
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
