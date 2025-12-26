@@ -1,8 +1,41 @@
 {
   "name": "Inbox Pro",
-  "short_name": "Inbox",
-  "start_url": "./",
+  "short_name": "InboxPro",
+  "description": "AI-Powered Smart Email Client",
+  "start_url": "/",
   "display": "standalone",
-  "theme_color": "#0f1117",
-  "background_color": "#0f1117"
+  "background_color": "#0f172a",
+  "theme_color": "#667eea",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "business", "communication"],
+  "shortcuts": [
+    {
+      "name": "Compose New Email",
+      "short_name": "Compose",
+      "description": "Create a new email",
+      "url": "/?compose=true",
+      "icons": [{ "src": "icon-compose.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "View Inbox",
+      "short_name": "Inbox",
+      "description": "Check your inbox",
+      "url": "/?inbox=true",
+      "icons": [{ "src": "icon-inbox.png", "sizes": "192x192" }]
+    }
+  ]
 }
