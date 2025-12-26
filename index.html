@@ -78,7 +78,7 @@
     
     <!-- Firebase -->
     <script type="module" src="firebase-config.js"></script>
-   <script src="app.js"></script>
+    <script type="module" src="auth-service.js"></script>
     
     <!-- Styles -->
     <link rel="stylesheet" href="style.css">
@@ -319,6 +319,12 @@
                 <button class="compose-btn" id="composeBtn">
                     <span class="compose-icon">+</span>
                     <span class="compose-text">Compose</span>
+                </button>
+
+                <!-- AI Compose Button -->
+                <button class="ai-compose-btn" id="aiComposeBtn">
+                    <span class="ai-compose-icon">🤖</span>
+                    <span class="ai-compose-text">AI Compose</span>
                 </button>
 
                 <!-- Quick Actions -->
@@ -594,6 +600,41 @@
             </div>
         </div>
 
+        <!-- AI COMPOSE MODAL -->
+        <div class="modal hidden" id="aiComposeModal">
+            <div class="modal-content ai-compose-modal">
+                <div class="modal-header">
+                    <h3>🤖 AI Email Writer</h3>
+                    <button class="modal-close" id="closeAICompose">✕</button>
+                </div>
+                <div class="modal-body">
+                    <div class="ai-prompt-container">
+                        <label for="aiPrompt">Describe what you want to write about:</label>
+                        <textarea id="aiPrompt" placeholder="Example: Write a professional email to schedule a meeting next week..."></textarea>
+                        <button class="ai-generate-btn" id="aiGenerateBtn">
+                            <span>✨ Generate Email</span>
+                        </button>
+                        <div class="ai-writing" id="aiWriting">AI is writing your email...</div>
+                    </div>
+                    
+                    <div class="ai-result-container" id="aiResultContainer" style="display: none;">
+                        <div class="ai-preview">
+                            <h4>Generated Email Preview:</h4>
+                            <div class="ai-preview-content">
+                                <h5>Subject:</h5>
+                                <p id="aiSubjectPreview"></p>
+                                <h5>Body:</h5>
+                                <p id="aiBodyPreview"></p>
+                            </div>
+                        </div>
+                        <button class="use-ai-btn" id="useAIGeneratedBtn">
+                            <span>📝 Use This Email</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Settings Modal -->
         <div class="modal hidden" id="settingsModal">
             <div class="modal-content">
@@ -668,6 +709,6 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <!-- Script -->
-    <script src="script.js" type="module"></script>
+    <script src="app.js"></script>
 </body>
 </html>
