@@ -5,7 +5,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebas
 import { getAuth } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 
-// Конфігурація Firebase
+// Конфігурація Firebase (ТВОЇ ДАНІ З КОНСОЛІ)
 const firebaseConfig = {
     apiKey: "AIzaSyDdqDJC6iI2pXLtxm61220CIPgG4YdTrYk",
     authDomain: "inboxprodemo.firebaseapp.com",
