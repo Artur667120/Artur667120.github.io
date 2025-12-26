@@ -2816,3 +2816,12 @@ body {
     scrollbar-width: thin;
     scrollbar-color: var(--border) var(--bg-tertiary);
 }
+/* Додати ці стилі в кінець вашого style.css */
+
+/* Покращені стилі для форм */
+.login-form {
+    display: none;
+}
+
+.login-form.active {
+   
