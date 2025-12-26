@@ -5,58 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>Inbox Pro | AI-Powered Email Client</title>
     
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <!-- Firebase SDKs -->
     <script type="module" src="firebase-config.js"></script>
     <script type="module" src="auth-service.js"></script>
     
-    <!-- Local Font Awesome -->
-    <style>
-        @font-face {
-            font-family: 'Font Awesome 6 Free';
-            font-style: normal;
-            font-weight: 400;
-            font-display: block;
-            src: url("data:application/font-woff2;charset=utf-8;base64,d09GMgABAAAAAA...") format("woff2");
-        }
-        .fas, .far, .fa {
-            font-family: 'Font Awesome 6 Free';
-            font-weight: 900;
-        }
-        .far {
-            font-weight: 400;
-        }
-    </style>
-    
-    <!-- Local Animate.css -->
-    <style>
-        .animate__animated {
-            animation-duration: 1s;
-            animation-fill-mode: both;
-        }
-        .animate__fadeIn { animation-name: fadeIn; }
-        .animate__fadeInDown { animation-name: fadeInDown; }
-        .animate__slideInLeft { animation-name: slideInLeft; }
-        .animate__slideInDown { animation-name: slideInDown; }
-        .animate__zoomIn { animation-name: zoomIn; }
-        .animate__pulse { animation-name: pulse; }
-        .animate__bounceIn { animation-name: bounceIn; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes slideInLeft { from { transform: translateX(-100%); } to { transform: translateX(0); } }
-        @keyframes slideInDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
-        @keyframes zoomIn { from { opacity: 0; transform: scale3d(0.3, 0.3, 0.3); } 50% { opacity: 1; } }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-        @keyframes bounceIn { 
-            0%, 20%, 40%, 60%, 80%, 100% { animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000); }
-            0% { opacity: 0; transform: scale3d(0.3, 0.3, 0.3); }
-            20% { transform: scale3d(1.1, 1.1, 1.1); }
-            40% { transform: scale3d(0.9, 0.9, 0.9); }
-            60% { opacity: 1; transform: scale3d(1.03, 1.03, 1.03); }
-            80% { transform: scale3d(0.97, 0.97, 0.97); }
-            100% { opacity: 1; transform: scale3d(1, 1, 1); }
-        }
-    </style>
-    
+    <!-- Styles -->
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📬</text></svg>">
 </head>
@@ -524,6 +480,24 @@
                     <!-- Emails List -->
                     <div class="emails" id="emailsList">
                         <!-- Emails will be loaded here -->
+                        <div class="email-item unread">
+                            <div class="email-select">
+                                <input type="checkbox" class="email-checkbox">
+                            </div>
+                            <div class="email-avatar">JD</div>
+                            <div class="email-info">
+                                <div class="email-sender">
+                                    <span>John Doe</span>
+                                    <i class="fas fa-star email-action-btn starred"></i>
+                                </div>
+                                <div class="email-subject">Welcome to Inbox Pro!</div>
+                                <div class="email-preview">Thank you for choosing our AI-powered email client...</div>
+                            </div>
+                            <div class="email-meta">
+                                <div class="email-date">10:30 AM</div>
+                                <i class="fas fa-paperclip email-attachment"></i>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Email Reader -->
@@ -635,7 +609,7 @@
     </div>
 
     <!-- COMPOSE MODAL -->
-    <div class="modal" id="composeModal">
+    <div class="modal hidden" id="composeModal">
         <div class="modal-box compose-modal">
             <div class="modal-header">
                 <h3><i class="fas fa-edit"></i> New Message</h3>
@@ -674,7 +648,7 @@
     </div>
 
     <!-- SETTINGS MODAL -->
-    <div class="modal" id="settingsModal">
+    <div class="modal hidden" id="settingsModal">
         <div class="modal-box">
             <div class="modal-header">
                 <h3><i class="fas fa-user-cog"></i> User Settings</h3>
