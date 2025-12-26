@@ -1,86 +1,88 @@
-/* ====================== ІМПОРТ СЕРВІСІВ ====================== */
+/* ====================== СПРОЩЕНИЙ SCRIPT.JS ====================== */
 
-// Імпорт наших нових сервісів
-import { authService } from './auth-service.js';
-import { emailService } from './email-service.js';
-import { storageService } from './storage-service.js';
-import { 
-    formatDate, 
-    validateEmail, 
-    validatePassword, 
-    checkPasswordStrength,
-    pluralize 
-} from './utils.js';
-
-// EMAILJS CONFIG - ТВОЇ КЛЮЧІ
-const EMAILJS_CONFIG = {
-    PUBLIC_KEY: 'afzWbZbh3EJiObFmK',
-    SERVICE_ID: 'service_a3mpspb',
-    TEMPLATE_ID: 'xftxq1o'
-};
-
-/* ====================== ГЛОБАЛЬНІ ЗМІННІ ====================== */
+// ГЛОБАЛЬНІ ЗМІННІ
 let currentUser = null;
 let currentFolder = 'inbox';
 let isInitialized = false;
 
-/* ====================== ІНІЦІАЛІЗАЦІЯ ДОДАТКУ ====================== */
-function initializeApp() {
+// Основні функції
+async function initializeApp() {
     if (isInitialized) return;
     
     console.log('🚀 Ініціалізація Inbox Pro...');
     
-    // Ініціалізація сервісу автентифікації
-    authService.initAuthStateListener();
-    
-    // Додати слухача зміни стану автентифікації
-    authService.addAuthStateListener((user) => {
-        handleAuthStateChange(user);
-    });
-    
-    // Ініціалізація EmailJS
-    if (typeof emailjs !== 'undefined') {
-        emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY);
-        console.log('✅ EmailJS ініціалізовано');
+    try {
+        // Спробувати імпортувати сервіси динамічно
+        const module = await import('./auth-service.js');
+        const { authService } = module;
+        
+        // Ініціалізація сервісу автентифікації
+        authService.initAuthStateListener();
+        
+        // Додати слухача зміни стану автентифікації
+        authService.addAuthStateListener((user) => {
+            handleAuthStateChange(user);
+        });
+        
+    } catch (error) {
+        console.error('Помилка ініціалізації сервісів:', error);
+        // Показати помилку користувачу
+        showErrorToUser('Помилка завантаження додатку. Спробуйте оновити сторінку.');
     }
+    
+    // Приховати завантаження через 2 секунди (навіть якщо помилка)
+    setTimeout(() => {
+        const initialLoading = document.getElementById('initialLoading');
+        if (initialLoading) {
+            initialLoading.style.display = 'none';
+        }
+        
+        // Якщо немає користувача, показати екран входу
+        if (!currentUser) {
+            showLoginScreen();
+        }
+    }, 2000);
     
     // Налаштування слухачів подій
     setupEventListeners();
-    
-    // Приховати завантаження через 2 секунди
-    setTimeout(() => {
-        const initialLoading = document.getElementById('initialLoading');
-        if (initialLoading) initialLoading.style.display = 'none';
-    }, 2000);
     
     isInitialized = true;
     console.log('✅ Inbox Pro ініціалізовано');
 }
 
 function handleAuthStateChange(user) {
+    console.log('Зміна стану автентифікації:', user ? 'Користувач увійшов' : 'Користувач вийшов');
+    
     const initialLoading = document.getElementById('initialLoading');
     if (initialLoading) initialLoading.style.display = 'none';
     
+    currentUser = user;
+    
     if (user) {
-        currentUser = user;
         showApp();
-        updateUserInterface();
-        emailService.setupRealtimeListener(user.uid, currentFolder);
-        
-        // Показати повідомлення про успішний вхід
-        if (user.emailVerified) {
-            showToast('З поверненням!', 'success');
-        } else {
-            showToast('Ласкаво просимо до Inbox Pro!', 'success');
-        }
+        updateUserInterface(user);
+        showToast(`Вітаємо, ${user.name || user.email}!`, 'success');
     } else {
-        currentUser = null;
         showLoginScreen();
-        emailService.stopRealtimeListener();
     }
 }
 
-/* ====================== ІНТЕРФЕЙС ====================== */
+function showErrorToUser(message) {
+    const toast = document.createElement('div');
+    toast.className = 'toast error';
+    toast.innerHTML = `
+        <i class="fas fa-exclamation-circle"></i>
+        <span>${message}</span>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.remove();
+    }, 5000);
+}
+
+// ІНТЕРФЕЙС ФУНКЦІЇ
 function showLoginScreen() {
     const loginScreen = document.getElementById('loginScreen');
     const app = document.getElementById('app');
@@ -113,83 +115,84 @@ function showApp() {
     initializeAppInterface();
 }
 
-function updateUserInterface() {
-    if (!currentUser) return;
+function updateUserInterface(user) {
+    if (!user) return;
     
     // Оновлення імені користувача
     const userNameElements = document.querySelectorAll('#userName, .user-name');
     userNameElements.forEach(el => {
-        if (el) el.textContent = currentUser.name;
+        if (el) el.textContent = user.name || user.email;
     });
     
     // Оновлення email
     const userEmailElements = document.querySelectorAll('#userEmail, .user-email');
     userEmailElements.forEach(el => {
-        if (el) el.textContent = currentUser.email;
+        if (el) el.textContent = user.email;
     });
     
     // Оновлення аватара
     const userAvatar = document.getElementById('userAvatar');
     if (userAvatar) {
-        userAvatar.textContent = currentUser.name.charAt(0).toUpperCase();
-        if (currentUser.profile?.avatar) {
-            userAvatar.style.backgroundImage = `url(${currentUser.profile.avatar})`;
-            userAvatar.textContent = '';
-        }
+        const firstLetter = (user.name || user.email).charAt(0).toUpperCase();
+        userAvatar.textContent = firstLetter;
+        userAvatar.style.backgroundImage = `linear-gradient(135deg, #667eea, #48bb78)`;
     }
-    
-    // Оновлення інформації про сховище
-    updateStorageInfo();
 }
 
-function updateStorageInfo() {
-    if (!currentUser) return;
+function initializeAppInterface() {
+    // Завантажити демо-дані для листів
+    loadDemoEmails();
     
-    const storageUsed = currentUser.storageUsed || 0;
-    const storageLimit = currentUser.plan === 'free' ? 10 * 1024 * 1024 : 50 * 1024 * 1024;
-    const percent = Math.min((storageUsed / storageLimit) * 100, 100);
+    // Налаштувати перемикання папок
+    setupFolderSelection();
     
-    // Оновлення відсотка використаного сховища
-    const storagePercentElements = document.querySelectorAll('.storage-percent');
-    storagePercentElements.forEach(el => {
-        if (el) el.textContent = `${Math.round(percent)}%`;
-    });
-    
-    // Оновлення прогрес-бару
-    const storageProgressElements = document.querySelectorAll('.storage-progress');
-    storageProgressElements.forEach(el => {
-        if (el) el.style.width = `${percent}%`;
-    });
-    
-    // Оновлення тексту
-    const storageTextElements = document.querySelectorAll('.storage-text');
-    storageTextElements.forEach(el => {
-        if (el) {
-            const usedMB = (storageUsed / (1024 * 1024)).toFixed(1);
-            const totalMB = (storageLimit / (1024 * 1024)).toFixed(0);
-            el.textContent = `${usedMB}GB / ${totalMB}GB використано`;
-        }
-    });
+    // Налаштувати пошук
+    setupSearch();
 }
 
-function updateEmailsList(emails) {
+function loadDemoEmails() {
     const emailsList = document.getElementById('emailsList');
     if (!emailsList) return;
     
+    const demoEmails = [
+        {
+            id: 1,
+            from: 'support@inboxpro.com',
+            fromName: 'Inbox Pro Support',
+            subject: 'Ласкаво просимо до Inbox Pro!',
+            body: 'Дякуємо за реєстрацію в Inbox Pro. Ми раді вас бачити!',
+            date: new Date(),
+            read: false,
+            important: true,
+            attachments: 0
+        },
+        {
+            id: 2,
+            from: 'team@company.com',
+            fromName: 'Команда проєкту',
+            subject: 'Запланована зустріч',
+            body: 'Нагадуємо про заплановану зустріч завтра о 14:00.',
+            date: new Date(Date.now() - 3600000),
+            read: true,
+            important: true,
+            attachments: 1
+        },
+        {
+            id: 3,
+            from: 'newsletter@tech.com',
+            fromName: 'Tech Newsletter',
+            subject: 'Останні новини технологій',
+            body: 'Ознайомтеся з останніми новинами в світі технологій.',
+            date: new Date(Date.now() - 86400000),
+            read: false,
+            important: false,
+            attachments: 0
+        }
+    ];
+    
     emailsList.innerHTML = '';
     
-    if (emails.length === 0) {
-        emailsList.innerHTML = `
-            <div class="empty-state">
-                <i class="fas fa-inbox"></i>
-                <h3>Немає листів</h3>
-                <p>Натисніть "Написати" для створення нового листа</p>
-            </div>
-        `;
-        return;
-    }
-    
-    emails.forEach((email, index) => {
+    demoEmails.forEach((email, index) => {
         const emailElement = createEmailElement(email, index);
         emailsList.appendChild(emailElement);
     });
@@ -198,12 +201,11 @@ function updateEmailsList(emails) {
 function createEmailElement(email, index) {
     const div = document.createElement('div');
     div.className = `email ${email.read ? '' : 'unread'} ${email.important ? 'important' : ''}`;
-    div.style.animationDelay = `${index * 0.05}s`;
     div.dataset.id = email.id;
     
-    const avatarText = email.from ? email.from.charAt(0).toUpperCase() : '?';
-    const date = formatDate(email.createdAt);
-    const preview = email.body ? email.body.substring(0, 100) + (email.body.length > 100 ? '...' : '') : '';
+    const avatarText = email.fromName ? email.fromName.charAt(0).toUpperCase() : '?';
+    const date = formatDate(email.date);
+    const preview = email.body.substring(0, 80) + (email.body.length > 80 ? '...' : '');
     
     div.innerHTML = `
         <div class="email-checkbox">
@@ -212,20 +214,18 @@ function createEmailElement(email, index) {
         <div class="email-avatar">${avatarText}</div>
         <div class="email-content">
             <div class="email-header">
-                <div class="email-sender">${email.from || 'Невідомий відправник'}</div>
+                <div class="email-sender">${email.fromName || email.from}</div>
                 <div class="email-date">${date}</div>
             </div>
-            <div class="email-subject">${email.subject || 'Без теми'}</div>
+            <div class="email-subject">${email.subject}</div>
             <div class="email-preview">${preview}</div>
         </div>
-        ${email.attachments && email.attachments.length > 0 ? 
+        ${email.attachments > 0 ? 
             '<div class="email-attachment"><i class="fas fa-paperclip"></i></div>' : ''}
     `;
     
-    div.addEventListener('click', (e) => {
-        if (!e.target.classList.contains('email-select')) {
-            showEmailDetails(email);
-        }
+    div.addEventListener('click', () => {
+        showEmailDetails(email);
     });
     
     return div;
@@ -235,132 +235,60 @@ function showEmailDetails(email) {
     const reader = document.getElementById('reader');
     const readerTitle = document.getElementById('readerTitle');
     const readerSender = document.getElementById('readerSender');
-    const readerSenderEmail = document.getElementById('readerSenderEmail');
     const readerDate = document.getElementById('readerDate');
     const readerSubject = document.getElementById('readerSubject');
     const readerText = document.getElementById('readerText');
-    const emailTo = document.getElementById('emailTo');
-    const emailCc = document.getElementById('emailCc');
     
     if (!reader || !readerTitle) return;
     
-    // Оновлення заголовка
-    readerTitle.textContent = email.subject || 'Без теми';
+    readerTitle.textContent = email.subject;
+    readerSender.textContent = email.fromName || email.from;
     
-    // Оновлення інформації про відправника
-    readerSender.textContent = email.fromName || email.from || 'Невідомий відправник';
-    readerSenderEmail.textContent = email.from || '';
-    
-    // Оновлення дати
     const dateElement = readerDate.querySelector('span');
-    if (dateElement) dateElement.textContent = formatDate(email.createdAt);
+    if (dateElement) dateElement.textContent = formatDate(email.date);
     
-    // Оновлення теми та тіла листа
-    readerSubject.textContent = email.subject || 'Без теми';
-    readerText.innerHTML = `<p>${email.body || ''}</p>`;
-    
-    // Оновлення одержувачів
-    if (emailTo) emailTo.textContent = email.to || '';
-    if (emailCc) emailCc.textContent = email.cc || '';
+    readerSubject.textContent = email.subject;
+    readerText.innerHTML = `<p>${email.body}</p>`;
     
     // Оновлення аватара
     const readerAvatar = document.getElementById('readerAvatar');
     if (readerAvatar) {
-        const avatarText = email.from ? email.from.charAt(0).toUpperCase() : '?';
+        const avatarText = (email.fromName || email.from).charAt(0).toUpperCase();
         readerAvatar.textContent = avatarText;
     }
     
-    // Позначити лист як прочитаний
-    if (!email.read) {
-        emailService.updateEmail(email.id, { read: true });
-        document.querySelector(`[data-id="${email.id}"]`)?.classList.remove('unread');
-    }
-    
-    // На мобільних пристроях показуємо тільки переглядач
+    // Показати переглядач на мобільних пристроях
     if (window.innerWidth <= 768) {
         document.querySelector('.emails').style.display = 'none';
         reader.style.display = 'flex';
-        const backBtn = document.getElementById('backToList');
-        if (backBtn) backBtn.style.display = 'flex';
     }
 }
 
-function updateEmailCounts(emails) {
-    if (!emails) return;
+function formatDate(date) {
+    if (!date) return '';
     
-    const inboxCount = emails.filter(e => e.folder === 'inbox' && !e.read).length;
-    const importantCount = emails.filter(e => e.important).length;
-    const unreadCount = emails.filter(e => !e.read).length;
-    const totalCount = emails.length;
+    const now = new Date();
+    const emailDate = new Date(date);
+    const diffMs = now - emailDate;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
     
-    // Оновлення бейджів
-    const inboxBadge = document.getElementById('inboxCount');
-    const importantBadge = document.getElementById('importantCount');
-    
-    if (inboxBadge) inboxBadge.textContent = inboxCount > 0 ? inboxCount : '';
-    if (importantBadge) importantBadge.textContent = importantCount > 0 ? importantCount : '';
-    
-    // Оновлення заголовків
-    const emailCountElement = document.getElementById('emailCount');
-    const unreadCountElement = document.getElementById('unreadCount');
-    
-    if (emailCountElement) {
-        emailCountElement.textContent = `${totalCount} ${pluralize(totalCount, 'лист', 'листи', 'листів')}`;
-    }
-    
-    if (unreadCountElement) {
-        unreadCountElement.textContent = `${unreadCount} ${pluralize(unreadCount, 'непрочитаний', 'непрочитаних', 'непрочитаних')}`;
-    }
-    
-    // Оновлення статистики в віджетах
-    const totalEmailsElement = document.getElementById('totalEmails');
-    const unreadEmailsElement = document.getElementById('unreadEmails');
-    const importantEmailsElement = document.getElementById('importantEmails');
-    
-    if (totalEmailsElement) totalEmailsElement.textContent = totalCount;
-    if (unreadEmailsElement) unreadEmailsElement.textContent = unreadCount;
-    if (importantEmailsElement) importantEmailsElement.textContent = importantCount;
-}
-
-/* ====================== ДОПОМІЖНІ ФУНКЦІЇ ====================== */
-function showLoading(text = 'Завантаження...') {
-    const loadingOverlay = document.getElementById('loadingOverlay');
-    const loadingText = loadingOverlay?.querySelector('.loading-text');
-    
-    if (loadingOverlay) {
-        loadingOverlay.style.display = 'flex';
-        if (loadingText) loadingText.textContent = text;
+    if (diffMins < 1) {
+        return 'щойно';
+    } else if (diffMins < 60) {
+        return `${diffMins} хв тому`;
+    } else if (diffHours < 24) {
+        return `${diffHours} год тому`;
+    } else {
+        return emailDate.toLocaleDateString('uk-UA', {
+            day: 'numeric',
+            month: 'short',
+            year: emailDate.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
+        });
     }
 }
 
-function hideLoading() {
-    const loadingOverlay = document.getElementById('loadingOverlay');
-    if (loadingOverlay) {
-        loadingOverlay.style.display = 'none';
-    }
-}
-
-function showError(elementId, message) {
-    const element = document.getElementById(elementId);
-    if (element) {
-        element.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
-        element.classList.add('show');
-        
-        // Автоматичне приховування через 5 секунд
-        setTimeout(() => {
-            element.classList.remove('show');
-        }, 5000);
-    }
-}
-
-function clearAllErrors() {
-    const errorElements = document.querySelectorAll('.error-message');
-    errorElements.forEach(el => {
-        el.classList.remove('show');
-        el.innerHTML = '';
-    });
-}
-
+// ДОПОМІЖНІ ФУНКЦІЇ
 function showToast(message, type = 'info') {
     const toastContainer = document.getElementById('toastContainer');
     if (!toastContainer) return;
@@ -382,7 +310,6 @@ function showToast(message, type = 'info') {
     
     toastContainer.appendChild(toast);
     
-    // Автоматичне видалення через 5 секунд
     setTimeout(() => {
         toast.style.animation = 'toastOut 0.3s ease';
         setTimeout(() => {
@@ -409,243 +336,95 @@ function resetAllForms() {
     clearAllErrors();
 }
 
-function handleAuthError(error, context) {
-    console.error('Помилка автентифікації:', error);
-    
-    const errorMap = {
-        'auth/email-already-in-use': { 
-            register: ['registerEmailError', 'Ця електронна пошта вже використовується']
-        },
-        'auth/invalid-email': {
-            login: ['loginEmailError', 'Невірний формат електронної пошти'],
-            register: ['registerEmailError', 'Невірний формат електронної пошти'],
-            reset: ['resetEmailError', 'Невірний формат електронної пошти']
-        },
-        'auth/user-not-found': {
-            login: ['loginEmailError', 'Користувача з такою поштою не знайдено'],
-            reset: ['resetEmailError', 'Користувача з такою поштою не знайдено']
-        },
-        'auth/wrong-password': {
-            login: ['loginPasswordError', 'Невірний пароль']
-        },
-        'auth/weak-password': {
-            register: ['registerPasswordError', 'Пароль занадто слабкий. Мінімум 6 символів']
-        },
-        'auth/user-disabled': {
-            login: ['loginEmailError', 'Акаунт заблоковано']
-        },
-        'auth/too-many-requests': {
-            login: ['loginEmailError', 'Забагато невдалих спроб. Спробуйте пізніше'],
-            register: ['registerEmailError', 'Забагато спроб. Спробуйте пізніше']
-        }
-    };
-    
-    const errorConfig = errorMap[error.code];
-    if (errorConfig && errorConfig[context]) {
-        const [elementId, message] = errorConfig[context];
-        showError(elementId, message);
-    } else {
-        const defaultMessages = {
-            login: 'Невірний email або пароль',
-            register: 'Помилка реєстрації. Спробуйте ще раз',
-            reset: 'Помилка відновлення пароля'
-        };
+function clearAllErrors() {
+    const errorElements = document.querySelectorAll('.error-message');
+    errorElements.forEach(el => {
+        el.classList.remove('show');
+        el.innerHTML = '';
+    });
+}
+
+function showError(elementId, message) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+        element.classList.add('show');
         
-        const defaultElement = context === 'login' ? 'loginEmailError' : 
-                              context === 'register' ? 'registerEmailError' : 'resetEmailError';
-        
-        showError(defaultElement, defaultMessages[context] || 'Сталася помилка. Спробуйте ще раз');
+        setTimeout(() => {
+            element.classList.remove('show');
+        }, 5000);
     }
 }
 
-/* ====================== НАЛАШТУВАННЯ СЛУХАЧІВ ПОДІЙ ====================== */
+// НАЛАШТУВАННЯ СЛУХАЧІВ ПОДІЙ
 function setupEventListeners() {
-    // Перемикання форм автентифікації
     setupAuthForms();
-    
-    // Кнопка виходу
     setupLogout();
-    
-    // Модальні вікна
     setupModals();
-    
-    // Бокове меню
     setupMenu();
-    
-    // Пошук
-    setupSearch();
-    
-    // Темы
-    setupThemes();
-    
-    // Мови
-    setupLanguages();
-    
-    // Написати лист
     setupCompose();
-    
-    // Фільтри листів
-    setupFilters();
-    
-    // Вибір папки
-    setupFolderSelection();
-    
-    // Відкриття листа
-    setupEmailReader();
-    
-    // Глобальні події
-    setupGlobalEvents();
+    setupBackToList();
 }
 
 function setupAuthForms() {
     // Перемикання між формами
-    document.getElementById('showRegister')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        switchAuthForm('registerForm');
-    });
+    const showRegister = document.getElementById('showRegister');
+    const showLogin = document.getElementById('showLogin');
+    const forgotPasswordBtn = document.getElementById('forgotPasswordBtn');
+    const showLoginFromReset = document.getElementById('showLoginFromReset');
     
-    document.getElementById('showLogin')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        switchAuthForm('loginForm');
-    });
-    
-    document.getElementById('forgotPasswordBtn')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        switchAuthForm('resetForm');
-    });
-    
-    document.getElementById('showLoginFromReset')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        switchAuthForm('loginForm');
-    });
-    
-    // Вхід
-    document.getElementById('loginBtn')?.addEventListener('click', async () => {
-        const email = document.getElementById('loginEmail').value.trim();
-        const password = document.getElementById('loginPassword').value;
-        const rememberMe = document.getElementById('rememberMe').checked;
-        
-        clearAllErrors();
-        
-        // Валідація
-        if (!validateEmail(email)) {
-            showError('loginEmailError', 'Введіть коректну електронну пошту');
-            return;
-        }
-        
-        if (!validatePassword(password)) {
-            showError('loginPasswordError', 'Пароль повинен містити мінімум 6 символів');
-            return;
-        }
-        
-        showLoading('Вхід в систему...');
-        const result = await authService.login(email, password);
-        hideLoading();
-        
-        if (result.success) {
-            showToast('Успішний вхід!', 'success');
-        } else {
-            showError('loginEmailError', result.error);
-        }
-    });
-    
-    // Реєстрація
-    document.getElementById('registerBtn')?.addEventListener('click', async () => {
-        const name = document.getElementById('registerName').value.trim();
-        const email = document.getElementById('registerEmail').value.trim();
-        const password = document.getElementById('registerPassword').value;
-        const confirmPassword = document.getElementById('registerConfirm').value;
-        const acceptTerms = document.getElementById('acceptTerms').checked;
-        
-        clearAllErrors();
-        
-        // Валідація
-        if (!name) {
-            showError('registerNameError', 'Введіть ваше ім\'я');
-            return;
-        }
-        
-        if (!validateEmail(email)) {
-            showError('registerEmailError', 'Введіть коректну електронну пошту');
-            return;
-        }
-        
-        if (!validatePassword(password)) {
-            showError('registerPasswordError', 'Пароль повинен містити мінімум 6 символів');
-            return;
-        }
-        
-        if (password !== confirmPassword) {
-            showError('registerConfirmError', 'Паролі не співпадають');
-            return;
-        }
-        
-        if (!acceptTerms) {
-            showError('termsError', 'Ви повинні прийняти умови використання');
-            return;
-        }
-        
-        showLoading('Реєстрація...');
-        const result = await authService.register(email, password, name);
-        hideLoading();
-        
-        if (result.success) {
-            showToast('Акаунт успішно створено!', 'success');
-        } else {
-            showError('registerEmailError', result.error);
-        }
-    });
-    
-    // Відновлення пароля
-    document.getElementById('sendResetBtn')?.addEventListener('click', async () => {
-        const email = document.getElementById('resetEmail').value.trim();
-        
-        clearAllErrors();
-        
-        if (!validateEmail(email)) {
-            showError('resetEmailError', 'Введіть коректну електронну пошту');
-            return;
-        }
-        
-        showLoading('Надсилання листа...');
-        const result = await authService.resetPassword(email);
-        hideLoading();
-        
-        if (result.success) {
-            showToast('Лист для відновлення пароля надіслано на вашу пошту', 'success');
-            switchAuthForm('loginForm');
-        } else {
-            showError('resetEmailError', result.error);
-        }
-    });
-    
-    // Індикатор сили пароля
-    const passwordInput = document.getElementById('registerPassword');
-    const passwordStrength = document.getElementById('passwordStrength');
-    
-    if (passwordInput && passwordStrength) {
-        passwordInput.addEventListener('input', () => {
-            const strength = checkPasswordStrength(passwordInput.value);
-            passwordStrength.className = 'password-strength';
-            
-            if (passwordInput.value.length === 0) {
-                return;
-            }
-            
-            if (strength.score <= 1) {
-                passwordStrength.classList.add('weak');
-            } else if (strength.score <= 2) {
-                passwordStrength.classList.add('medium');
-            } else {
-                passwordStrength.classList.add('strong');
-            }
+    if (showRegister) {
+        showRegister.addEventListener('click', (e) => {
+            e.preventDefault();
+            switchAuthForm('registerForm');
         });
     }
     
+    if (showLogin) {
+        showLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            switchAuthForm('loginForm');
+        });
+    }
+    
+    if (forgotPasswordBtn) {
+        forgotPasswordBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            switchAuthForm('resetForm');
+        });
+    }
+    
+    if (showLoginFromReset) {
+        showLoginFromReset.addEventListener('click', (e) => {
+            e.preventDefault();
+            switchAuthForm('loginForm');
+        });
+    }
+    
+    // Вхід
+    const loginBtn = document.getElementById('loginBtn');
+    if (loginBtn) {
+        loginBtn.addEventListener('click', handleLogin);
+    }
+    
+    // Реєстрація
+    const registerBtn = document.getElementById('registerBtn');
+    if (registerBtn) {
+        registerBtn.addEventListener('click', handleRegister);
+    }
+    
+    // Відновлення пароля
+    const sendResetBtn = document.getElementById('sendResetBtn');
+    if (sendResetBtn) {
+        sendResetBtn.addEventListener('click', handleResetPassword);
+    }
+    
     // Enter для форм
-    const forms = ['loginForm', 'registerForm', 'resetForm'];
-    forms.forEach(formId => {
-        const form = document.getElementById(formId);
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+    const resetForm = document.getElementById('resetForm');
+    
+    [loginForm, registerForm, resetForm].forEach(form => {
         if (form) {
             form.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
@@ -658,79 +437,224 @@ function setupAuthForms() {
     });
 }
 
-function setupLogout() {
-    document.getElementById('logoutBtn')?.addEventListener('click', async (e) => {
-        e.preventDefault();
-        if (confirm('Ви дійсно хочете вийти з акаунту?')) {
-            showLoading('Вихід...');
-            const result = await authService.logout();
-            hideLoading();
-            
-            if (result.success) {
-                showToast('Ви успішно вийшли з системи', 'success');
-            } else {
-                showToast('Помилка при виході з системи', 'error');
-            }
+function switchAuthForm(formId) {
+    const forms = ['loginForm', 'registerForm', 'resetForm'];
+    forms.forEach(id => {
+        const form = document.getElementById(id);
+        if (form) {
+            form.classList.toggle('active', id === formId);
         }
     });
+    
+    clearAllErrors();
+}
+
+async function handleLogin() {
+    const email = document.getElementById('loginEmail')?.value.trim();
+    const password = document.getElementById('loginPassword')?.value;
+    
+    clearAllErrors();
+    
+    if (!email || !validateEmail(email)) {
+        showError('loginEmailError', 'Введіть коректну електронну пошту');
+        return;
+    }
+    
+    if (!password || password.length < 6) {
+        showError('loginPasswordError', 'Пароль повинен містити мінімум 6 символів');
+        return;
+    }
+    
+    try {
+        const module = await import('./auth-service.js');
+        const { authService } = module;
+        
+        const result = await authService.login(email, password);
+        
+        if (result.success) {
+            showToast('Успішний вхід!', 'success');
+        } else {
+            showError('loginEmailError', result.error);
+        }
+    } catch (error) {
+        console.error('Помилка входу:', error);
+        showError('loginEmailError', 'Помилка сервера. Спробуйте пізніше');
+    }
+}
+
+async function handleRegister() {
+    const name = document.getElementById('registerName')?.value.trim();
+    const email = document.getElementById('registerEmail')?.value.trim();
+    const password = document.getElementById('registerPassword')?.value;
+    const confirmPassword = document.getElementById('registerConfirm')?.value;
+    const acceptTerms = document.getElementById('acceptTerms')?.checked;
+    
+    clearAllErrors();
+    
+    // Валідація
+    if (!name) {
+        showError('registerNameError', 'Введіть ваше ім\'я');
+        return;
+    }
+    
+    if (!email || !validateEmail(email)) {
+        showError('registerEmailError', 'Введіть коректну електронну пошту');
+        return;
+    }
+    
+    if (!password || password.length < 6) {
+        showError('registerPasswordError', 'Пароль повинен містити мінімум 6 символів');
+        return;
+    }
+    
+    if (password !== confirmPassword) {
+        showError('registerConfirmError', 'Паролі не співпадають');
+        return;
+    }
+    
+    if (!acceptTerms) {
+        showError('termsError', 'Ви повинні прийняти умови використання');
+        return;
+    }
+    
+    try {
+        const module = await import('./auth-service.js');
+        const { authService } = module;
+        
+        const result = await authService.register(email, password, name);
+        
+        if (result.success) {
+            showToast('Акаунт успішно створено!', 'success');
+        } else {
+            showError('registerEmailError', result.error);
+        }
+    } catch (error) {
+        console.error('Помилка реєстрації:', error);
+        showError('registerEmailError', 'Помилка сервера. Спробуйте пізніше');
+    }
+}
+
+async function handleResetPassword() {
+    const email = document.getElementById('resetEmail')?.value.trim();
+    
+    clearAllErrors();
+    
+    if (!email || !validateEmail(email)) {
+        showError('resetEmailError', 'Введіть коректну електронну пошту');
+        return;
+    }
+    
+    try {
+        const module = await import('./auth-service.js');
+        const { authService } = module;
+        
+        const result = await authService.resetPassword(email);
+        
+        if (result.success) {
+            showToast('Лист для відновлення пароля надіслано на вашу пошту', 'success');
+            switchAuthForm('loginForm');
+        } else {
+            showError('resetEmailError', result.error);
+        }
+    } catch (error) {
+        console.error('Помилка відновлення пароля:', error);
+        showError('resetEmailError', 'Помилка сервера. Спробуйте пізніше');
+    }
+}
+
+function validateEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+}
+
+function setupLogout() {
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            if (confirm('Ви дійсно хочете вийти з акаунту?')) {
+                try {
+                    const module = await import('./auth-service.js');
+                    const { authService } = module;
+                    
+                    const result = await authService.logout();
+                    
+                    if (result.success) {
+                        showToast('Ви успішно вийшли з системи', 'success');
+                    } else {
+                        showToast('Помилка при виході з системи', 'error');
+                    }
+                } catch (error) {
+                    console.error('Помилка виходу:', error);
+                    showToast('Помилка при виході', 'error');
+                }
+            }
+        });
+    }
 }
 
 function setupModals() {
     // Політика конфіденційності
-    document.getElementById('privacyPolicyBtn')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        showModal('privacyModal');
+    const privacyBtns = ['privacyPolicyBtn', 'privacyBtn'];
+    privacyBtns.forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                showModal('privacyModal');
+            });
+        }
     });
     
-    document.getElementById('privacyBtn')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        showModal('privacyModal');
-    });
-    
-    document.getElementById('closePrivacy')?.addEventListener('click', () => {
-        hideModal('privacyModal');
-    });
-    
-    document.getElementById('acceptPrivacyBtn')?.addEventListener('click', () => {
-        hideModal('privacyModal');
-        const termsCheckbox = document.getElementById('acceptTerms');
-        if (termsCheckbox) termsCheckbox.checked = true;
-    });
+    const closePrivacy = document.getElementById('closePrivacy');
+    if (closePrivacy) {
+        closePrivacy.addEventListener('click', () => hideModal('privacyModal'));
+    }
     
     // Умови використання
-    document.getElementById('termsBtn')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        showModal('termsModal');
+    const termsBtn = document.getElementById('termsBtn');
+    if (termsBtn) {
+        termsBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            showModal('termsModal');
+        });
+    }
+    
+    const closeTerms = document.getElementById('closeTerms');
+    if (closeTerms) {
+        closeTerms.addEventListener('click', () => hideModal('termsModal'));
+    }
+    
+    // Закриття модальних вікон при кліку поза ними
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('modal')) {
+            e.target.style.display = 'none';
+        }
     });
     
-    document.getElementById('closeTerms')?.addEventListener('click', () => {
-        hideModal('termsModal');
+    // Закриття модальних вікон клавішею Escape
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                modal.style.display = 'none';
+            });
+        }
     });
-    
-    document.getElementById('acceptTermsBtn')?.addEventListener('click', () => {
-        hideModal('termsModal');
-        const termsCheckbox = document.getElementById('acceptTerms');
-        if (termsCheckbox) termsCheckbox.checked = true;
-    });
-    
-    // Налаштування
-    document.getElementById('userSettingsBtn')?.addEventListener('click', () => {
-        showModal('settingsModal');
-    });
-    
-    document.getElementById('closeSettings')?.addEventListener('click', () => {
-        hideModal('settingsModal');
-    });
-    
-    // Допомога
-    document.getElementById('helpBtn')?.addEventListener('click', () => {
-        showToast('Допомога скоро буде доступна', 'info');
-    });
-    
-    // Зворотній зв'язок
-    document.getElementById('feedbackBtn')?.addEventListener('click', () => {
-        showToast('Форма зворотного зв\'язку скоро буде доступна', 'info');
-    });
+}
+
+function showModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'flex';
+    }
+}
+
+function hideModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'none';
+    }
 }
 
 function setupMenu() {
@@ -741,17 +665,60 @@ function setupMenu() {
         menuToggle.addEventListener('click', () => {
             sidebar.classList.toggle('active');
         });
-        
-        // Закриття меню при кліку поза ним (на мобільних)
-        document.addEventListener('click', (e) => {
-            if (window.innerWidth <= 992 && 
-                !sidebar.contains(e.target) && 
-                !menuToggle.contains(e.target) &&
-                sidebar.classList.contains('active')) {
-                sidebar.classList.remove('active');
-            }
+    }
+}
+
+function setupCompose() {
+    const composeBtn = document.getElementById('composeBtn');
+    if (composeBtn) {
+        composeBtn.addEventListener('click', () => {
+            showModal('composeModal');
         });
     }
+    
+    const closeCompose = document.getElementById('closeCompose');
+    if (closeCompose) {
+        closeCompose.addEventListener('click', () => hideModal('composeModal'));
+    }
+}
+
+function setupBackToList() {
+    const backBtn = document.getElementById('backToList');
+    if (backBtn) {
+        backBtn.addEventListener('click', () => {
+            const reader = document.getElementById('reader');
+            const emails = document.querySelector('.emails');
+            
+            if (reader) reader.style.display = 'none';
+            if (emails) emails.style.display = 'block';
+        });
+    }
+}
+
+function setupFolderSelection() {
+    const folderItems = document.querySelectorAll('.menu-item[data-folder]');
+    folderItems.forEach(item => {
+        item.addEventListener('click', () => {
+            // Видалити активний клас у всіх
+            folderItems.forEach(i => i.classList.remove('active'));
+            // Додати активний клас поточному
+            item.classList.add('active');
+            
+            // Оновити поточну папку
+            currentFolder = item.dataset.folder;
+            
+            // Оновити заголовок
+            const folderTitle = document.getElementById('currentFolder');
+            if (folderTitle) {
+                const icon = item.querySelector('i')?.className || 'fas fa-inbox';
+                const text = item.querySelector('span')?.textContent || 'Inbox';
+                folderTitle.innerHTML = `<i class="${icon}"></i> <span>${text}</span>`;
+            }
+            
+            // Завантажити листи для цієї папки
+            loadDemoEmails();
+        });
+    });
 }
 
 function setupSearch() {
@@ -772,51 +739,25 @@ function setupSearch() {
             searchClear.style.display = 'none';
             searchInput.focus();
         });
-        
-        // Пошук при натисканні Enter
-        searchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                performSearch(searchInput.value);
-            }
-        });
     }
 }
 
-function setupThemes() {
-    const themeToggle = document.getElementById('themeToggle');
-    const themeMenu = document.getElementById('themeMenu');
-    const themeOptions = document.querySelectorAll('.theme-option');
+// ПОЧАТОК ВИКОНАННЯ
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM завантажено, ініціалізація додатку...');
     
-    if (themeToggle && themeMenu) {
-        themeToggle.addEventListener('click', () => {
-            themeMenu.classList.toggle('show');
-        });
-        
-        // Закриття меню при кліку поза ним
-        document.addEventListener('click', (e) => {
-            if (!themeToggle.contains(e.target) && !themeMenu.contains(e.target)) {
-                themeMenu.classList.remove('show');
-            }
-        });
-        
-        themeOptions.forEach(option => {
-            option.addEventListener('click', () => {
-                const theme = option.dataset.theme;
-                changeTheme(theme);
-                themeMenu.classList.remove('show');
-            });
-        });
-        
-        // Відновлення збереженої теми
-        const savedTheme = localStorage.getItem('theme') || 'dark';
-        changeTheme(savedTheme);
-    }
-}
-
-function setupLanguages() {
-    const langSelect = document.getElementById('langSelect');
-    if (langSelect) {
-        const savedLang = localStorage.getItem('language') || 'ua';
-        langSelect.value = savedLang;
-        
-        langSelect.addEventListener('change', () => {
+    // Запустити ініціалізацію додатку
+    initializeApp();
+    
+    // Додати глобальний обробник помилок
+    window.addEventListener('error', (event) => {
+        console.error('Глобальна помилка:', event.error);
+        showErrorToUser('Сталася несподівана помилка. Спробуйте оновити сторінку.');
+    });
+    
+    // Додати обробник для незавантажених ресурсів
+    window.addEventListener('unhandledrejection', (event) => {
+        console.error('Необроблена проміс-помилка:', event.reason);
+        showErrorToUser('Помилка завантаження. Спробуйте ще раз.');
+    });
+});
