@@ -1,8 +1,6 @@
 /* Inbox Pro - AI-Powered Email Client */
-
 /* ======== CSS Variables ======== */
 :root {
-    /* Colors */
     --primary: #667eea;
     --secondary: #764ba2;
     --success: #48bb78;
@@ -18,8 +16,6 @@
     --text-secondary: #718096;
     --border: #e2e8f0;
     --shadow: rgba(0, 0, 0, 0.1);
-    
-    /* Transitions */
     --transition: all 0.3s ease;
 }
 
@@ -42,6 +38,122 @@
     --border: #333333;
     --shadow: rgba(0, 0, 0, 0.5);
 }
+
+/* ======== Animations ======== */
+.animate__animated {
+    animation-duration: 1s;
+    animation-fill-mode: both;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        transform: translateX(-100%);
+        visibility: visible;
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInDown {
+    from {
+        transform: translateY(-100%);
+        visibility: visible;
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+@keyframes zoomIn {
+    from {
+        opacity: 0;
+        transform: scale3d(0.3, 0.3, 0.3);
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+@keyframes bounceIn {
+    0%, 20%, 40%, 60%, 80%, 100% {
+        animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+    }
+    0% {
+        opacity: 0;
+        transform: scale3d(0.3, 0.3, 0.3);
+    }
+    20% {
+        transform: scale3d(1.1, 1.1, 1.1);
+    }
+    40% {
+        transform: scale3d(0.9, 0.9, 0.9);
+    }
+    60% {
+        opacity: 1;
+        transform: scale3d(1.03, 1.03, 1.03);
+    }
+    80% {
+        transform: scale3d(0.97, 0.97, 0.97);
+    }
+    100% {
+        opacity: 1;
+        transform: scale3d(1, 1, 1);
+    }
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes progressPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+@keyframes dotPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+@keyframes modalSlideUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes toastSlideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+.animate__fadeIn { animation-name: fadeIn; }
+.animate__fadeInDown { animation-name: fadeInDown; }
+.animate__slideInLeft { animation-name: slideInLeft; }
+.animate__slideInDown { animation-name: slideInDown; }
+.animate__zoomIn { animation-name: zoomIn; }
+.animate__pulse { animation-name: pulse; animation-duration: 2s; animation-iteration-count: infinite; }
+.animate__bounceIn { animation-name: bounceIn; }
 
 /* ======== Base Styles ======== */
 * {
@@ -71,7 +183,6 @@ body {
     align-items: center;
     justify-content: center;
     z-index: 9999;
-    transition: opacity 0.3s ease;
 }
 
 .loading-content {
@@ -92,15 +203,6 @@ body {
     font-size: 16px;
     color: var(--text-secondary);
     animation: pulse 1.5s ease-in-out infinite;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-@keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
 }
 
 /* ======== Login Screen ======== */
@@ -125,8 +227,6 @@ body {
     width: 100%;
     max-width: 400px;
     padding: 40px;
-    position: relative;
-    overflow: hidden;
 }
 
 .login-header {
@@ -169,19 +269,13 @@ body {
     margin-top: 5px;
 }
 
-/* Стилі для форм */
+/* Login Forms */
 .login-form {
     display: none;
 }
 
 .login-form.active {
     display: block;
-    animation: fadeIn 0.5s ease;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
 }
 
 .form-group {
@@ -220,23 +314,17 @@ body {
     color: var(--text-secondary);
 }
 
-/* Виправлення для помилок */
 .error-message {
-    color: #f56565;
+    color: var(--danger);
     font-size: 12px;
     margin-top: 4px;
-    display: flex;
+    display: none;
     align-items: center;
     gap: 4px;
-    display: none;
 }
 
 .error-message.show {
     display: flex;
-}
-
-.error-message i {
-    font-size: 14px;
 }
 
 .password-hint {
@@ -345,10 +433,6 @@ body {
     box-shadow: 0 10px 20px var(--shadow);
 }
 
-.btn-primary:active {
-    transform: translateY(0);
-}
-
 .btn-primary:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -378,6 +462,7 @@ body {
 .danger {
     background: var(--danger) !important;
     border-color: var(--danger) !important;
+    color: white !important;
 }
 
 .danger:hover {
@@ -440,8 +525,6 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    position: relative;
-    z-index: 100;
 }
 
 .menu-toggle {
@@ -492,7 +575,6 @@ body {
     border-radius: 12px;
 }
 
-/* Стилі для піктограм статусу */
 .status-dot {
     width: 8px;
     height: 8px;
@@ -503,11 +585,6 @@ body {
 .status-dot.ai-active {
     background: var(--success);
     animation: dotPulse 2s infinite;
-}
-
-@keyframes dotPulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
 }
 
 .search-box {
@@ -798,7 +875,7 @@ body {
     color: var(--danger) !important;
 }
 
-/* Стилі для AI статусу */
+/* AI Status Bar */
 .ai-status-bar {
     background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(72, 187, 120, 0.1));
     border: 1px solid var(--border);
@@ -849,11 +926,6 @@ body {
 .ai-dismiss:hover {
     color: var(--text);
     background: var(--bg-tertiary);
-}
-
-@keyframes progressPulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
 }
 
 /* Main Content */
@@ -956,7 +1028,6 @@ body {
     cursor: pointer;
     transition: var(--transition);
     color: var(--text-secondary);
-    text-decoration: none;
     position: relative;
 }
 
@@ -1229,7 +1300,7 @@ body {
     box-shadow: 0 2px 4px var(--shadow);
 }
 
-/* Стилі для фільтрів */
+/* Email Filters */
 .email-filters {
     padding: 15px 20px;
     border-bottom: 1px solid var(--border);
@@ -1318,7 +1389,6 @@ body {
     color: white !important;
 }
 
-/* Стилі для виділення */
 .email-checkbox {
     margin-right: 10px;
 }
@@ -1402,7 +1472,6 @@ body {
     font-size: 14px;
 }
 
-/* Стилі для email actions */
 .email-actions {
     margin-left: auto;
     display: flex;
@@ -1436,7 +1505,6 @@ body {
     overflow: hidden;
 }
 
-/* Стилі для переглядача */
 .reader-header {
     display: flex;
     align-items: center;
@@ -1702,7 +1770,7 @@ body {
     color: white;
 }
 
-/* Стилі для bottom bar */
+/* Bottom Bar */
 .bottom-bar {
     background: var(--bg-secondary);
     border-top: 1px solid var(--border);
@@ -1760,7 +1828,7 @@ body {
     background: var(--bg-tertiary);
 }
 
-/* Стилі для модальних вікон */
+/* Modals */
 .modal {
     position: fixed;
     top: 0;
@@ -1777,7 +1845,6 @@ body {
 
 .modal.active {
     display: flex;
-    animation: fadeIn 0.3s ease;
 }
 
 .modal-box {
@@ -1791,11 +1858,6 @@ body {
     flex-direction: column;
     border: 1px solid var(--border);
     animation: modalSlideUp 0.3s ease;
-}
-
-@keyframes modalSlideUp {
-    from { transform: translateY(30px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
 }
 
 .modal-header {
@@ -1888,7 +1950,7 @@ body {
     gap: 12px;
 }
 
-/* Стилі для compose modal */
+/* Compose Modal */
 .compose-modal {
     max-width: 700px;
 }
@@ -1969,11 +2031,6 @@ body {
     overflow: hidden;
 }
 
-@keyframes toastSlideIn {
-    from { transform: translateX(100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
-}
-
 .toast::before {
     content: '';
     position: absolute;
@@ -2031,12 +2088,12 @@ body {
     background: var(--bg-tertiary);
 }
 
-/* Hidden class for JavaScript */
+/* Hidden class */
 .hidden {
     display: none !important;
 }
 
-/* Responsive styles */
+/* Responsive */
 @media (max-width: 1024px) {
     .emails-container {
         grid-template-columns: 1.5fr 1fr;
