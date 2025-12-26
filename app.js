@@ -1,5 +1,5 @@
 // Inbox Pro - AI-Powered Email Client
-console.log('🚀 Inbox Pro запускається...');
+console.log('🚀 Inbox Pro starting...');
 
 // ==================== CONFIGURATION ====================
 const TRANSLATIONS = {
@@ -234,31 +234,6 @@ const TRANSLATIONS = {
     }
 };
 
-// Mock authentication
-const mockAuth = {
-    onAuthStateChanged: (callback) => {
-        setTimeout(() => callback(null), 1000);
-    },
-    
-    login: async (email, password) => {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        return { uid: 'mock-user', email, displayName: 'Test User' };
-    },
-    
-    register: async (email, password, name) => {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        return { uid: 'mock-user', email, displayName: name };
-    },
-    
-    logout: async () => {
-        await new Promise(resolve => setTimeout(resolve, 500));
-    },
-    
-    resetPassword: async (email) => {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-    }
-};
-
 // State
 let currentLanguage = 'en';
 let currentTheme = 'dark';
@@ -266,9 +241,6 @@ let currentUser = null;
 let deferredPrompt = null;
 let isMobile = false;
 let isTouchDevice = false;
-let swipeStartX = 0;
-let swipeStartY = 0;
-let swipeThreshold = 50;
 
 // ==================== CORE FUNCTIONS ====================
 
@@ -402,101 +374,6 @@ function showSwipeInstruction() {
     }
 }
 
-function setupSwipeGestures() {
-    if (!isTouchDevice) return;
-    
-    const emailItems = document.querySelectorAll('.email-item');
-    
-    emailItems.forEach(item => {
-        let startX = 0;
-        let startY = 0;
-        let isSwiping = false;
-        
-        item.addEventListener('touchstart', (e) => {
-            startX = e.touches[0].clientX;
-            startY = e.touches[0].clientY;
-            isSwiping = false;
-        }, { passive: true });
-        
-        item.addEventListener('touchmove', (e) => {
-            if (!startX || !startY) return;
-            
-            const x = e.touches[0].clientX;
-            const y = e.touches[0].clientY;
-            
-            const diffX = x - startX;
-            const diffY = y - startY;
-            
-            // Check if it's a horizontal swipe (not vertical scroll)
-            if (Math.abs(diffX) > Math.abs(diffY) * 2) {
-                e.preventDefault();
-                isSwiping = true;
-                
-                // Add visual feedback
-                item.style.transform = `translateX(${diffX}px)`;
-                item.classList.remove('swipe-right', 'swipe-left');
-                
-                if (diffX > 0) {
-                    item.classList.add('swipe-right');
-                } else {
-                    item.classList.add('swipe-left');
-                }
-            }
-        }, { passive: false });
-        
-        item.addEventListener('touchend', (e) => {
-            if (!isSwiping) return;
-            
-            const endX = e.changedTouches[0].clientX;
-            const diffX = endX - startX;
-            
-            // Reset transform
-            item.style.transform = '';
-            item.classList.remove('swipe-right', 'swipe-left');
-            
-            // Check if swipe threshold is reached
-            if (Math.abs(diffX) > swipeThreshold) {
-                if (diffX > 0) {
-                    // Swipe right - Archive
-                    handleSwipeAction(item, 'archive');
-                } else {
-                    // Swipe left - Delete
-                    handleSwipeAction(item, 'delete');
-                }
-                
-                // Haptic feedback on mobile
-                vibrate([50]);
-            }
-            
-            startX = 0;
-            startY = 0;
-            isSwiping = false;
-        });
-    });
-}
-
-function handleSwipeAction(emailItem, action) {
-    const lang = TRANSLATIONS[currentLanguage];
-    
-    switch(action) {
-        case 'archive':
-            emailItem.style.animation = 'slideOutLeft 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-            setTimeout(() => {
-                emailItem.remove();
-                showToast('Email archived', 'success');
-            }, 300);
-            break;
-            
-        case 'delete':
-            emailItem.style.animation = 'slideOutRight 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-            setTimeout(() => {
-                emailItem.remove();
-                showToast('Email deleted', 'success');
-            }, 300);
-            break;
-    }
-}
-
 function vibrate(pattern) {
     if (isMobile && navigator.vibrate) {
         navigator.vibrate(pattern);
@@ -506,6 +383,10 @@ function vibrate(pattern) {
 // ==================== PWA FUNCTIONS ====================
 
 function setupPWA() {
+    // Temporarily disable PWA to fix errors
+    return;
+    
+    /* Original PWA code - comment out for now
     // Check if PWA is already installed
     if (window.matchMedia('(display-mode: standalone)').matches) {
         console.log('PWA installed and running in standalone mode');
@@ -547,6 +428,7 @@ function setupPWA() {
         document.getElementById('installPrompt')?.style.display = 'none';
         deferredPrompt = null;
     });
+    */
 }
 
 // ==================== ANIMATION FUNCTIONS ====================
@@ -651,7 +533,7 @@ function setLanguage(lang) {
     updateTextElements();
     
     // Show toast
-    const langNames = { en: 'English', ua: 'Українська', de: 'Deutsch', ru: 'Русский' };
+    const langNames = { en: 'English', ua: 'Українська' };
     showToast(`${TRANSLATIONS[lang].languageChanged} ${langNames[lang]}`, 'success');
 }
 
@@ -905,298 +787,6 @@ Best regards,
     return examples[emailType];
 }
 
-// ==================== QUICK ACTIONS SYSTEM ====================
-
-function setupQuickActions() {
-    const emailItems = document.querySelectorAll('.email-item');
-    
-    emailItems.forEach(item => {
-        // Add hover effects for desktop
-        if (!isMobile) {
-            item.addEventListener('mouseenter', () => {
-                item.style.transform = 'translateX(8px)';
-                item.style.transition = 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)';
-            });
-            
-            item.addEventListener('mouseleave', () => {
-                item.style.transform = 'translateX(0)';
-            });
-        }
-        
-        // Add context menu for desktop
-        if (!isMobile) {
-            item.addEventListener('contextmenu', (e) => {
-                e.preventDefault();
-                showQuickActionsMenu(e, item);
-            });
-        }
-        
-        // Touch handling for mobile
-        if (isMobile && isTouchDevice) {
-            let tapTimer;
-            let longPress = false;
-            
-            item.addEventListener('touchstart', () => {
-                tapTimer = setTimeout(() => {
-                    longPress = true;
-                    showQuickActionsMenuTouch(item);
-                    vibrate([100]);
-                }, 500);
-            });
-            
-            item.addEventListener('touchend', () => {
-                clearTimeout(tapTimer);
-                if (!longPress) {
-                    // Normal tap - view email
-                    viewEmail(item);
-                }
-                longPress = false;
-            });
-            
-            item.addEventListener('touchmove', () => {
-                clearTimeout(tapTimer);
-                longPress = false;
-            });
-        } else {
-            // Desktop click to view
-            item.addEventListener('click', (e) => {
-                if (e.target.type !== 'checkbox' && !e.target.closest('.email-action')) {
-                    viewEmail(item);
-                }
-            });
-        }
-    });
-    
-    // Keyboard shortcuts for desktop
-    if (!isMobile) {
-        document.addEventListener('keydown', (e) => {
-            // Ctrl/Cmd + S to star
-            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-                e.preventDefault();
-                const selected = document.querySelector('.email-item:hover');
-                if (selected) {
-                    const starBtn = selected.querySelector('.star-btn');
-                    if (starBtn) {
-                        starBtn.click();
-                        showToast('Email starred', 'success');
-                    }
-                }
-            }
-            
-            // Ctrl/Cmd + D to delete
-            if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
-                e.preventDefault();
-                const selected = document.querySelector('.email-item:hover');
-                if (selected) {
-                    selected.style.animation = 'slideOutRight 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-                    setTimeout(() => {
-                        selected.remove();
-                        showToast('Email deleted', 'success');
-                    }, 300);
-                }
-            }
-            
-            // Ctrl/Cmd + A to archive
-            if ((e.ctrlKey || e.metaKey) && e.key === 'a') {
-                e.preventDefault();
-                const selected = document.querySelector('.email-item:hover');
-                if (selected) {
-                    selected.style.animation = 'slideOutLeft 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-                    setTimeout(() => {
-                        selected.remove();
-                        showToast('Email archived', 'success');
-                    }, 300);
-                }
-            }
-        });
-    }
-}
-
-function showQuickActionsMenu(e, emailItem) {
-    // Remove existing menu
-    const existingMenu = document.querySelector('.quick-actions-menu');
-    if (existingMenu) existingMenu.remove();
-    
-    const lang = TRANSLATIONS[currentLanguage];
-    
-    const menu = document.createElement('div');
-    menu.className = 'quick-actions-menu';
-    menu.style.left = e.pageX + 'px';
-    menu.style.top = e.pageY + 'px';
-    menu.style.animation = 'scaleIn 0.2s cubic-bezier(0.4, 0, 0.2, 1)';
-    
-    menu.innerHTML = `
-        <div class="quick-actions-header">
-            <span>${lang.quickActions}</span>
-        </div>
-        <button class="quick-action-item" data-action="star">
-            <span class="action-icon">★</span>
-            <span>${lang.markImportant}</span>
-        </button>
-        <button class="quick-action-item" data-action="unread">
-            <span class="action-icon">📨</span>
-            <span>${lang.markUnread}</span>
-        </button>
-        <button class="quick-action-item" data-action="label">
-            <span class="action-icon">🏷️</span>
-            <span>${lang.addLabel}</span>
-        </button>
-        <button class="quick-action-item" data-action="move">
-            <span class="action-icon">📁</span>
-            <span>${lang.moveToFolder}</span>
-        </button>
-    `;
-    
-    document.body.appendChild(menu);
-    
-    // Handle menu actions
-    menu.querySelectorAll('.quick-action-item').forEach(button => {
-        button.addEventListener('click', () => {
-            const action = button.dataset.action;
-            handleQuickAction(action, emailItem);
-            menu.remove();
-        });
-    });
-    
-    // Close menu when clicking outside
-    setTimeout(() => {
-        const closeMenu = (clickEvent) => {
-            if (!menu.contains(clickEvent.target)) {
-                menu.style.animation = 'scaleOut 0.2s cubic-bezier(0.4, 0, 0.2, 1)';
-                setTimeout(() => menu.remove(), 200);
-                document.removeEventListener('click', closeMenu);
-            }
-        };
-        document.addEventListener('click', closeMenu);
-    }, 100);
-}
-
-function showQuickActionsMenuTouch(emailItem) {
-    const lang = TRANSLATIONS[currentLanguage];
-    
-    // Create mobile action sheet
-    const actionSheet = document.createElement('div');
-    actionSheet.className = 'mobile-action-sheet';
-    actionSheet.innerHTML = `
-        <div class="action-sheet-header">
-            <span>${lang.quickActions}</span>
-            <button class="action-sheet-close">✕</button>
-        </div>
-        <div class="action-sheet-actions">
-            <button class="action-sheet-item" data-action="star">
-                <span class="action-icon">★</span>
-                <span>${lang.markImportant}</span>
-            </button>
-            <button class="action-sheet-item" data-action="unread">
-                <span class="action-icon">📨</span>
-                <span>${lang.markUnread}</span>
-            </button>
-            <button class="action-sheet-item" data-action="label">
-                <span class="action-icon">🏷️</span>
-                <span>${lang.addLabel}</span>
-            </button>
-            <button class="action-sheet-item" data-action="move">
-                <span class="action-icon">📁</span>
-                <span>${lang.moveToFolder}</span>
-            </button>
-            <button class="action-sheet-item delete" data-action="delete">
-                <span class="action-icon">🗑️</span>
-                <span>${lang.delete}</span>
-            </button>
-        </div>
-    `;
-    
-    document.body.appendChild(actionSheet);
-    
-    // Animate in
-    setTimeout(() => {
-        actionSheet.style.transform = 'translateY(0)';
-    }, 10);
-    
-    // Handle actions
-    actionSheet.querySelectorAll('.action-sheet-item').forEach(button => {
-        button.addEventListener('click', () => {
-            const action = button.dataset.action;
-            handleQuickAction(action, emailItem);
-            closeActionSheet(actionSheet);
-        });
-    });
-    
-    // Close button
-    actionSheet.querySelector('.action-sheet-close').addEventListener('click', () => {
-        closeActionSheet(actionSheet);
-    });
-    
-    // Close on backdrop click
-    actionSheet.addEventListener('click', (e) => {
-        if (e.target === actionSheet) {
-            closeActionSheet(actionSheet);
-        }
-    });
-}
-
-function closeActionSheet(actionSheet) {
-    actionSheet.style.transform = 'translateY(100%)';
-    setTimeout(() => {
-        actionSheet.remove();
-    }, 300);
-}
-
-function handleQuickAction(action, emailItem) {
-    const lang = TRANSLATIONS[currentLanguage];
-    
-    switch(action) {
-        case 'star':
-            const starBtn = emailItem.querySelector('.star-btn');
-            if (starBtn) {
-                starBtn.classList.toggle('active');
-                starBtn.textContent = starBtn.classList.contains('active') ? '★' : '☆';
-                pulseAnimation(starBtn);
-                showToast('Email starred', 'success');
-            }
-            break;
-            
-        case 'unread':
-            emailItem.classList.toggle('unread');
-            showToast('Email marked as unread', 'success');
-            break;
-            
-        case 'label':
-            showToast('Label added', 'info');
-            break;
-            
-        case 'move':
-            showToast('Email moved', 'info');
-            break;
-            
-        case 'delete':
-            emailItem.style.animation = 'slideOutRight 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-            setTimeout(() => {
-                emailItem.remove();
-                showToast('Email deleted', 'success');
-            }, 300);
-            break;
-    }
-}
-
-function viewEmail(emailItem) {
-    const emailList = document.getElementById('emailsList');
-    const emailViewer = document.getElementById('emailViewer');
-    
-    if (emailList && emailViewer) {
-        emailList.style.display = 'none';
-        emailViewer.style.display = 'flex';
-        
-        // Show mobile viewer actions on mobile
-        if (isMobile) {
-            const mobileViewerActions = document.querySelector('.mobile-viewer-actions');
-            if (mobileViewerActions) {
-                mobileViewerActions.style.display = 'flex';
-            }
-        }
-    }
-}
-
 // ==================== EVENT HANDLERS ====================
 
 function setupAuthForms() {
@@ -1264,7 +854,14 @@ function setupAuthForms() {
                 loginBtn.innerHTML = '<span class="btn-text">Signing in...</span><span class="btn-icon">⏳</span>';
                 loginBtn.style.transform = 'scale(0.98)';
                 
-                const user = await mockAuth.login(email, password);
+                // Simulate login for now (remove later)
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                const user = {
+                    uid: 'demo-user',
+                    email: email,
+                    displayName: email.split('@')[0]
+                };
                 
                 // Success animation
                 loginBtn.style.transform = 'scale(1)';
@@ -1316,7 +913,14 @@ function setupAuthForms() {
                 registerBtn.innerHTML = '<span class="btn-text">Creating account...</span><span class="btn-icon">⏳</span>';
                 registerBtn.style.transform = 'scale(0.98)';
                 
-                const user = await mockAuth.register(email, password, name);
+                // Simulate registration for now (remove later)
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                const user = {
+                    uid: 'demo-user',
+                    email: email,
+                    displayName: name
+                };
                 
                 // Success animation
                 registerBtn.style.transform = 'scale(1)';
@@ -1397,7 +1001,7 @@ function setupMobileEvents() {
                     right: 0;
                     bottom: 0;
                     background: rgba(0, 0, 0, 0.5);
-                    z-index: var(--z-modal-backdrop);
+                    z-index: 1040;
                     backdrop-filter: blur(4px);
                 `;
                 document.body.appendChild(backdrop);
@@ -1421,8 +1025,6 @@ function setupMobileEvents() {
                 const searchInput = document.getElementById('searchInput');
                 if (searchInput) {
                     searchInput.focus();
-                    // Show keyboard on mobile
-                    searchInput.setAttribute('inputmode', 'search');
                 }
             }
         });
@@ -1508,45 +1110,28 @@ function setupMobileEvents() {
             }
         });
     }
-    
-    // Mobile viewer actions
-    const mobileViewerBtns = document.querySelectorAll('.mobile-viewer-btn');
-    mobileViewerBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const action = btn.dataset.action;
-            handleMobileViewerAction(action);
-        });
-    });
 }
 
 function handleMobileNavAction(action) {
     switch(action) {
         case 'inbox':
-            // Switch to inbox view
             showToast('Showing inbox', 'info');
             break;
             
         case 'starred':
-            // Switch to starred view
             showToast('Showing starred emails', 'info');
             break;
             
         case 'sent':
-            // Switch to sent view
             showToast('Showing sent emails', 'info');
             break;
             
         case 'compose':
-            // Open compose modal
             const mobileComposeModal = document.getElementById('mobileComposeModal');
             if (mobileComposeModal) {
                 mobileComposeModal.classList.remove('hidden');
                 document.getElementById('mobileTo')?.focus();
             }
-            break;
-            
-        case 'more':
-            // Already handled by event listener
             break;
     }
 }
@@ -1573,35 +1158,6 @@ function handleMobileMenuAction(action) {
             setTimeout(() => {
                 window.location.reload();
             }, 1000);
-            break;
-    }
-}
-
-function handleMobileViewerAction(action) {
-    const lang = TRANSLATIONS[currentLanguage];
-    
-    switch(action) {
-        case 'reply':
-            showToast('Opening reply...', 'info');
-            break;
-            
-        case 'forward':
-            showToast('Opening forward...', 'info');
-            break;
-            
-        case 'star':
-            showToast('Email starred', 'success');
-            vibrate([100]);
-            break;
-            
-        case 'archive':
-            showToast('Email archived', 'success');
-            vibrate([100]);
-            break;
-            
-        case 'delete':
-            showToast('Email deleted', 'success');
-            vibrate([100, 50, 100]);
             break;
     }
 }
@@ -1642,7 +1198,6 @@ function showMainApp(user) {
     // Setup mobile events
     if (isMobile) {
         setupMobileEvents();
-        setupSwipeGestures();
     }
     
     // Setup quick actions
@@ -1955,24 +1510,13 @@ function loadUserSettings() {
     
     // Load language
     const savedLang = localStorage.getItem('inboxpro-language') || 'en';
-    document.getElementById('settingsLanguage').value = savedLang;
+    const settingsLanguage = document.getElementById('settingsLanguage');
+    if (settingsLanguage) settingsLanguage.value = savedLang;
     
     // Load notification settings
     const notificationsEnabled = localStorage.getItem('notificationsEnabled') !== 'false';
-    document.getElementById('notificationsEnabled').checked = notificationsEnabled;
-    
-    // Load mobile settings
-    if (isMobile) {
-        const touchGestures = localStorage.getItem('touchGestures') !== 'false';
-        const mobileOptimization = localStorage.getItem('mobileOptimization') !== 'false';
-        const dataSaver = localStorage.getItem('dataSaver') === 'true';
-        const offlineMode = localStorage.getItem('offlineMode') === 'true';
-        
-        document.getElementById('touchGestures').checked = touchGestures;
-        document.getElementById('mobileOptimization').checked = mobileOptimization;
-        document.getElementById('dataSaver').checked = dataSaver;
-        document.getElementById('offlineMode').checked = offlineMode;
-    }
+    const notificationsCheckbox = document.getElementById('notificationsEnabled');
+    if (notificationsCheckbox) notificationsCheckbox.checked = notificationsEnabled;
 }
 
 function saveUserSettings() {
@@ -1984,22 +1528,66 @@ function saveUserSettings() {
     // Save notification settings
     const notificationsEnabled = document.getElementById('notificationsEnabled').checked;
     localStorage.setItem('notificationsEnabled', notificationsEnabled);
-    
-    // Save mobile settings
-    if (isMobile) {
-        const touchGestures = document.getElementById('touchGestures').checked;
-        const mobileOptimization = document.getElementById('mobileOptimization').checked;
-        const dataSaver = document.getElementById('dataSaver').checked;
-        const offlineMode = document.getElementById('offlineMode').checked;
-        
-        localStorage.setItem('touchGestures', touchGestures);
-        localStorage.setItem('mobileOptimization', mobileOptimization);
-        localStorage.setItem('dataSaver', dataSaver);
-        localStorage.setItem('offlineMode', offlineMode);
-    }
 }
 
 // ==================== INITIALIZATION ====================
+
+function setupQuickActions() {
+    // Basic email item interactions
+    const emailItems = document.querySelectorAll('.email-item');
+    
+    emailItems.forEach(item => {
+        // Star button
+        const starBtn = item.querySelector('.star-btn');
+        if (starBtn) {
+            starBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                starBtn.classList.toggle('active');
+                starBtn.textContent = starBtn.classList.contains('active') ? '★' : '☆';
+                pulseAnimation(starBtn);
+                showToast('Email starred', 'success');
+            });
+        }
+        
+        // Archive button
+        const archiveBtn = item.querySelector('.email-action:not(.star-btn)');
+        if (archiveBtn) {
+            archiveBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                item.style.animation = 'slideOutLeft 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+                setTimeout(() => {
+                    item.remove();
+                    showToast('Email archived', 'success');
+                }, 300);
+            });
+        }
+        
+        // Click to view
+        item.addEventListener('click', (e) => {
+            if (e.target.type !== 'checkbox' && !e.target.closest('.email-action')) {
+                viewEmail(item);
+            }
+        });
+    });
+}
+
+function viewEmail(emailItem) {
+    const emailList = document.getElementById('emailsList');
+    const emailViewer = document.getElementById('emailViewer');
+    
+    if (emailList && emailViewer) {
+        emailList.style.display = 'none';
+        emailViewer.style.display = 'flex';
+        
+        // Show mobile viewer actions on mobile
+        if (isMobile) {
+            const mobileViewerActions = document.querySelector('.mobile-viewer-actions');
+            if (mobileViewerActions) {
+                mobileViewerActions.style.display = 'flex';
+            }
+        }
+    }
+}
 
 function initApp() {
     console.log('✅ Initializing Inbox Pro with mobile support...');
@@ -2049,26 +1637,24 @@ function initApp() {
         });
     });
     
-    // Setup mock auth
-    mockAuth.onAuthStateChanged((user) => {
-        if (user) {
-            console.log('User logged in:', user.email);
-            setTimeout(() => showMainApp(user), 1000);
-        }
-    });
+    // Setup sidebar toggle
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    
+    if (menuToggle && sidebar) {
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+            pulseAnimation(menuToggle);
+        });
+    }
     
     // Handle window resize
     window.addEventListener('resize', checkMobile);
     
-    // Handle orientation change
-    window.addEventListener('orientationchange', () => {
-        setTimeout(checkMobile, 100);
-    });
-    
     // Hide loading screen after animations
     setTimeout(() => {
         hideLoadingScreen();
-        console.log('✅ Inbox Pro ready with mobile support!');
+        console.log('✅ Inbox Pro ready!');
     }, 2000);
 }
 
@@ -2078,13 +1664,3 @@ if (document.readyState === 'loading') {
 } else {
     initApp();
 }
-
-// Export for debugging
-window.InboxPro = {
-    setLanguage,
-    setTheme,
-    generateAIEmail,
-    showToast,
-    checkMobile,
-    isMobile: () => isMobile
-};
