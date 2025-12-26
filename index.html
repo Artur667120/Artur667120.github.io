@@ -2,78 +2,60 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>Inbox Pro | AI Email Client</title>
     
-    <!-- Font Awesome локально щоб уникнути Tracking Prevention -->
+    <!-- PWA метатеги -->
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         
-        /* Font Awesome icons system */
-        .fas, .far, .fa, .fab {
-            font-family: 'Font Awesome 6 Free';
-            font-weight: 900;
+        /* Touch-friendly увеличение областей клика для мобильных */
+        @media (max-width: 768px) {
+            button, a, input, select {
+                min-height: 44px;
+                min-width: 44px;
+            }
+            
+            .nav-item, .quick-action, .toolbar-btn {
+                padding: 12px !important;
+            }
         }
         
-        /* Basic icons replacement */
-        .fa-mail-bulk::before { content: "✉️"; }
-        .fa-sign-in-alt::before { content: "→"; }
-        .fa-user-plus::before { content: "👤"; }
-        .fa-key::before { content: "🔑"; }
-        .fa-envelope::before { content: "📧"; }
-        .fa-lock::before { content: "🔒"; }
-        .fa-user::before { content: "👤"; }
-        .fa-check::before { content: "✓"; }
-        .fa-paper-plane::before { content: "✈️"; }
-        .fa-robot::before { content: "🤖"; }
-        .fa-bolt::before { content: "⚡"; }
-        .fa-shield-alt::before { content: "🛡️"; }
-        .fa-bars::before { content: "☰"; }
-        .fa-sync-alt::before { content: "🔄"; }
-        .fa-bell::before { content: "🔔"; }
-        .fa-palette::before { content: "🎨"; }
-        .fa-cog::before { content: "⚙️"; }
-        .fa-sun::before { content: "☀️"; }
-        .fa-moon::before { content: "🌙"; }
-        .fa-circle::before { content: "●"; }
-        .fa-plus::before { content: "+"; }
-        .fa-archive::before { content: "📦"; }
-        .fa-star::before { content: "★"; }
-        .fa-trash::before { content: "🗑️"; }
-        .fa-clock::before { content: "⏰"; }
-        .fa-inbox::before { content: "📥"; }
-        .fa-paper-plane::before { content: "📤"; }
-        .fa-file-alt::before { content: "📄"; }
-        .fa-ban::before { content: "🚫"; }
-        .fa-chart-bar::before { content: "📊"; }
-        .fa-database::before { content: "💾"; }
-        .fa-search::before { content: "🔍"; }
-        .fa-times::before { content: "✕"; }
-        .fa-question-circle::before { content: "❓"; }
-        .fa-sign-out-alt::before { content: "🚪"; }
-        .fa-check-square::before { content: "☑"; }
-        .fa-envelope-open::before { content: "📨"; }
-        .fa-paperclip::before { content: "📎"; }
-        .fa-list::before { content: "≡"; }
-        .fa-th-large::before { content: "▦"; }
-        .fa-arrow-left::before { content: "←"; }
-        .fa-reply::before { content: "↩"; }
-        .fa-share::before { content: "↪"; }
-        .fa-print::before { content: "🖨️"; }
-        .fa-chevron-left::before { content: "‹"; }
-        .fa-chevron-right::before { content: "›"; }
-        .fa-check-circle::before { content: "✅"; }
-        .fa-edit::before { content: "✏️"; }
-        .fa-save::before { content: "💾"; }
-        .fa-user-cog::before { content: "👤⚙"; }
-        .fa-exclamation-circle::before { content: "⚠"; }
-        .fa-info-circle::before { content: "ℹ"; }
-        .fa-exclamation-triangle::before { content: "⚠"; }
-        .fa-briefcase::before { content: "💼"; }
-        .fa-home::before { content: "🏠"; }
-        .fa-plane::before { content: "✈️"; }
-        .fa-users::before { content: "👥"; }
-        .fa-question-circle::before { content: "❓"; }
+        /* Предотвращение масштабирования при фокусе на мобильных */
+        input, textarea, select {
+            font-size: 16px !important;
+        }
+        
+        /* Адаптивная типографика */
+        :root {
+            --font-scale: 1;
+        }
+        
+        @media (max-width: 480px) {
+            :root {
+                --font-scale: 0.9;
+            }
+        }
+        
+        @media (max-width: 320px) {
+            :root {
+                --font-scale: 0.85;
+            }
+        }
+        
+        /* Предотвращение bounce эффекта на iOS */
+        html, body {
+            position: fixed;
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            -webkit-overflow-scrolling: touch;
+        }
     </style>
     
     <!-- Firebase -->
@@ -83,6 +65,9 @@
     <!-- Styles -->
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📬</text></svg>">
+    
+    <!-- PWA манифест -->
+    <link rel="manifest" href="manifest.json">
 </head>
 <body class="dark-theme">
     <!-- Loading -->
@@ -214,6 +199,13 @@
                 </p>
             </div>
 
+            <!-- Mobile Auth Actions -->
+            <div class="mobile-auth-actions">
+                <button class="mobile-auth-btn" id="quickLogin" style="display: none;">
+                    <span>🔑 Quick Login</span>
+                </button>
+            </div>
+
             <div class="login-features">
                 <div class="feature">
                     <span class="feature-icon">🤖</span>
@@ -228,6 +220,15 @@
                     <span class="feature-text">Secure & Private</span>
                 </div>
             </div>
+
+            <!-- Mobile Install Prompt -->
+            <div class="install-prompt" id="installPrompt">
+                <div class="install-content">
+                    <span class="install-icon">📱</span>
+                    <span class="install-text">Install Inbox Pro for better experience</span>
+                    <button class="install-btn" id="installBtn">Install</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -236,7 +237,10 @@
         <!-- Header -->
         <header class="app-header">
             <div class="header-left">
-                <button class="menu-toggle" id="menuToggle">☰</button>
+                <button class="menu-toggle" id="menuToggle">
+                    <span class="menu-icon">☰</span>
+                    <span class="menu-text">Menu</span>
+                </button>
                 <div class="logo">
                     <div class="logo-icon">📬</div>
                     <h1>Inbox Pro</h1>
@@ -282,6 +286,12 @@
                     <option value="ru">🇷🇺 RU</option>
                 </select>
                 
+                <!-- Mobile Actions -->
+                <div class="mobile-header-actions">
+                    <button class="mobile-action-btn" id="mobileComposeBtn" title="Compose">+</button>
+                    <button class="mobile-action-btn" id="mobileSearchBtn" title="Search">🔍</button>
+                </div>
+                
                 <!-- Notifications -->
                 <div class="notification-icon" id="notificationBell">
                     <span class="notification-badge">3</span>
@@ -299,6 +309,29 @@
                 </div>
             </div>
         </header>
+
+        <!-- Mobile Navigation Bar (Bottom) -->
+        <nav class="mobile-nav" id="mobileNav">
+            <button class="mobile-nav-item active" data-action="inbox">
+                <span class="nav-icon">📥</span>
+                <span class="nav-label">Inbox</span>
+            </button>
+            <button class="mobile-nav-item" data-action="starred">
+                <span class="nav-icon">★</span>
+                <span class="nav-label">Starred</span>
+            </button>
+            <button class="mobile-nav-item mobile-compose-btn" data-action="compose">
+                <span class="compose-circle">+</span>
+            </button>
+            <button class="mobile-nav-item" data-action="sent">
+                <span class="nav-icon">📤</span>
+                <span class="nav-label">Sent</span>
+            </button>
+            <button class="mobile-nav-item" data-action="more">
+                <span class="nav-icon">⋯</span>
+                <span class="nav-label">More</span>
+            </button>
+        </nav>
 
         <!-- AI Status Bar -->
         <div class="ai-status-bar" id="aiStatusBar">
@@ -435,6 +468,26 @@
                             </div>
                             <div class="storage-info">4.2GB / 10GB used</div>
                         </div>
+
+                        <!-- Activity Chart -->
+                        <div class="activity-card">
+                            <div class="activity-header">
+                                <span class="activity-icon">📈</span>
+                                <span class="activity-title">Activity Today</span>
+                            </div>
+                            <div class="activity-chart">
+                                <div class="chart-bar" style="height: 60%"></div>
+                                <div class="chart-bar" style="height: 85%"></div>
+                                <div class="chart-bar" style="height: 45%"></div>
+                                <div class="chart-bar" style="height: 70%"></div>
+                                <div class="chart-bar" style="height: 90%"></div>
+                                <div class="chart-bar" style="height: 55%"></div>
+                                <div class="chart-bar" style="height: 75%"></div>
+                            </div>
+                            <div class="chart-labels">
+                                <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+                            </div>
+                        </div>
                     </div>
                 </nav>
             </aside>
@@ -476,6 +529,26 @@
                     </div>
                 </div>
 
+                <!-- Mobile Actions Bar -->
+                <div class="mobile-actions-bar">
+                    <button class="mobile-action" data-action="select">
+                        <span>☑</span>
+                        <span>Select</span>
+                    </button>
+                    <button class="mobile-action" data-action="archive">
+                        <span>📦</span>
+                        <span>Archive</span>
+                    </button>
+                    <button class="mobile-action" data-action="delete">
+                        <span>🗑️</span>
+                        <span>Delete</span>
+                    </button>
+                    <button class="mobile-action" data-action="mark">
+                        <span>📨</span>
+                        <span>Mark</span>
+                    </button>
+                </div>
+
                 <!-- Filters -->
                 <div class="email-filters">
                     <div class="filter-tags">
@@ -496,11 +569,12 @@
                             <span class="filter-count">1</span>
                         </button>
                     </div>
+                    <button class="filter-more" id="filterMore">⋯ More</button>
                 </div>
 
                 <!-- Email List -->
                 <div class="email-list" id="emailsList">
-                    <!-- Emails will be loaded here -->
+                    <!-- Email items will be loaded here -->
                     <div class="email-item unread">
                         <div class="email-select">
                             <input type="checkbox" class="email-checkbox">
@@ -563,6 +637,15 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Mobile Email Viewer Actions -->
+                <div class="mobile-viewer-actions">
+                    <button class="mobile-viewer-btn" data-action="reply">↩</button>
+                    <button class="mobile-viewer-btn" data-action="forward">↪</button>
+                    <button class="mobile-viewer-btn" data-action="star">★</button>
+                    <button class="mobile-viewer-btn" data-action="archive">📦</button>
+                    <button class="mobile-viewer-btn delete" data-action="delete">🗑️</button>
+                </div>
             </main>
         </div>
 
@@ -584,17 +667,24 @@
                         <textarea id="mailText" placeholder="Write your message here..."></textarea>
                     </div>
                     <div class="compose-footer">
-                        <button class="btn-primary" id="sendMail">
-                            <span>✈️ Send</span>
-                        </button>
-                        <button class="btn-secondary" id="saveDraftBtn">
-                            <span>💾 Save Draft</span>
-                        </button>
-                        <label class="checkbox">
-                            <input type="checkbox" id="urgentCheck">
-                            <span class="checkmark"></span>
-                            <span>Important</span>
-                        </label>
+                        <div class="compose-actions">
+                            <button class="attach-btn" id="attachBtn">
+                                <span>📎 Attach</span>
+                            </button>
+                            <label class="checkbox">
+                                <input type="checkbox" id="urgentCheck">
+                                <span class="checkmark"></span>
+                                <span>Important</span>
+                            </label>
+                        </div>
+                        <div class="compose-buttons">
+                            <button class="btn-secondary" id="saveDraftBtn">
+                                <span>💾 Save</span>
+                            </button>
+                            <button class="btn-primary" id="sendMail">
+                                <span>✈️ Send</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -611,6 +701,12 @@
                     <div class="ai-prompt-container">
                         <label for="aiPrompt">Describe what you want to write about:</label>
                         <textarea id="aiPrompt" placeholder="Example: Write a professional email to schedule a meeting next week..."></textarea>
+                        <div class="ai-examples">
+                            <button class="ai-example" data-example="meeting">📅 Meeting Request</button>
+                            <button class="ai-example" data-example="followup">🔄 Follow-up</button>
+                            <button class="ai-example" data-example="thankyou">🙏 Thank You</button>
+                            <button class="ai-example" data-example="introduction">👋 Introduction</button>
+                        </div>
                         <button class="ai-generate-btn" id="aiGenerateBtn">
                             <span>✨ Generate Email</span>
                         </button>
@@ -635,6 +731,60 @@
             </div>
         </div>
 
+        <!-- Mobile Compose Modal -->
+        <div class="modal hidden" id="mobileComposeModal">
+            <div class="modal-content mobile-compose-modal">
+                <div class="modal-header">
+                    <h3>📝 Quick Compose</h3>
+                    <button class="modal-close" id="closeMobileCompose">✕</button>
+                </div>
+                <div class="compose-body">
+                    <div class="compose-field">
+                        <input type="text" id="mobileTo" placeholder="To" autocomplete="email">
+                    </div>
+                    <div class="compose-field">
+                        <input type="text" id="mobileSubject" placeholder="Subject">
+                    </div>
+                    <div class="compose-editor">
+                        <textarea id="mobileText" placeholder="Type your message..."></textarea>
+                    </div>
+                    <div class="compose-footer">
+                        <button class="btn-primary full-width" id="mobileSend">
+                            <span>✈️ Send</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile More Menu -->
+        <div class="modal hidden" id="mobileMoreModal">
+            <div class="modal-content mobile-menu-modal">
+                <div class="modal-header">
+                    <h3>Inbox Pro</h3>
+                    <button class="modal-close" id="closeMobileMore">✕</button>
+                </div>
+                <div class="mobile-menu-items">
+                    <button class="mobile-menu-item" data-action="settings">
+                        <span>⚙️</span>
+                        <span>Settings</span>
+                    </button>
+                    <button class="mobile-menu-item" data-action="help">
+                        <span>❓</span>
+                        <span>Help</span>
+                    </button>
+                    <button class="mobile-menu-item" data-action="feedback">
+                        <span>💬</span>
+                        <span>Feedback</span>
+                    </button>
+                    <button class="mobile-menu-item" data-action="logout">
+                        <span>🚪</span>
+                        <span>Logout</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- Settings Modal -->
         <div class="modal hidden" id="settingsModal">
             <div class="modal-content">
@@ -648,6 +798,7 @@
                         <button class="tab-btn" data-tab="appearance">Appearance</button>
                         <button class="tab-btn" data-tab="notifications">Notifications</button>
                         <button class="tab-btn" data-tab="language">Language</button>
+                        <button class="tab-btn" data-tab="mobile">Mobile</button>
                     </div>
                     
                     <div class="tab-content active" id="profileTab">
@@ -676,6 +827,13 @@
                                 </button>
                             </div>
                         </div>
+                        <div class="form-group">
+                            <label class="checkbox large">
+                                <input type="checkbox" id="animationsEnabled" checked>
+                                <span class="checkmark"></span>
+                                <span>Enable animations</span>
+                            </label>
+                        </div>
                     </div>
                     
                     <div class="tab-content" id="notificationsTab">
@@ -683,6 +841,16 @@
                             <input type="checkbox" id="notificationsEnabled" checked>
                             <span class="checkmark"></span>
                             <span>Enable notifications</span>
+                        </label>
+                        <label class="checkbox large">
+                            <input type="checkbox" id="soundEnabled" checked>
+                            <span class="checkmark"></span>
+                            <span>Enable sound</span>
+                        </label>
+                        <label class="checkbox large">
+                            <input type="checkbox" id="vibrationEnabled" checked>
+                            <span class="checkmark"></span>
+                            <span>Enable vibration</span>
                         </label>
                     </div>
                     
@@ -697,6 +865,29 @@
                             </select>
                         </div>
                     </div>
+                    
+                    <div class="tab-content" id="mobileTab">
+                        <label class="checkbox large">
+                            <input type="checkbox" id="touchGestures" checked>
+                            <span class="checkmark"></span>
+                            <span>Enable touch gestures</span>
+                        </label>
+                        <label class="checkbox large">
+                            <input type="checkbox" id="mobileOptimization" checked>
+                            <span class="checkmark"></span>
+                            <span>Mobile optimization</span>
+                        </label>
+                        <label class="checkbox large">
+                            <input type="checkbox" id="dataSaver">
+                            <span class="checkmark"></span>
+                            <span>Data saver mode</span>
+                        </label>
+                        <label class="checkbox large">
+                            <input type="checkbox" id="offlineMode">
+                            <span class="checkmark"></span>
+                            <span>Enable offline mode</span>
+                        </label>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button class="btn-primary" id="saveSettings">💾 Save Changes</button>
@@ -708,7 +899,22 @@
     <!-- Notification Toast -->
     <div class="toast-container" id="toastContainer"></div>
 
+    <!-- Swipe Instruction -->
+    <div class="swipe-instruction" id="swipeInstruction">
+        <span class="swipe-icon">👆</span>
+        <span class="swipe-text">Swipe left/right for actions</span>
+    </div>
+
     <!-- Script -->
     <script src="app.js"></script>
+    
+    <!-- PWA Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js')
+                .then(() => console.log('Service Worker registered'))
+                .catch(err => console.log('Service Worker registration failed:', err));
+        }
+    </script>
 </body>
 </html>
