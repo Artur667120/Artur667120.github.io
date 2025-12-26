@@ -27,6 +27,8 @@ class AuthService {
     // Слухач зміни стану автентифікації
     initAuthStateListener() {
         onAuthStateChanged(auth, async (user) => {
+            console.log('Auth state changed:', user ? 'User logged in' : 'User logged out');
+            
             if (user) {
                 this.currentUser = {
                     uid: user.uid,
@@ -36,13 +38,22 @@ class AuthService {
                     photoURL: user.photoURL
                 };
                 
+                console.log('✅ Користувач авторизований:', this.currentUser.email);
+                
                 // Оновлення останнього входу
-                await this.updateLastLogin(user.uid);
+                try {
+                    await this.updateLastLogin(user.uid);
+                } catch (error) {
+                    console.log('Попередження: не вдалося оновити останній вхід:', error.message);
+                }
                 
                 // Завантаження додаткових даних
-                await this.loadUserProfile(user.uid);
+                try {
+                    await this.loadUserProfile(user.uid);
+                } catch (error) {
+                    console.log('Попередження: не вдалося завантажити профіль:', error.message);
+                }
                 
-                console.log('✅ Користувач авторизований:', this.currentUser.email);
             } else {
                 this.currentUser = null;
                 console.log('🔒 Користувач не авторизований');
@@ -56,38 +67,47 @@ class AuthService {
     // Реєстрація нового користувача
     async register(email, password, name) {
         try {
+            console.log('Спроба реєстрації:', email);
+            
             // Створення користувача
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
             
+            console.log('Користувач створений:', user.uid);
+            
             // Оновлення профілю
-            await updateProfile(user, { displayName: name });
+            if (name) {
+                await updateProfile(user, { displayName: name });
+            }
             
             // Збереження додаткових даних у Firestore
-            await setDoc(doc(db, "users", user.uid), {
-                email: email.toLowerCase(),
-                name: name,
-                createdAt: serverTimestamp(),
-                lastLogin: serverTimestamp(),
-                emailVerified: false,
-                storageUsed: 0,
-                plan: 'free',
-                settings: {
-                    theme: 'dark',
-                    language: 'ua',
-                    notifications: true,
-                    autoSave: true
-                },
-                profile: {
-                    avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=667eea&color=fff`,
-                    bio: '',
-                    location: '',
-                    website: ''
-                }
-            });
-            
-            // Відправлення листа з підтвердженням
-            await this.sendVerificationEmail(user);
+            try {
+                await setDoc(doc(db, "users", user.uid), {
+                    email: email.toLowerCase(),
+                    name: name || email.split('@')[0],
+                    createdAt: serverTimestamp(),
+                    lastLogin: serverTimestamp(),
+                    emailVerified: false,
+                    storageUsed: 0,
+                    plan: 'free',
+                    settings: {
+                        theme: 'dark',
+                        language: 'ua',
+                        notifications: true,
+                        autoSave: true
+                    },
+                    profile: {
+                        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(name || email)}&background=667eea&color=fff`,
+                        bio: '',
+                        location: '',
+                        website: ''
+                    }
+                });
+                console.log('Дані користувача збережено в Firestore');
+            } catch (firestoreError) {
+                console.warn('Не вдалося зберегти дані в Firestore:', firestoreError);
+                // Продовжуємо, навіть якщо Firestore не вдалося
+            }
             
             return { success: true, user };
         } catch (error) {
@@ -99,12 +119,21 @@ class AuthService {
     // Вхід
     async login(email, password) {
         try {
+            console.log('Спроба входу:', email);
+            
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+            
+            console.log('Вхід успішний:', user.uid);
             
             // Оновлення останнього входу
-            await this.updateLastLogin(userCredential.user.uid);
+            try {
+                await this.updateLastLogin(user.uid);
+            } catch (updateError) {
+                console.warn('Не вдалося оновити останній вхід:', updateError);
+            }
             
-            return { success: true, user: userCredential.user };
+            return { success: true, user };
         } catch (error) {
             console.error('Помилка входу:', error);
             return { success: false, error: this.getErrorMessage(error) };
@@ -116,6 +145,7 @@ class AuthService {
         try {
             await signOut(auth);
             this.currentUser = null;
+            console.log('Вихід успішний');
             return { success: true };
         } catch (error) {
             console.error('Помилка виходу:', error);
@@ -127,6 +157,7 @@ class AuthService {
     async resetPassword(email) {
         try {
             await sendPasswordResetEmail(auth, email);
+            console.log('Лист для відновлення пароля надіслано:', email);
             return { success: true };
         } catch (error) {
             console.error('Помилка відновлення пароля:', error);
@@ -137,18 +168,23 @@ class AuthService {
     // Оновлення останнього входу
     async updateLastLogin(uid) {
         try {
+            if (!uid) return;
+            
             await updateDoc(doc(db, "users", uid), {
                 lastLogin: serverTimestamp(),
                 updatedAt: serverTimestamp()
             });
         } catch (error) {
             console.error('Помилка оновлення останнього входу:', error);
+            // Не викидаємо помилку, щоб не переривати потік
         }
     }
 
     // Завантаження профілю користувача
     async loadUserProfile(uid) {
         try {
+            if (!uid) return null;
+            
             const userDoc = await getDoc(doc(db, "users", uid));
             if (userDoc.exists()) {
                 const userData = userDoc.data();
@@ -162,19 +198,6 @@ class AuthService {
         }
     }
 
-    // Відправлення листа з підтвердженням email
-    async sendVerificationEmail(user) {
-        try {
-            // Firebase v11 має інший API для sendEmailVerification
-            // Можна використати EmailJS як альтернативу
-            console.log('Підтвердження email буде доступно після налаштування');
-            return { success: true };
-        } catch (error) {
-            console.error('Помилка відправлення листа з підтвердженням:', error);
-            return { success: false, error: error.message };
-        }
-    }
-
     // Отримання повідомлення про помилку
     getErrorMessage(error) {
         const errorMessages = {
@@ -184,21 +207,30 @@ class AuthService {
             'auth/wrong-password': 'Невірний пароль',
             'auth/weak-password': 'Пароль занадто слабкий. Мінімум 6 символів',
             'auth/user-disabled': 'Акаунт заблоковано',
-            'auth/too-many-requests': 'Забагато спроб. Спробуйте пізніше'
+            'auth/too-many-requests': 'Забагато спроб. Спробуйте пізніше',
+            'auth/network-request-failed': 'Помилка мережі. Перевірте підключення до інтернету'
         };
         
-        return errorMessages[error.code] || error.message;
+        return errorMessages[error.code] || error.message || 'Сталася невідома помилка';
     }
 
     // Додавання слухача зміни стану
     addAuthStateListener(callback) {
         this.authStateListeners.push(callback);
+        // Викликати негайно, якщо користувач вже авторизований
+        if (this.currentUser) {
+            callback(this.currentUser);
+        }
     }
 
     // Сповіщення слухачів
     notifyAuthStateChange() {
         this.authStateListeners.forEach(callback => {
-            callback(this.currentUser);
+            try {
+                callback(this.currentUser);
+            } catch (error) {
+                console.error('Помилка в слухачі стану автентифікації:', error);
+            }
         });
     }
 
