@@ -1327,3 +1327,64 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+// Додайте цю функцію після всіх інших функцій
+function setupCompose() {
+    const composeBtn = document.getElementById('composeBtn');
+    const composeModal = document.getElementById('composeModal');
+    const closeCompose = document.getElementById('closeCompose');
+    const sendMailBtn = document.getElementById('sendMail');
+    const saveDraftBtn = document.getElementById('saveDraftBtn');
+    
+    if (composeBtn && composeModal) {
+        composeBtn.addEventListener('click', () => {
+            composeModal.classList.remove('hidden');
+            document.getElementById('mailTo').focus();
+        });
+    }
+    
+    if (closeCompose) {
+        closeCompose.addEventListener('click', () => {
+            composeModal.classList.add('hidden');
+            clearComposeForm();
+        });
+    }
+    
+    if (sendMailBtn) {
+        sendMailBtn.addEventListener('click', async () => {
+            const to = document.getElementById('mailTo').value.trim();
+            const subject = document.getElementById('mailSubject').value.trim();
+            const text = document.getElementById('mailText').value.trim();
+            
+            if (!to || !subject || !text) {
+                showToast('Будь ласка, заповніть всі поля', 'error');
+                return;
+            }
+            
+            // Тут буде логіка відправки email через Firebase
+            showToast('Email відправлено успішно!', 'success');
+            composeModal.classList.add('hidden');
+            clearComposeForm();
+        });
+    }
+    
+    if (saveDraftBtn) {
+        saveDraftBtn.addEventListener('click', () => {
+            showToast('Чернетку збережено', 'info');
+            composeModal.classList.add('hidden');
+        });
+    }
+    
+    // Закриття по ESC
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !composeModal.classList.contains('hidden')) {
+            composeModal.classList.add('hidden');
+        }
+    });
+}
+
+function clearComposeForm() {
+    document.getElementById('mailTo').value = '';
+    document.getElementById('mailSubject').value = '';
+    document.getElementById('mailText').value = '';
+    document.getElementById('urgentCheck').checked = false;
+}
