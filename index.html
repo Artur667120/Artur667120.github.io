@@ -5,11 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>Inbox Pro | AI Email Client</title>
     
-    <!-- PWA метатеги -->
+    <!-- Mobile оптимізація -->
     <meta name="theme-color" content="#667eea">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="mobile-web-app-capable" content="yes">
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -20,32 +17,6 @@
                 min-height: 44px;
                 min-width: 44px;
             }
-            
-            .nav-item, .quick-action, .toolbar-btn {
-                padding: 12px !important;
-            }
-        }
-        
-        /* Предотвращение масштабирования при фокусе на мобильных */
-        input, textarea, select {
-            font-size: 16px !important;
-        }
-        
-        /* Адаптивная типографика */
-        :root {
-            --font-scale: 1;
-        }
-        
-        @media (max-width: 480px) {
-            :root {
-                --font-scale: 0.9;
-            }
-        }
-        
-        @media (max-width: 320px) {
-            :root {
-                --font-scale: 0.85;
-            }
         }
         
         /* Предотвращение bounce эффекта на iOS */
@@ -54,20 +25,12 @@
             overflow: hidden;
             width: 100%;
             height: 100%;
-            -webkit-overflow-scrolling: touch;
         }
     </style>
-    
-    <!-- Firebase -->
-    <script type="module" src="firebase-config.js"></script>
-    <script type="module" src="auth-service.js"></script>
     
     <!-- Styles -->
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📬</text></svg>">
-    
-    <!-- PWA манифест -->
-    <link rel="manifest" href="manifest.json">
 </head>
 <body class="dark-theme">
     <!-- Loading -->
@@ -94,8 +57,6 @@
                 <select id="languageSelect" class="lang-select-small">
                     <option value="en">🇬🇧 English</option>
                     <option value="ua">🇺🇦 Українська</option>
-                    <option value="de">🇩🇪 Deutsch</option>
-                    <option value="ru">🇷🇺 Русский</option>
                 </select>
             </div>
             
@@ -199,13 +160,6 @@
                 </p>
             </div>
 
-            <!-- Mobile Auth Actions -->
-            <div class="mobile-auth-actions">
-                <button class="mobile-auth-btn" id="quickLogin" style="display: none;">
-                    <span>🔑 Quick Login</span>
-                </button>
-            </div>
-
             <div class="login-features">
                 <div class="feature">
                     <span class="feature-icon">🤖</span>
@@ -220,15 +174,6 @@
                     <span class="feature-text">Secure & Private</span>
                 </div>
             </div>
-
-            <!-- Mobile Install Prompt -->
-            <div class="install-prompt" id="installPrompt">
-                <div class="install-content">
-                    <span class="install-icon">📱</span>
-                    <span class="install-text">Install Inbox Pro for better experience</span>
-                    <button class="install-btn" id="installBtn">Install</button>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -239,7 +184,6 @@
             <div class="header-left">
                 <button class="menu-toggle" id="menuToggle">
                     <span class="menu-icon">☰</span>
-                    <span class="menu-text">Menu</span>
                 </button>
                 <div class="logo">
                     <div class="logo-icon">📬</div>
@@ -282,8 +226,6 @@
                 <select id="appLanguageSelect" class="lang-select">
                     <option value="en">🇬🇧 EN</option>
                     <option value="ua">🇺🇦 UA</option>
-                    <option value="de">🇩🇪 DE</option>
-                    <option value="ru">🇷🇺 RU</option>
                 </select>
                 
                 <!-- Mobile Actions -->
@@ -468,26 +410,6 @@
                             </div>
                             <div class="storage-info">4.2GB / 10GB used</div>
                         </div>
-
-                        <!-- Activity Chart -->
-                        <div class="activity-card">
-                            <div class="activity-header">
-                                <span class="activity-icon">📈</span>
-                                <span class="activity-title">Activity Today</span>
-                            </div>
-                            <div class="activity-chart">
-                                <div class="chart-bar" style="height: 60%"></div>
-                                <div class="chart-bar" style="height: 85%"></div>
-                                <div class="chart-bar" style="height: 45%"></div>
-                                <div class="chart-bar" style="height: 70%"></div>
-                                <div class="chart-bar" style="height: 90%"></div>
-                                <div class="chart-bar" style="height: 55%"></div>
-                                <div class="chart-bar" style="height: 75%"></div>
-                            </div>
-                            <div class="chart-labels">
-                                <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
-                            </div>
-                        </div>
                     </div>
                 </nav>
             </aside>
@@ -569,7 +491,6 @@
                             <span class="filter-count">1</span>
                         </button>
                     </div>
-                    <button class="filter-more" id="filterMore">⋯ More</button>
                 </div>
 
                 <!-- Email List -->
@@ -667,24 +588,17 @@
                         <textarea id="mailText" placeholder="Write your message here..."></textarea>
                     </div>
                     <div class="compose-footer">
-                        <div class="compose-actions">
-                            <button class="attach-btn" id="attachBtn">
-                                <span>📎 Attach</span>
-                            </button>
-                            <label class="checkbox">
-                                <input type="checkbox" id="urgentCheck">
-                                <span class="checkmark"></span>
-                                <span>Important</span>
-                            </label>
-                        </div>
-                        <div class="compose-buttons">
-                            <button class="btn-secondary" id="saveDraftBtn">
-                                <span>💾 Save</span>
-                            </button>
-                            <button class="btn-primary" id="sendMail">
-                                <span>✈️ Send</span>
-                            </button>
-                        </div>
+                        <button class="btn-primary" id="sendMail">
+                            <span>✈️ Send</span>
+                        </button>
+                        <button class="btn-secondary" id="saveDraftBtn">
+                            <span>💾 Save Draft</span>
+                        </button>
+                        <label class="checkbox">
+                            <input type="checkbox" id="urgentCheck">
+                            <span class="checkmark"></span>
+                            <span>Important</span>
+                        </label>
                     </div>
                 </div>
             </div>
@@ -701,12 +615,6 @@
                     <div class="ai-prompt-container">
                         <label for="aiPrompt">Describe what you want to write about:</label>
                         <textarea id="aiPrompt" placeholder="Example: Write a professional email to schedule a meeting next week..."></textarea>
-                        <div class="ai-examples">
-                            <button class="ai-example" data-example="meeting">📅 Meeting Request</button>
-                            <button class="ai-example" data-example="followup">🔄 Follow-up</button>
-                            <button class="ai-example" data-example="thankyou">🙏 Thank You</button>
-                            <button class="ai-example" data-example="introduction">👋 Introduction</button>
-                        </div>
                         <button class="ai-generate-btn" id="aiGenerateBtn">
                             <span>✨ Generate Email</span>
                         </button>
@@ -798,7 +706,6 @@
                         <button class="tab-btn" data-tab="appearance">Appearance</button>
                         <button class="tab-btn" data-tab="notifications">Notifications</button>
                         <button class="tab-btn" data-tab="language">Language</button>
-                        <button class="tab-btn" data-tab="mobile">Mobile</button>
                     </div>
                     
                     <div class="tab-content active" id="profileTab">
@@ -827,13 +734,6 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label class="checkbox large">
-                                <input type="checkbox" id="animationsEnabled" checked>
-                                <span class="checkmark"></span>
-                                <span>Enable animations</span>
-                            </label>
-                        </div>
                     </div>
                     
                     <div class="tab-content" id="notificationsTab">
@@ -841,16 +741,6 @@
                             <input type="checkbox" id="notificationsEnabled" checked>
                             <span class="checkmark"></span>
                             <span>Enable notifications</span>
-                        </label>
-                        <label class="checkbox large">
-                            <input type="checkbox" id="soundEnabled" checked>
-                            <span class="checkmark"></span>
-                            <span>Enable sound</span>
-                        </label>
-                        <label class="checkbox large">
-                            <input type="checkbox" id="vibrationEnabled" checked>
-                            <span class="checkmark"></span>
-                            <span>Enable vibration</span>
                         </label>
                     </div>
                     
@@ -860,33 +750,8 @@
                             <select id="settingsLanguage">
                                 <option value="en">🇬🇧 English</option>
                                 <option value="ua">🇺🇦 Українська</option>
-                                <option value="de">🇩🇪 Deutsch</option>
-                                <option value="ru">🇷🇺 Русский</option>
                             </select>
                         </div>
-                    </div>
-                    
-                    <div class="tab-content" id="mobileTab">
-                        <label class="checkbox large">
-                            <input type="checkbox" id="touchGestures" checked>
-                            <span class="checkmark"></span>
-                            <span>Enable touch gestures</span>
-                        </label>
-                        <label class="checkbox large">
-                            <input type="checkbox" id="mobileOptimization" checked>
-                            <span class="checkmark"></span>
-                            <span>Mobile optimization</span>
-                        </label>
-                        <label class="checkbox large">
-                            <input type="checkbox" id="dataSaver">
-                            <span class="checkmark"></span>
-                            <span>Data saver mode</span>
-                        </label>
-                        <label class="checkbox large">
-                            <input type="checkbox" id="offlineMode">
-                            <span class="checkmark"></span>
-                            <span>Enable offline mode</span>
-                        </label>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -899,22 +764,7 @@
     <!-- Notification Toast -->
     <div class="toast-container" id="toastContainer"></div>
 
-    <!-- Swipe Instruction -->
-    <div class="swipe-instruction" id="swipeInstruction">
-        <span class="swipe-icon">👆</span>
-        <span class="swipe-text">Swipe left/right for actions</span>
-    </div>
-
     <!-- Script -->
     <script src="app.js"></script>
-    
-    <!-- PWA Service Worker -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('service-worker.js')
-                .then(() => console.log('Service Worker registered'))
-                .catch(err => console.log('Service Worker registration failed:', err));
-        }
-    </script>
 </body>
 </html>
