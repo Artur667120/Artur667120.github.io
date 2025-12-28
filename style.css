@@ -46,16 +46,6 @@
     --transition-fast: 0.15s ease;
     --transition-normal: 0.3s ease;
     --transition-slow: 0.5s ease;
-    
-    /* Z-index слои */
-    --z-dropdown: 1000;
-    --z-sticky: 1020;
-    --z-fixed: 1030;
-    --z-modal-backdrop: 1040;
-    --z-modal: 1050;
-    --z-popover: 1060;
-    --z-tooltip: 1070;
-    --z-toast: 1080;
 }
 
 /* ==================== BASE STYLES ==================== */
@@ -91,12 +81,6 @@ body {
     input, textarea, select {
         font-size: 16px !important; /* Предотвращает масштабирование в iOS */
         padding: 14px 16px;
-    }
-    
-    /* Улучшение скролла */
-    .email-list {
-        -webkit-overflow-scrolling: touch;
-        overscroll-behavior-y: contain;
     }
 }
 
@@ -151,7 +135,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: var(--z-modal);
+    z-index: 1050;
     transition: opacity var(--transition-normal);
 }
 
@@ -477,87 +461,9 @@ body {
     color: var(--text-secondary);
 }
 
-/* Mobile Auth Actions */
-.mobile-auth-actions {
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border);
-}
-
-.mobile-auth-btn {
-    width: 100%;
-    padding: 14px;
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    color: var(--text);
-    font-size: 14px;
-    cursor: pointer;
-    transition: var(--transition-normal);
-}
-
-.mobile-auth-btn:hover {
-    background: var(--bg-secondary);
-    border-color: var(--primary);
-}
-
-/* Install Prompt */
-.install-prompt {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--bg-secondary);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 16px;
-    box-shadow: var(--shadow-xl);
-    z-index: var(--z-toast);
-    width: calc(100% - 40px);
-    max-width: 400px;
-    animation: slideUp 0.3s ease;
-}
-
-.install-content {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.install-icon {
-    font-size: 20px;
-}
-
-.install-text {
-    flex: 1;
-    font-size: 14px;
-    color: var(--text);
-}
-
-.install-btn {
-    background: var(--primary);
-    color: white;
-    border: none;
-    border-radius: var(--radius-sm);
-    padding: 8px 16px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: var(--transition-normal);
-}
-
-.install-btn:hover {
-    background: var(--primary-dark);
-}
-
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes slideUp {
-    from { transform: translate(-50%, 100%); opacity: 0; }
-    to { transform: translate(-50%, 0); opacity: 1; }
 }
 
 /* ==================== MAIN APP ==================== */
@@ -579,7 +485,7 @@ body {
     border-bottom: 1px solid var(--border);
     position: sticky;
     top: 0;
-    z-index: var(--z-fixed);
+    z-index: 1030;
     height: 70px;
 }
 
@@ -605,16 +511,6 @@ body {
 
 .menu-toggle:hover {
     background: var(--bg-tertiary);
-}
-
-.menu-text {
-    font-size: 14px;
-}
-
-@media (max-width: 768px) {
-    .menu-text {
-        display: none;
-    }
 }
 
 .logo {
@@ -750,7 +646,7 @@ body {
     box-shadow: var(--shadow-xl);
     min-width: 150px;
     display: none;
-    z-index: var(--z-dropdown);
+    z-index: 1000;
 }
 
 .theme-options.show {
@@ -794,6 +690,30 @@ body {
 }
 
 .lang-select:hover {
+    border-color: var(--primary);
+}
+
+.mobile-header-actions {
+    display: none;
+    gap: 12px;
+}
+
+.mobile-action-btn {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px;
+    color: var(--text);
+    cursor: pointer;
+    transition: var(--transition-normal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.mobile-action-btn:hover {
+    background: var(--bg-secondary);
     border-color: var(--primary);
 }
 
@@ -878,31 +798,6 @@ body {
     background: var(--bg-tertiary);
 }
 
-/* Mobile Header Actions */
-.mobile-header-actions {
-    display: none;
-    gap: 12px;
-}
-
-.mobile-action-btn {
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 10px;
-    color: var(--text);
-    cursor: pointer;
-    transition: var(--transition-normal);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-}
-
-.mobile-action-btn:hover {
-    background: var(--bg-secondary);
-    border-color: var(--primary);
-}
-
 /* Mobile Navigation */
 .mobile-nav {
     display: none;
@@ -913,7 +808,7 @@ body {
     background: var(--bg-secondary);
     border-top: 1px solid var(--border);
     padding: 12px 20px;
-    z-index: var(--z-fixed);
+    z-index: 1030;
     justify-content: space-between;
 }
 
@@ -1087,7 +982,7 @@ body {
         top: 70px;
         left: 0;
         bottom: 0;
-        z-index: var(--z-modal-backdrop);
+        z-index: 1040;
         transform: translateX(-100%);
         width: 280px;
         box-shadow: var(--shadow-xl);
@@ -1384,53 +1279,6 @@ body {
     color: var(--text-secondary);
 }
 
-.activity-card {
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 20px;
-}
-
-.activity-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 16px;
-}
-
-.activity-icon {
-    font-size: 20px;
-}
-
-.activity-title {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text);
-}
-
-.activity-chart {
-    display: flex;
-    align-items: flex-end;
-    gap: 8px;
-    height: 80px;
-    margin-bottom: 8px;
-}
-
-.chart-bar {
-    flex: 1;
-    background: linear-gradient(to top, var(--primary), var(--secondary));
-    border-radius: 4px 4px 0 0;
-    min-height: 4px;
-    transition: height var(--transition-normal);
-}
-
-.chart-labels {
-    display: flex;
-    justify-content: space-between;
-    font-size: 10px;
-    color: var(--text-secondary);
-}
-
 /* Email Content */
 .email-content {
     flex: 1;
@@ -1575,7 +1423,6 @@ body {
     border-bottom: 1px solid var(--border);
     gap: 12px;
     overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
 }
 
 .mobile-action {
@@ -1616,7 +1463,6 @@ body {
     align-items: center;
     gap: 16px;
     overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
 }
 
 .filter-tags {
@@ -1666,28 +1512,10 @@ body {
     color: white;
 }
 
-.filter-more {
-    background: none;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 8px 16px;
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: var(--transition-normal);
-    flex-shrink: 0;
-    font-size: 14px;
-}
-
-.filter-more:hover {
-    border-color: var(--primary);
-    color: var(--text);
-}
-
 /* Email List */
 .email-list {
     flex: 1;
     overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
     padding: 0;
 }
 
@@ -1700,8 +1528,6 @@ body {
     transition: var(--transition-normal);
     cursor: pointer;
     gap: 16px;
-    position: relative;
-    touch-action: pan-y;
 }
 
 .email-item:hover {
@@ -1849,39 +1675,6 @@ body {
 .email-action.star-btn.active {
     color: #fbbf24;
     border-color: #fbbf24;
-}
-
-/* Swipe Actions */
-.email-item::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(90deg, 
-        rgba(102, 126, 234, 0) 0%,
-        rgba(102, 126, 234, 0) 50%,
-        rgba(102, 126, 234, 0.1) 100%);
-    opacity: 0;
-    transition: opacity var(--transition-normal);
-    pointer-events: none;
-}
-
-.email-item.swipe-right::before {
-    opacity: 1;
-    background: linear-gradient(90deg, 
-        rgba(102, 126, 234, 0.1) 0%,
-        rgba(102, 126, 234, 0.2) 50%,
-        rgba(102, 126, 234, 0.3) 100%);
-}
-
-.email-item.swipe-left::before {
-    opacity: 1;
-    background: linear-gradient(90deg, 
-        rgba(239, 68, 68, 0.3) 0%,
-        rgba(239, 68, 68, 0.2) 50%,
-        rgba(239, 68, 68, 0.1) 100%);
 }
 
 /* Email Viewer */
@@ -2055,7 +1848,7 @@ body {
     background: var(--bg-secondary);
     border-top: 1px solid var(--border);
     padding: 16px;
-    z-index: var(--z-fixed);
+    z-index: 1030;
     justify-content: space-around;
     gap: 8px;
 }
@@ -2090,40 +1883,6 @@ body {
     border-color: var(--danger);
 }
 
-/* Swipe Instruction */
-.swipe-instruction {
-    position: fixed;
-    bottom: 100px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: 12px 24px;
-    border-radius: 24px;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    z-index: var(--z-tooltip);
-    animation: fadeInOut 3s ease;
-    pointer-events: none;
-}
-
-.swipe-icon {
-    font-size: 20px;
-    animation: swipe 2s ease-in-out infinite;
-}
-
-@keyframes swipe {
-    0%, 100% { transform: translateX(0); }
-    50% { transform: translateX(10px); }
-}
-
-@keyframes fadeInOut {
-    0%, 100% { opacity: 0; }
-    10%, 90% { opacity: 1; }
-}
-
 /* ==================== MODALS ==================== */
 .modal {
     position: fixed;
@@ -2135,7 +1894,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: var(--z-modal);
+    z-index: 1050;
     padding: 20px;
     backdrop-filter: blur(4px);
 }
@@ -2273,31 +2032,6 @@ body {
     gap: 16px;
 }
 
-.attach-btn {
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    padding: 10px 20px;
-    color: var(--text);
-    cursor: pointer;
-    transition: var(--transition-normal);
-    font-size: 14px;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.attach-btn:hover {
-    background: var(--bg-secondary);
-    border-color: var(--primary);
-}
-
-.compose-buttons {
-    display: flex;
-    gap: 12px;
-}
-
 .btn-secondary {
     background: var(--bg-tertiary);
     border: 1px solid var(--border);
@@ -2353,32 +2087,6 @@ body {
     outline: none;
     border-color: var(--primary);
     background: var(--bg-secondary);
-}
-
-.ai-examples {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-}
-
-.ai-example {
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    padding: 10px 16px;
-    color: var(--text);
-    cursor: pointer;
-    transition: var(--transition-normal);
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.ai-example:hover {
-    background: var(--bg-secondary);
-    border-color: var(--primary);
 }
 
 .ai-generate-btn {
@@ -2532,7 +2240,6 @@ body {
     background: var(--bg-tertiary);
     border-radius: var(--radius-md);
     overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
 }
 
 .tab-btn {
@@ -2638,7 +2345,7 @@ body {
     position: fixed;
     top: 24px;
     right: 24px;
-    z-index: var(--z-toast);
+    z-index: 1080;
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -2758,7 +2465,7 @@ body {
         padding: 12px 16px;
         border-bottom: 1px solid var(--border);
         margin: 0;
-        z-index: var(--z-fixed);
+        z-index: 1030;
     }
     
     .search-container.active {
@@ -2875,17 +2582,8 @@ body {
         gap: 12px;
     }
     
-    .compose-actions {
-        width: 100%;
-        justify-content: space-between;
-    }
-    
-    .compose-buttons {
-        width: 100%;
-    }
-    
     .btn-secondary, .btn-primary {
-        flex: 1;
+        width: 100%;
     }
 }
 
@@ -2912,12 +2610,6 @@ body {
         gap: 16px;
     }
     
-    /* Улучшение скролла на iOS */
-    .email-list, .modal-body, .compose-editor textarea {
-        -webkit-overflow-scrolling: touch;
-        overscroll-behavior-y: contain;
-    }
-    
     /* Увеличение кнопок для пальцев */
     .mobile-nav-item, .mobile-action, .mobile-viewer-btn {
         min-height: 44px;
@@ -2937,68 +2629,5 @@ body {
     /* Адаптивные модальные окна */
     .modal-content {
         max-width: 100%;
-    }
-}
-
-/* Портретный режим */
-@media (orientation: portrait) {
-    .sidebar-stats {
-        display: none;
-    }
-}
-
-/* Ландшафтный режим */
-@media (orientation: landscape) and (max-height: 600px) {
-    .app-header {
-        height: 50px;
-        padding: 8px 16px;
-    }
-    
-    .mobile-nav {
-        padding: 8px 16px;
-    }
-    
-    .main-content {
-        padding-bottom: 60px;
-    }
-}
-
-/* Высокие экраны (iPhone X и выше) */
-@media (max-width: 768px) and (min-height: 812px) {
-    .login-container {
-        margin-top: env(safe-area-inset-top);
-    }
-    
-    .mobile-nav {
-        padding-bottom: calc(12px + env(safe-area-inset-bottom));
-    }
-    
-    .main-content {
-        padding-bottom: calc(70px + env(safe-area-inset-bottom));
-    }
-    
-    .toast-container {
-        top: calc(24px + env(safe-area-inset-top));
-    }
-}
-
-/* Поддержка темной темы системного уровня */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --bg-primary: var(--dark-bg);
-        --bg-secondary: var(--dark-card);
-        --bg-tertiary: var(--dark-card-hover);
-        --text: var(--dark-text);
-        --text-secondary: var(--dark-text-secondary);
-        --border: var(--dark-border);
-    }
-}
-
-/* Поддержка уменьшенного движения */
-@media (prefers-reduced-motion: reduce) {
-    * {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
     }
 }
