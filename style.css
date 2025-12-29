@@ -135,8 +135,13 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1050;
-    transition: opacity var(--transition-normal);
+    z-index: 9999;
+    transition: opacity 0.5s ease;
+}
+
+.loading-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
 }
 
 .loading-content {
@@ -471,8 +476,12 @@ body {
     display: none;
     flex-direction: column;
     height: 100vh;
-    opacity: 0;
+    opacity: 1;
     transition: opacity var(--transition-normal);
+}
+
+.app.visible {
+    display: flex;
 }
 
 /* Header */
