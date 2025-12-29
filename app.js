@@ -229,7 +229,6 @@ function hideLoadingScreen() {
     const loadingOverlay = document.getElementById('initialLoading');
     if (loadingOverlay) {
         loadingOverlay.style.opacity = '0';
-        loadingOverlay.style.transition = 'opacity 0.5s ease';
         setTimeout(() => {
             loadingOverlay.style.display = 'none';
         }, 500);
@@ -887,6 +886,11 @@ function viewEmail(emailItem) {
 function initApp() {
     console.log('✅ Initializing Inbox Pro...');
     
+    // Перевірка чи CSS завантажився
+    if (!document.styleSheets.length) {
+        console.warn('⚠️ CSS might not be loaded, adding fallback');
+    }
+    
     // Check device
     checkMobile();
     
@@ -907,5 +911,27 @@ function initApp() {
     setTimeout(hideLoadingScreen, 1500);
 }
 
-// Start app
-document.addEventListener('DOMContentLoaded', initApp);
+// Start app when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('📦 DOM Content Loaded');
+    
+    // Перевірка наявності основних елементів
+    if (!document.getElementById('initialLoading')) {
+        console.error('❌ Loading screen element not found');
+        return;
+    }
+    
+    // Ініціалізація з резервним таймером
+    initApp();
+    
+    // Резервний таймер на випадок помилок
+    setTimeout(hideLoadingScreen, 3000);
+});
+
+// Обробник помилок для налагодження
+window.addEventListener('error', function(e) {
+    console.error('❌ Global error:', e.message, e.filename, e.lineno);
+    
+    // Примусово приховуємо loading screen при помилці
+    setTimeout(hideLoadingScreen, 1000);
+});
