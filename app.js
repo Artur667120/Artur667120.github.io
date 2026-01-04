@@ -4,10 +4,7 @@ console.log('🚀 Inbox Pro starting...');
 // Basic translations
 const TRANSLATIONS = {
     en: {
-        // Loading
         loading: "Loading Inbox Pro...",
-        
-        // Login Screen
         welcomeBack: "Welcome Back",
         createAccount: "Create Account",
         resetPassword: "Reset Password",
@@ -25,12 +22,10 @@ const TRANSLATIONS = {
         createAccountBtn: "Create Account",
         passwordHint: "Minimum 8 characters with letters & numbers",
         
-        // Features
         aiSpamFilter: "AI Spam Filter",
         smartSorting: "Smart Sorting",
         securePrivate: "Secure & Private",
         
-        // Main App
         aiActive: "AI Active",
         aiOrganizing: "AI is organizing your inbox. <strong>15</strong> emails sorted automatically.",
         searchPlaceholder: "Search emails, contacts, subjects...",
@@ -58,7 +53,6 @@ const TRANSLATIONS = {
         storage: "Storage",
         used: "used",
         
-        // Toolbar
         newestFirst: "Newest first",
         oldestFirst: "Oldest first",
         importantFirst: "Important first",
@@ -68,13 +62,11 @@ const TRANSLATIONS = {
         withAttachments: "With Attachments",
         all: "All",
         
-        // Email Viewer
         reply: "Reply",
         forward: "Forward",
         print: "Print",
         back: "Back",
         
-        // Compose Modal
         newMessage: "New Message",
         to: "To",
         subject: "Subject",
@@ -87,7 +79,6 @@ const TRANSLATIONS = {
         aiPrompt: "Describe what you want to write about:",
         aiGenerateBtn: "Generate Email",
         
-        // Settings
         settings: "Settings",
         profile: "Profile",
         appearance: "Appearance",
@@ -97,7 +88,6 @@ const TRANSLATIONS = {
         interfaceLanguage: "Interface Language",
         saveChanges: "Save Changes",
         
-        // Mobile
         mobileCompose: "Compose",
         mobileSearch: "Search",
         mobileInbox: "Inbox",
@@ -105,7 +95,6 @@ const TRANSLATIONS = {
         mobileSent: "Sent",
         mobileMore: "More",
         
-        // Toast Messages
         loginSuccess: "Login successful! Welcome to Inbox Pro.",
         registerSuccess: "Account created successfully!",
         emailSent: "Email sent successfully!",
@@ -312,6 +301,7 @@ function updateMobileLabels() {
                 case 'starred': label.textContent = lang.mobileStarred; break;
                 case 'sent': label.textContent = lang.mobileSent; break;
                 case 'more': label.textContent = lang.mobileMore; break;
+                case 'compose': label.textContent = lang.mobileCompose; break;
             }
         }
     });
@@ -534,6 +524,34 @@ function setupAuthForms() {
         });
     }
     
+    // Reset password button
+    const sendResetBtn = document.getElementById('sendResetBtn');
+    if (sendResetBtn) {
+        sendResetBtn.addEventListener('click', async () => {
+            const email = document.getElementById('resetEmail').value;
+            
+            if (!email) {
+                showToast('Please enter your email', 'error');
+                return;
+            }
+            
+            sendResetBtn.disabled = true;
+            sendResetBtn.innerHTML = '<span class="btn-text">Sending...</span><span class="btn-icon">⏳</span>';
+            
+            // Simulate sending reset link
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            showToast('Reset link sent to your email!', 'success');
+            
+            // Switch back to login form
+            resetForm.classList.remove('active');
+            loginForm.classList.add('active');
+            
+            sendResetBtn.disabled = false;
+            sendResetBtn.innerHTML = '<span class="btn-text">Send Reset Link</span><span class="btn-icon">↻</span>';
+        });
+    }
+    
     // Password strength indicator
     const passwordInput = document.getElementById('registerPassword');
     if (passwordInput) {
@@ -571,11 +589,18 @@ function updatePasswordStrength() {
 // ==================== MAIN APP FUNCTIONS ====================
 
 function showMainApp(user) {
+    console.log('Showing main app for user:', user.email);
+    
     const loginScreen = document.getElementById('loginScreen');
     const app = document.getElementById('app');
     
-    loginScreen.style.display = 'none';
-    app.style.display = 'flex';
+    if (loginScreen) loginScreen.style.display = 'none';
+    if (app) {
+        app.style.display = 'flex';
+        
+        // Force hide loading screen
+        hideLoadingScreen();
+    }
     
     // Update user info
     updateUserInfo(user);
@@ -608,6 +633,8 @@ function getInitialsFromName(name) {
 // ==================== APP EVENTS ====================
 
 function setupAppEvents() {
+    console.log('Setting up app events...');
+    
     // Menu toggle
     const menuToggle = document.getElementById('menuToggle');
     const sidebar = document.getElementById('sidebar');
@@ -683,6 +710,15 @@ function setupAppEvents() {
         });
     }
     
+    // Save draft
+    const saveDraftBtn = document.getElementById('saveDraft');
+    if (saveDraftBtn) {
+        saveDraftBtn.addEventListener('click', () => {
+            showToast(TRANSLATIONS[currentLanguage].emailSaved, 'success');
+            composeModal.classList.add('hidden');
+        });
+    }
+    
     // AI Compose
     const aiComposeBtn = document.getElementById('aiComposeBtn');
     const aiComposeModal = document.getElementById('aiComposeModal');
@@ -733,6 +769,60 @@ function setupAppEvents() {
         });
     }
     
+    // AI Use as Draft
+    const aiUseDraftBtn = document.getElementById('aiUseDraft');
+    if (aiUseDraftBtn) {
+        aiUseDraftBtn.addEventListener('click', () => {
+            document.getElementById('mailSubject').value = document.getElementById('aiSubjectPreview').textContent;
+            document.getElementById('mailText').value = document.getElementById('aiBodyPreview').textContent;
+            
+            aiComposeModal.classList.add('hidden');
+            composeModal.classList.remove('hidden');
+            
+            showToast('AI draft loaded to compose', 'success');
+        });
+    }
+    
+    // Toolbar buttons
+    document.querySelectorAll('.toolbar-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const action = btn.querySelector('.btn-text').textContent;
+            showToast(`${action} action triggered`, 'info');
+        });
+    });
+    
+    // Sort select
+    const sortSelect = document.getElementById('sortSelect');
+    if (sortSelect) {
+        sortSelect.addEventListener('change', (e) => {
+            showToast(`Sorted by: ${e.target.selectedOptions[0].text}`, 'info');
+        });
+    }
+    
+    // Select all emails
+    const selectAllBtn = document.getElementById('selectAllBtn');
+    if (selectAllBtn) {
+        selectAllBtn.addEventListener('click', () => {
+            const checkboxes = document.querySelectorAll('.email-select');
+            checkboxes.forEach(cb => cb.checked = true);
+            showToast('All emails selected', 'info');
+        });
+    }
+    
+    // Email viewer back button
+    const viewerBackBtn = document.getElementById('viewerBack');
+    if (viewerBackBtn) {
+        viewerBackBtn.addEventListener('click', () => {
+            const emailList = document.getElementById('emailsList');
+            const emailViewer = document.getElementById('emailViewer');
+            
+            if (emailList && emailViewer) {
+                emailList.style.display = 'block';
+                emailViewer.style.display = 'none';
+            }
+        });
+    }
+    
     // Mobile events
     if (isMobile) {
         setupMobileAppEvents();
@@ -740,6 +830,8 @@ function setupAppEvents() {
     
     // Email actions
     setupEmailActions();
+    
+    console.log('App events setup complete');
 }
 
 function setupMobileAppEvents() {
@@ -844,7 +936,7 @@ function setupEmailActions() {
         }
         
         // Archive button
-        const archiveBtn = item.querySelector('.email-action:not(.star-btn)');
+        const archiveBtn = item.querySelector('.archive-btn');
         if (archiveBtn) {
             archiveBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -909,9 +1001,12 @@ function initApp() {
     // Auto-login for testing (remove in production)
     // Для тестування можна автоматично увійти
     setTimeout(() => {
-        if (document.getElementById('loginScreen').style.display !== 'none') {
+        const loginScreen = document.getElementById('loginScreen');
+        const loginBtn = document.getElementById('loginBtn');
+        
+        if (loginScreen && loginScreen.style.display !== 'none' && loginBtn) {
             // Автоматично натискаємо кнопку входу для демо
-            document.getElementById('loginBtn').click();
+            loginBtn.click();
         }
     }, 2000);
 }
@@ -929,3 +1024,11 @@ window.addEventListener('error', function(e) {
     // Force hide loading screen on error
     setTimeout(hideLoadingScreen, 100);
 });
+
+// Expose for debugging
+window.InboxPro = {
+    hideLoadingScreen,
+    showToast,
+    setTheme,
+    setLanguage
+};
