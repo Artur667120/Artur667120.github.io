@@ -4,15 +4,448 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inbox Pro | AI Email Client</title>
-    <link rel="stylesheet" href="https://artur667120.github.io/style.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* CRITICAL: Basic styles to show content immediately */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', sans-serif;
+            background: #0f172a;
+            color: white;
+            min-height: 100vh;
+            transition: background 0.3s;
+        }
+        body.light-theme {
+            background: #f8fafc;
+            color: #1e293b;
+        }
+        .hidden { display: none !important; }
+        
+        /* Loading screen */
+        .loading-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #0f172a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s;
+        }
+        .light-theme .loading-overlay {
+            background: #f8fafc;
+        }
+        .loading-content {
+            text-align: center;
+        }
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(59, 130, 246, 0.3);
+            border-radius: 50%;
+            border-top-color: #3b82f6;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .loading-text {
+            color: #94a3b8;
+            font-size: 16px;
+        }
+        .light-theme .loading-text {
+            color: #64748b;
+        }
+        
+        /* Language selector */
+        .language-selector {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+        }
+        .lang-btn {
+            background: #1e293b;
+            border: 1px solid #334155;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .light-theme .lang-btn {
+            background: white;
+            border-color: #e2e8f0;
+            color: #1e293b;
+        }
+        .lang-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            margin-top: 5px;
+            min-width: 150px;
+            display: none;
+        }
+        .lang-dropdown.show {
+            display: block;
+        }
+        .lang-option {
+            padding: 12px 16px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.2s;
+        }
+        .lang-option:hover {
+            background: #334155;
+        }
+        .light-theme .lang-dropdown {
+            background: white;
+            border-color: #e2e8f0;
+        }
+        .light-theme .lang-option {
+            color: #1e293b;
+        }
+        .light-theme .lang-option:hover {
+            background: #f1f5f9;
+        }
+        
+        /* Login screen */
+        .login-screen {
+            background: #0f172a;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            transition: background 0.3s;
+        }
+        .light-theme .login-screen {
+            background: #f8fafc;
+        }
+        .login-container {
+            max-width: 400px;
+            width: 100%;
+            background: #1e293b;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            transition: background 0.3s;
+        }
+        .light-theme .login-container {
+            background: white;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .login-logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        .logo-icon {
+            font-size: 40px;
+        }
+        .login-logo h1 {
+            font-size: 28px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .login-subtitle {
+            color: #94a3b8;
+            margin-bottom: 30px;
+            transition: color 0.3s;
+        }
+        .light-theme .login-subtitle {
+            color: #64748b;
+        }
+        .login-form h2 {
+            margin-bottom: 25px;
+            font-size: 22px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #cbd5e1;
+            transition: color 0.3s;
+        }
+        .light-theme .form-group label {
+            color: #475569;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            background: #334155;
+            border: 1px solid #475569;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        .light-theme .form-group input {
+            background: white;
+            border-color: #cbd5e1;
+            color: #1e293b;
+        }
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+        .login-features {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #334155;
+        }
+        .light-theme .login-features {
+            border-top-color: #e2e8f0;
+        }
+        .feature {
+            text-align: center;
+            flex: 1;
+        }
+        .feature-icon {
+            font-size: 24px;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .feature-text {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+        .light-theme .feature-text {
+            color: #64748b;
+        }
+        
+        /* Main App */
+        .app {
+            display: none;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+        .app.visible {
+            display: flex;
+        }
+        
+        /* Email Viewer Modal (Fullscreen like Gmail) */
+        .email-viewer-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0f172a;
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+        }
+        .light-theme .email-viewer-modal {
+            background: #f8fafc;
+        }
+        .email-viewer-modal.active {
+            display: flex;
+        }
+        .viewer-header {
+            padding: 20px;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .light-theme .viewer-header {
+            border-bottom-color: #e2e8f0;
+        }
+        .back-btn {
+            background: none;
+            border: none;
+            color: #3b82f6;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .viewer-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .viewer-action-btn {
+            background: #334155;
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .light-theme .viewer-action-btn {
+            background: #e2e8f0;
+            color: #1e293b;
+        }
+        .viewer-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        .viewer-subject {
+            font-size: 24px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #334155;
+        }
+        .light-theme .viewer-subject {
+            border-bottom-color: #e2e8f0;
+        }
+        .viewer-sender {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .sender-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .sender-info {
+            flex: 1;
+        }
+        .sender-name {
+            font-weight: 600;
+            font-size: 18px;
+        }
+        .sender-email {
+            color: #94a3b8;
+            font-size: 14px;
+            margin: 4px 0;
+        }
+        .light-theme .sender-email {
+            color: #64748b;
+        }
+        .sender-time {
+            color: #64748b;
+            font-size: 14px;
+        }
+        .light-theme .sender-time {
+            color: #94a3b8;
+        }
+        .viewer-body {
+            line-height: 1.6;
+            font-size: 16px;
+        }
+        .viewer-body ul {
+            margin: 20px 0;
+            padding-left: 20px;
+        }
+        .viewer-body li {
+            margin-bottom: 10px;
+        }
+        
+        /* Toast notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+        .toast {
+            background: #10b981;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            margin-top: 10px;
+            animation: slideIn 0.3s ease;
+        }
+        .toast.error { background: #ef4444; }
+        .toast.warning { background: #f59e0b; }
+        .toast.info { background: #3b82f6; }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .login-container {
+                padding: 30px 20px;
+            }
+            .viewer-header {
+                padding: 15px;
+            }
+            .viewer-content {
+                padding: 15px;
+            }
+            .viewer-subject {
+                font-size: 20px;
+            }
+        }
+    </style>
 </head>
 <body class="dark-theme">
     <!-- Loading Screen -->
     <div class="loading-overlay" id="initialLoading">
         <div class="loading-content">
             <div class="loading-spinner"></div>
-            <div class="loading-text">Loading Inbox Pro...</div>
+            <div class="loading-text" id="loadingText">Loading Inbox Pro...</div>
+        </div>
+    </div>
+
+    <!-- Language Selector -->
+    <div class="language-selector">
+        <button class="lang-btn" id="langBtn">
+            <span id="currentLangFlag">🇺🇸</span>
+            <span id="currentLangName">English</span>
+            <span>▼</span>
+        </button>
+        <div class="lang-dropdown" id="langDropdown">
+            <div class="lang-option" data-lang="en">
+                <span>🇺🇸</span>
+                <span>English</span>
+            </div>
+            <div class="lang-option" data-lang="ua">
+                <span>🇺🇦</span>
+                <span>Українська</span>
+            </div>
+            <div class="lang-option" data-lang="de">
+                <span>🇩🇪</span>
+                <span>Deutsch</span>
+            </div>
+            <div class="lang-option" data-lang="ru">
+                <span>🇷🇺</span>
+                <span>Русский</span>
+            </div>
         </div>
     </div>
 
@@ -22,47 +455,48 @@
             <div class="login-header">
                 <div class="login-logo">
                     <div class="logo-icon">📬</div>
-                    <h1>Inbox Pro</h1>
+                    <h1 id="appTitle">Inbox Pro</h1>
                 </div>
-                <p class="login-subtitle">AI-Powered Smart Email Client</p>
+                <p class="login-subtitle" id="appSubtitle">AI-Powered Smart Email Client</p>
             </div>
             
             <div class="login-form">
-                <h2>🔑 Welcome Back</h2>
+                <h2 id="loginTitle">🔑 Welcome Back</h2>
                 
                 <div class="form-group">
-                    <label>📧 Email Address</label>
+                    <label id="emailLabel">📧 Email Address</label>
                     <input type="email" id="loginEmail" placeholder="demo@example.com" value="demo@example.com">
                 </div>
                 
                 <div class="form-group">
-                    <label>🔒 Password</label>
+                    <label id="passwordLabel">🔒 Password</label>
                     <input type="password" id="loginPassword" placeholder="••••••••" value="demo123">
                 </div>
                 
                 <button class="btn-primary" id="loginBtn">
-                    Sign In →
+                    <span id="loginBtnText">Sign In</span>
+                    <span>→</span>
                 </button>
             </div>
 
             <div class="login-features">
                 <div class="feature">
                     <span class="feature-icon">🤖</span>
-                    <span class="feature-text">AI Spam Filter</span>
+                    <span class="feature-text" id="feature1">AI Spam Filter</span>
                 </div>
                 <div class="feature">
                     <span class="feature-icon">⚡</span>
-                    <span class="feature-text">Smart Sorting</span>
+                    <span class="feature-text" id="feature2">Smart Sorting</span>
                 </div>
                 <div class="feature">
                     <span class="feature-icon">🛡️</span>
-                    <span class="feature-text">Secure & Private</span>
+                    <span class="feature-text" id="feature3">Secure & Private</span>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Main App (hidden by default) -->
+    <!-- Main App -->
     <div class="app hidden" id="app">
         <!-- Header -->
         <header class="app-header">
@@ -143,7 +577,7 @@
                 <!-- Email List -->
                 <div class="email-list">
                     <!-- Email item 1 -->
-                    <div class="email-item unread">
+                    <div class="email-item unread" data-email-id="1">
                         <div class="email-avatar">JD</div>
                         <div class="email-details">
                             <div class="email-header">
@@ -159,7 +593,7 @@
                     </div>
 
                     <!-- Email item 2 -->
-                    <div class="email-item important">
+                    <div class="email-item important" data-email-id="2">
                         <div class="email-avatar">AS</div>
                         <div class="email-details">
                             <div class="email-header">
@@ -175,7 +609,7 @@
                     </div>
 
                     <!-- Email item 3 -->
-                    <div class="email-item">
+                    <div class="email-item" data-email-id="3">
                         <div class="email-avatar">MC</div>
                         <div class="email-details">
                             <div class="email-header">
@@ -194,29 +628,388 @@
         </div>
     </div>
 
+    <!-- Email Viewer Modal (Fullscreen like Gmail) -->
+    <div class="email-viewer-modal" id="emailViewer">
+        <div class="viewer-header">
+            <button class="back-btn" id="closeViewer">
+                <span>←</span>
+                <span id="backText">Back</span>
+            </button>
+            <div class="viewer-actions">
+                <button class="viewer-action-btn" id="replyBtn">
+                    <span id="replyText">Reply</span>
+                </button>
+                <button class="viewer-action-btn" id="forwardBtn">
+                    <span id="forwardText">Forward</span>
+                </button>
+                <button class="viewer-action-btn" id="deleteBtn">
+                    <span id="deleteText">Delete</span>
+                </button>
+            </div>
+        </div>
+        
+        <div class="viewer-content">
+            <h1 class="viewer-subject" id="viewerSubject">Welcome to Inbox Pro!</h1>
+            
+            <div class="viewer-sender">
+                <div class="sender-avatar" id="senderAvatar">JD</div>
+                <div class="sender-info">
+                    <div class="sender-name" id="senderName">John Doe</div>
+                    <div class="sender-email" id="senderEmail">john@example.com</div>
+                    <div class="sender-time" id="senderTime">Today at 10:30 AM</div>
+                </div>
+            </div>
+            
+            <div class="viewer-body" id="viewerBody">
+                <p>Hello there!</p>
+                <p>Welcome to Inbox Pro, your new AI-powered email client. We're excited to have you on board!</p>
+                <p>Our features include:</p>
+                <ul>
+                    <li>🤖 AI-powered spam filtering</li>
+                    <li>⚡ Smart email sorting</li>
+                    <li>🔒 End-to-end encryption</li>
+                    <li>📱 Cross-platform sync</li>
+                </ul>
+                <p>If you have any questions, feel free to reach out to our support team.</p>
+                <p>Best regards,<br>The Inbox Pro Team</p>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Container -->
     <div class="toast-container" id="toastContainer"></div>
 
     <!-- Script -->
-    <script src="https://artur667120.github.io/app.js"></script>
+    <script src="app.js"></script>
     <script>
-        // Simple auto-login
-        setTimeout(function() {
-            // Hide loading
-            document.getElementById('initialLoading').style.display = 'none';
+        // Language translations
+        const TRANSLATIONS = {
+            en: {
+                loading: "Loading Inbox Pro...",
+                appTitle: "Inbox Pro",
+                appSubtitle: "AI-Powered Smart Email Client",
+                loginTitle: "🔑 Welcome Back",
+                emailLabel: "📧 Email Address",
+                passwordLabel: "🔒 Password",
+                loginBtnText: "Sign In",
+                feature1: "AI Spam Filter",
+                feature2: "Smart Sorting",
+                feature3: "Secure & Private",
+                back: "Back",
+                reply: "Reply",
+                forward: "Forward",
+                delete: "Delete",
+                inbox: "Inbox",
+                starred: "Starred",
+                sent: "Sent",
+                compose: "Compose"
+            },
+            ua: {
+                loading: "Завантаження Inbox Pro...",
+                appTitle: "Inbox Pro",
+                appSubtitle: "Розумний клієнт пошти на AI",
+                loginTitle: "🔑 З поверненням",
+                emailLabel: "📧 Електронна адреса",
+                passwordLabel: "🔒 Пароль",
+                loginBtnText: "Увійти",
+                feature1: "AI Фільтр Спаму",
+                feature2: "Розумне Сортування",
+                feature3: "Захищено & Приватно",
+                back: "Назад",
+                reply: "Відповісти",
+                forward: "Переслати",
+                delete: "Видалити",
+                inbox: "Вхідні",
+                starred: "Зірочка",
+                sent: "Надіслані",
+                compose: "Написати"
+            },
+            de: {
+                loading: "Inbox Pro wird geladen...",
+                appTitle: "Inbox Pro",
+                appSubtitle: "KI-gestützter E-Mail-Client",
+                loginTitle: "🔑 Willkommen zurück",
+                emailLabel: "📧 E-Mail-Adresse",
+                passwordLabel: "🔒 Passwort",
+                loginBtnText: "Anmelden",
+                feature1: "KI-Spamfilter",
+                feature2: "Intelligente Sortierung",
+                feature3: "Sicher & Privat",
+                back: "Zurück",
+                reply: "Antworten",
+                forward: "Weiterleiten",
+                delete: "Löschen",
+                inbox: "Posteingang",
+                starred: "Favoriten",
+                sent: "Gesendet",
+                compose: "Verfassen"
+            },
+            ru: {
+                loading: "Загрузка Inbox Pro...",
+                appTitle: "Inbox Pro",
+                appSubtitle: "Умный почтовый клиент на AI",
+                loginTitle: "🔑 С возвращением",
+                emailLabel: "📧 Адрес электронной почты",
+                passwordLabel: "🔒 Пароль",
+                loginBtnText: "Войти",
+                feature1: "AI-фильтр спама",
+                feature2: "Умная сортировка",
+                feature3: "Безопасно и приватно",
+                back: "Назад",
+                reply: "Ответить",
+                forward: "Переслать",
+                delete: "Удалить",
+                inbox: "Входящие",
+                starred: "Избранное",
+                sent: "Отправленные",
+                compose: "Написать"
+            }
+        };
+
+        // Current language
+        let currentLang = 'en';
+        const langFlags = {
+            en: '🇺🇸',
+            ua: '🇺🇦', 
+            de: '🇩🇪',
+            ru: '🇷🇺'
+        };
+        const langNames = {
+            en: 'English',
+            ua: 'Українська',
+            de: 'Deutsch',
+            ru: 'Русский'
+        };
+
+        // DOM elements
+        const langBtn = document.getElementById('langBtn');
+        const langDropdown = document.getElementById('langDropdown');
+        const currentLangFlag = document.getElementById('currentLangFlag');
+        const currentLangName = document.getElementById('currentLangName');
+
+        // Language dropdown toggle
+        langBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            langDropdown.classList.toggle('show');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', () => {
+            langDropdown.classList.remove('show');
+        });
+
+        // Language selection
+        document.querySelectorAll('.lang-option').forEach(option => {
+            option.addEventListener('click', () => {
+                const lang = option.dataset.lang;
+                setLanguage(lang);
+                langDropdown.classList.remove('show');
+            });
+        });
+
+        // Set language function
+        function setLanguage(lang) {
+            if (!TRANSLATIONS[lang]) return;
             
-            // Auto login
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('app').classList.remove('hidden');
+            currentLang = lang;
+            const t = TRANSLATIONS[lang];
             
-            // Show toast
+            // Update UI elements
+            document.getElementById('loadingText').textContent = t.loading;
+            document.getElementById('appTitle').textContent = t.appTitle;
+            document.getElementById('appSubtitle').textContent = t.appSubtitle;
+            document.getElementById('loginTitle').textContent = t.loginTitle;
+            document.getElementById('emailLabel').textContent = t.emailLabel;
+            document.getElementById('passwordLabel').textContent = t.passwordLabel;
+            document.getElementById('loginBtnText').textContent = t.loginBtnText;
+            document.getElementById('feature1').textContent = t.feature1;
+            document.getElementById('feature2').textContent = t.feature2;
+            document.getElementById('feature3').textContent = t.feature3;
+            document.getElementById('backText').textContent = t.back;
+            document.getElementById('replyText').textContent = t.reply;
+            document.getElementById('forwardText').textContent = t.forward;
+            document.getElementById('deleteText').textContent = t.delete;
+            
+            // Update language selector
+            currentLangFlag.textContent = langFlags[lang];
+            currentLangName.textContent = langNames[lang];
+            
+            // Save to localStorage
+            localStorage.setItem('inboxpro-lang', lang);
+            
+            // Show toast notification
+            showToast(`🌍 Language changed to ${langNames[lang]}`, 'info');
+        }
+
+        // Load saved language
+        const savedLang = localStorage.getItem('inboxpro-lang') || 'en';
+        setLanguage(savedLang);
+
+        // Simple toast function
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+            
             const toast = document.createElement('div');
-            toast.className = 'toast success';
-            toast.textContent = '✅ Welcome to Inbox Pro!';
-            document.getElementById('toastContainer').appendChild(toast);
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
             
-            setTimeout(() => toast.remove(), 3000);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Auto-login after 1.5 seconds
+        setTimeout(() => {
+            const loading = document.getElementById('initialLoading');
+            const loginScreen = document.getElementById('loginScreen');
+            const app = document.getElementById('app');
+            
+            if (loading) {
+                loading.style.opacity = '0';
+                setTimeout(() => {
+                    loading.style.display = 'none';
+                    
+                    // Auto login
+                    if (loginScreen && app) {
+                        loginScreen.style.display = 'none';
+                        app.classList.remove('hidden');
+                        app.classList.add('visible');
+                        showToast('✅ Welcome to Inbox Pro!', 'success');
+                    }
+                }, 500);
+            }
         }, 1500);
+
+        // Manual login button
+        document.getElementById('loginBtn').addEventListener('click', () => {
+            const loginScreen = document.getElementById('loginScreen');
+            const app = document.getElementById('app');
+            
+            if (loginScreen && app) {
+                loginScreen.style.display = 'none';
+                app.classList.remove('hidden');
+                app.classList.add('visible');
+                showToast('✅ Login successful!', 'success');
+            }
+        });
+
+        // Email viewer functionality
+        const emailViewer = document.getElementById('emailViewer');
+        const closeViewer = document.getElementById('closeViewer');
+        
+        // Sample email data
+        const emails = {
+            1: {
+                subject: "Welcome to Inbox Pro!",
+                sender: "John Doe",
+                email: "john@example.com",
+                time: "Today at 10:30 AM",
+                avatar: "JD",
+                body: `<p>Hello there!</p>
+                       <p>Welcome to Inbox Pro, your new AI-powered email client. We're excited to have you on board!</p>
+                       <p>Our features include:</p>
+                       <ul>
+                           <li>🤖 AI-powered spam filtering</li>
+                           <li>⚡ Smart email sorting</li>
+                           <li>🔒 End-to-end encryption</li>
+                           <li>📱 Cross-platform sync</li>
+                       </ul>
+                       <p>If you have any questions, feel free to reach out to our support team.</p>
+                       <p>Best regards,<br>The Inbox Pro Team</p>`
+            },
+            2: {
+                subject: "Meeting Notes & Project Updates",
+                sender: "Alex Smith",
+                email: "alex@company.com",
+                time: "Yesterday at 2:15 PM",
+                avatar: "AS",
+                body: `<p>Hi Team,</p>
+                       <p>Here are the notes from our meeting yesterday:</p>
+                       <ul>
+                           <li>Project Alpha is on track for Q3 delivery</li>
+                           <li>Beta testing begins next week</li>
+                           <li>New design mockups attached</li>
+                       </ul>
+                       <p>Let me know if you have any questions.</p>
+                       <p>Best,<br>Alex</p>`
+            },
+            3: {
+                subject: "Travel Plans for Conference",
+                sender: "Maria Chen",
+                email: "maria@travelco.com",
+                time: "2 days ago at 11:45 AM",
+                avatar: "MC",
+                body: `<p>Hello,</p>
+                       <p>I've booked everything for the Berlin conference:</p>
+                       <ul>
+                           <li>Flight: June 15, 9:00 AM → 11:30 AM</li>
+                           <li>Hotel: Grand Berlin Hotel (3 nights)</li>
+                           <li>Conference pass included</li>
+                       </ul>
+                       <p>See you there!</p>
+                       <p>Maria</p>`
+            }
+        };
+
+        // Open email viewer when clicking an email
+        document.querySelectorAll('.email-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                if (!e.target.classList.contains('star-btn')) {
+                    const emailId = item.dataset.emailId;
+                    const email = emails[emailId];
+                    
+                    if (email) {
+                        // Update viewer content
+                        document.getElementById('viewerSubject').textContent = email.subject;
+                        document.getElementById('senderName').textContent = email.sender;
+                        document.getElementById('senderEmail').textContent = email.email;
+                        document.getElementById('senderTime').textContent = email.time;
+                        document.getElementById('senderAvatar').textContent = email.avatar;
+                        document.getElementById('viewerBody').innerHTML = email.body;
+                        
+                        // Show viewer
+                        emailViewer.classList.add('active');
+                        document.body.style.overflow = 'hidden';
+                    }
+                }
+            });
+        });
+
+        // Close email viewer
+        closeViewer.addEventListener('click', () => {
+            emailViewer.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        });
+
+        // Email actions in viewer
+        document.getElementById('replyBtn').addEventListener('click', () => {
+            showToast('📧 Reply feature coming soon!', 'info');
+        });
+
+        document.getElementById('forwardBtn').addEventListener('click', () => {
+            showToast('📧 Forward feature coming soon!', 'info');
+        });
+
+        document.getElementById('deleteBtn').addEventListener('click', () => {
+            if (confirm('Delete this email?')) {
+                emailViewer.classList.remove('active');
+                document.body.style.overflow = 'auto';
+                showToast('🗑️ Email deleted', 'success');
+            }
+        });
+
+        // Close viewer with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && emailViewer.classList.contains('active')) {
+                emailViewer.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        console.log('✅ App initialized with language support');
     </script>
 </body>
 </html>
