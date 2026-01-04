@@ -5,9 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inbox Pro | AI Email Client</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-    </style>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <link rel="manifest" href="manifest.json">
 </head>
 <body class="dark-theme">
     <!-- Loading -->
@@ -49,6 +48,7 @@
                         <span class="checkmark"></span>
                         <span id="rememberMeText">Remember me</span>
                     </label>
+                    <a href="#" id="forgotPasswordBtn" class="forgot-password">Forgot password?</a>
                 </div>
                 
                 <button class="btn-primary" id="loginBtn">
@@ -101,6 +101,26 @@
                 </p>
             </div>
 
+            <!-- Reset Password Form -->
+            <div class="login-form" id="resetForm">
+                <h2>🔑 Reset Password</h2>
+                
+                <div class="form-group">
+                    <label for="resetEmail">📧 Email Address</label>
+                    <input type="email" id="resetEmail" placeholder="your@email.com" autocomplete="email">
+                </div>
+                
+                <button class="btn-primary" id="sendResetBtn">
+                    <span class="btn-text">Send Reset Link</span>
+                    <span class="btn-icon">↻</span>
+                </button>
+                
+                <p class="login-switch">
+                    <span id="rememberPasswordText">Remember password?</span> 
+                    <a href="#" id="showLoginFromReset">Sign in</a>
+                </p>
+            </div>
+
             <div class="login-features">
                 <div class="feature">
                     <span class="feature-icon">🤖</span>
@@ -119,7 +139,7 @@
     </div>
 
     <!-- Main App -->
-    <div class="app" id="app">
+    <div class="app" id="app" style="display: none;">
         <!-- Header -->
         <header class="app-header">
             <div class="header-left">
@@ -142,6 +162,27 @@
             </div>
 
             <div class="header-right">
+                <div class="theme-switcher">
+                    <button class="theme-toggle" id="themeToggle">
+                        <span class="theme-icon">🌙</span>
+                    </button>
+                    <div class="theme-options" id="themeOptions">
+                        <button class="theme-option" data-theme="dark">
+                            <span class="theme-icon">🌙</span> Dark
+                        </button>
+                        <button class="theme-option" data-theme="light">
+                            <span class="theme-icon">☀️</span> Light
+                        </button>
+                    </div>
+                </div>
+
+                <div class="language-selector">
+                    <select id="languageSelect">
+                        <option value="en">🇺🇸 English</option>
+                        <option value="ua">🇺🇦 Українська</option>
+                    </select>
+                </div>
+
                 <!-- User Menu -->
                 <div class="user-profile">
                     <div class="user-avatar" id="userAvatar">JD</div>
@@ -162,6 +203,11 @@
                     <span class="compose-text">Compose</span>
                 </button>
 
+                <button class="compose-btn ai-compose-btn" id="aiComposeBtn">
+                    <span class="compose-icon">🤖</span>
+                    <span class="compose-text">AI Compose</span>
+                </button>
+
                 <!-- Folders -->
                 <nav class="sidebar-nav">
                     <h3 class="nav-title">FOLDERS</h3>
@@ -180,8 +226,62 @@
                             <span class="nav-icon">📤</span>
                             <span class="nav-text">Sent</span>
                         </a>
+                        <a href="#" class="nav-item" data-folder="drafts">
+                            <span class="nav-icon">📝</span>
+                            <span class="nav-text">Drafts</span>
+                        </a>
+                        <a href="#" class="nav-item" data-folder="spam">
+                            <span class="nav-icon">🚫</span>
+                            <span class="nav-text">Spam</span>
+                        </a>
+                        <a href="#" class="nav-item" data-folder="trash">
+                            <span class="nav-icon">🗑️</span>
+                            <span class="nav-text">Trash</span>
+                        </a>
                     </div>
                 </nav>
+
+                <!-- Labels -->
+                <nav class="sidebar-nav">
+                    <h3 class="nav-title">LABELS</h3>
+                    <div class="nav-items">
+                        <a href="#" class="nav-item" data-label="work">
+                            <span class="nav-icon">💼</span>
+                            <span class="nav-text">Work</span>
+                        </a>
+                        <a href="#" class="nav-item" data-label="personal">
+                            <span class="nav-icon">👤</span>
+                            <span class="nav-text">Personal</span>
+                        </a>
+                        <a href="#" class="nav-item" data-label="travel">
+                            <span class="nav-icon">✈️</span>
+                            <span class="nav-text">Travel</span>
+                        </a>
+                        <a href="#" class="nav-item" data-label="social">
+                            <span class="nav-icon">👥</span>
+                            <span class="nav-text">Social</span>
+                        </a>
+                    </div>
+                </nav>
+
+                <!-- Email Stats -->
+                <div class="email-stats">
+                    <h3 class="nav-title">EMAIL STATS</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-value">42</span>
+                            <span class="stat-label">Total</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">5</span>
+                            <span class="stat-label">Unread</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">2.3/5 GB</span>
+                            <span class="stat-label">Storage</span>
+                        </div>
+                    </div>
+                </div>
             </aside>
 
             <!-- Email Content -->
@@ -195,12 +295,46 @@
                             <span class="folder-stats">5 emails • 3 unread</span>
                         </h2>
                     </div>
+                    
+                    <div class="toolbar-right">
+                        <div class="toolbar-actions">
+                            <select class="sort-select" id="sortSelect">
+                                <option value="newest">Newest first</option>
+                                <option value="oldest">Oldest first</option>
+                                <option value="important">Important first</option>
+                                <option value="unread">Unread first</option>
+                            </select>
+                            
+                            <button class="toolbar-btn" id="selectAllBtn">
+                                <span class="btn-icon">☑️</span>
+                                <span class="btn-text">Select All</span>
+                            </button>
+                            
+                            <button class="toolbar-btn" id="markReadBtn">
+                                <span class="btn-icon">📨</span>
+                                <span class="btn-text">Mark as Read</span>
+                            </button>
+                            
+                            <button class="toolbar-btn" id="archiveBtn">
+                                <span class="btn-icon">📁</span>
+                                <span class="btn-text">Archive</span>
+                            </button>
+                            
+                            <button class="toolbar-btn" id="deleteBtn">
+                                <span class="btn-icon">🗑️</span>
+                                <span class="btn-text">Delete</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Email List -->
                 <div class="email-list" id="emailsList">
-                    <!-- Email item -->
+                    <!-- Email item 1 -->
                     <div class="email-item unread">
+                        <div class="email-checkbox">
+                            <input type="checkbox" class="email-select">
+                        </div>
                         <div class="email-avatar">JD</div>
                         <div class="email-details">
                             <div class="email-header">
@@ -208,15 +342,150 @@
                                 <span class="email-time">10:30 AM</span>
                             </div>
                             <div class="email-subject">Welcome to Inbox Pro!</div>
-                            <div class="email-preview">Thank you for choosing our AI-powered email client...</div>
+                            <div class="email-preview">Thank you for choosing our AI-powered email client. We hope you enjoy the experience...</div>
+                            <div class="email-tags">
+                                <span class="email-tag work">💼 Work</span>
+                                <span class="email-tag">📎 2 attachments</span>
+                            </div>
                         </div>
                         <div class="email-actions">
-                            <button class="email-action star-btn">★</button>
+                            <button class="email-action star-btn">☆</button>
+                            <button class="email-action archive-btn">📁</button>
+                        </div>
+                    </div>
+
+                    <!-- Email item 2 -->
+                    <div class="email-item important">
+                        <div class="email-checkbox">
+                            <input type="checkbox" class="email-select">
+                        </div>
+                        <div class="email-avatar">AS</div>
+                        <div class="email-details">
+                            <div class="email-header">
+                                <span class="email-sender">Alex Smith</span>
+                                <span class="email-time">Yesterday</span>
+                            </div>
+                            <div class="email-subject">Meeting Notes & Project Updates</div>
+                            <div class="email-preview">Here are the meeting notes from our last session. Please review and let me know your thoughts...</div>
+                            <div class="email-tags">
+                                <span class="email-tag important-tag">❗ Important</span>
+                                <span class="email-tag">📎 1 attachment</span>
+                            </div>
+                        </div>
+                        <div class="email-actions">
+                            <button class="email-action star-btn">☆</button>
+                            <button class="email-action archive-btn">📁</button>
+                        </div>
+                    </div>
+
+                    <!-- Email item 3 -->
+                    <div class="email-item">
+                        <div class="email-checkbox">
+                            <input type="checkbox" class="email-select">
+                        </div>
+                        <div class="email-avatar">MC</div>
+                        <div class="email-details">
+                            <div class="email-header">
+                                <span class="email-sender">Maria Chen</span>
+                                <span class="email-time">2 days ago</span>
+                            </div>
+                            <div class="email-subject">Travel Plans for Conference</div>
+                            <div class="email-preview">I've booked the flights and hotel for the upcoming conference in Berlin. Details attached...</div>
+                            <div class="email-tags">
+                                <span class="email-tag travel">✈️ Travel</span>
+                                <span class="email-tag">📎 3 attachments</span>
+                            </div>
+                        </div>
+                        <div class="email-actions">
+                            <button class="email-action star-btn active">★</button>
+                            <button class="email-action archive-btn">📁</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Email Viewer (hidden by default) -->
+                <div class="email-viewer" id="emailViewer" style="display: none;">
+                    <div class="viewer-header">
+                        <button class="viewer-back" id="viewerBack">← Back</button>
+                        <div class="viewer-actions">
+                            <button class="viewer-action" id="viewerReply">Reply</button>
+                            <button class="viewer-action" id="viewerForward">Forward</button>
+                            <button class="viewer-action" id="viewerPrint">Print</button>
+                        </div>
+                    </div>
+                    
+                    <div class="viewer-content">
+                        <h1 class="viewer-subject" id="viewerSubject">Welcome to Inbox Pro!</h1>
+                        
+                        <div class="viewer-sender">
+                            <div class="sender-avatar" id="senderAvatar">JD</div>
+                            <div class="sender-info">
+                                <div class="sender-name" id="senderName">John Doe</div>
+                                <div class="sender-email" id="senderEmail">john@example.com</div>
+                                <div class="sender-time" id="senderTime">Today at 10:30 AM</div>
+                            </div>
+                        </div>
+                        
+                        <div class="viewer-body" id="viewerBody">
+                            <p>Hello there!</p>
+                            <p>Welcome to Inbox Pro, your new AI-powered email client. We're excited to have you on board!</p>
+                            <p>Our features include:</p>
+                            <ul>
+                                <li>🤖 AI-powered spam filtering</li>
+                                <li>⚡ Smart email sorting</li>
+                                <li>🔒 End-to-end encryption</li>
+                                <li>📱 Cross-platform sync</li>
+                            </ul>
+                            <p>If you have any questions, feel free to reach out to our support team.</p>
+                            <p>Best regards,<br>The Inbox Pro Team</p>
+                        </div>
+                        
+                        <div class="viewer-attachments" id="viewerAttachments">
+                            <h3>📎 Attachments (2)</h3>
+                            <div class="attachment-list">
+                                <div class="attachment-item">
+                                    <span class="attachment-icon">📄</span>
+                                    <span class="attachment-name">welcome_guide.pdf</span>
+                                    <span class="attachment-size">2.4 MB</span>
+                                    <button class="attachment-download">Download</button>
+                                </div>
+                                <div class="attachment-item">
+                                    <span class="attachment-icon">🖼️</span>
+                                    <span class="attachment-name">screenshot.png</span>
+                                    <span class="attachment-size">1.1 MB</span>
+                                    <button class="attachment-download">Download</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </main>
         </div>
+
+        <!-- Mobile Navigation -->
+        <nav class="mobile-nav" id="mobileNav">
+            <div class="mobile-nav-item" data-action="compose">
+                <span class="nav-icon">+</span>
+                <span class="nav-label">Compose</span>
+            </div>
+            <div class="mobile-nav-item active" data-action="inbox">
+                <span class="nav-icon">📥</span>
+                <span class="nav-label">Inbox</span>
+                <span class="nav-badge">5</span>
+            </div>
+            <div class="mobile-nav-item" data-action="starred">
+                <span class="nav-icon">★</span>
+                <span class="nav-label">Starred</span>
+            </div>
+            <div class="mobile-nav-item" data-action="sent">
+                <span class="nav-icon">📤</span>
+                <span class="nav-label">Sent</span>
+            </div>
+            <div class="mobile-nav-item" data-action="more">
+                <span class="nav-icon">⋯</span>
+                <span class="nav-label">More</span>
+            </div>
+        </nav>
 
         <!-- Compose Modal -->
         <div class="modal hidden" id="composeModal">
@@ -239,6 +508,161 @@
                         <button class="btn-primary" id="sendMail">
                             <span>✈️ Send</span>
                         </button>
+                        <button class="btn-secondary" id="saveDraft">
+                            <span>💾 Save Draft</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Compose Modal -->
+        <div class="modal hidden" id="aiComposeModal">
+            <div class="modal-content ai-compose-modal">
+                <div class="modal-header">
+                    <h3>🤖 AI Compose</h3>
+                    <button class="modal-close" id="closeAICompose">✕</button>
+                </div>
+                <div class="ai-compose-body">
+                    <div class="ai-prompt-section">
+                        <h4>Describe what you want to write about:</h4>
+                        <textarea id="aiPrompt" placeholder="E.g., 'Write a professional email to my manager requesting a meeting next week to discuss project milestones...'"></textarea>
+                        <button class="btn-primary" id="aiGenerateBtn">
+                            <span>✨ Generate Email</span>
+                        </button>
+                    </div>
+                    
+                    <div class="ai-loading" id="aiWriting" style="display: none;">
+                        <div class="ai-loading-spinner"></div>
+                        <p>AI is writing your email...</p>
+                    </div>
+                    
+                    <div class="ai-result" id="aiResultContainer" style="display: none;">
+                        <h4>AI Generated Email:</h4>
+                        <div class="ai-result-preview">
+                            <h5 id="aiSubjectPreview">Subject: Meeting Request - Project Discussion</h5>
+                            <p id="aiBodyPreview">Dear [Manager's Name],<br><br>I hope this email finds you well. I would like to request a meeting with you next week to discuss the current project milestones and address some important updates...</p>
+                        </div>
+                        <div class="ai-result-actions">
+                            <button class="btn-primary" id="aiUseDraft">
+                                <span>✏️ Use as Draft</span>
+                            </button>
+                            <button class="btn-secondary" id="aiRegenerate">
+                                <span>🔄 Regenerate</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Compose Modal -->
+        <div class="modal hidden" id="mobileComposeModal">
+            <div class="modal-content mobile-compose-modal">
+                <div class="modal-header">
+                    <h3>📱 Compose</h3>
+                    <button class="modal-close" id="closeMobileCompose">✕</button>
+                </div>
+                <div class="compose-body">
+                    <div class="compose-field">
+                        <input type="text" placeholder="To" autocomplete="email">
+                    </div>
+                    <div class="compose-field">
+                        <input type="text" placeholder="Subject">
+                    </div>
+                    <div class="compose-editor">
+                        <textarea placeholder="Write your message here..."></textarea>
+                    </div>
+                    <div class="compose-footer">
+                        <button class="btn-primary">
+                            <span>Send</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile More Modal -->
+        <div class="modal hidden" id="mobileMoreModal">
+            <div class="modal-content mobile-more-modal">
+                <div class="modal-header">
+                    <h3>⚙️ More Options</h3>
+                    <button class="modal-close" id="closeMobileMore">✕</button>
+                </div>
+                <div class="more-options">
+                    <button class="more-option" data-action="settings">
+                        <span class="option-icon">⚙️</span>
+                        <span class="option-text">Settings</span>
+                    </button>
+                    <button class="more-option" data-action="profile">
+                        <span class="option-icon">👤</span>
+                        <span class="option-text">Profile</span>
+                    </button>
+                    <button class="more-option" data-action="help">
+                        <span class="option-icon">❓</span>
+                        <span class="option-text">Help & Support</span>
+                    </button>
+                    <button class="more-option" data-action="logout">
+                        <span class="option-icon">🚪</span>
+                        <span class="option-text">Logout</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Modal -->
+        <div class="modal hidden" id="settingsModal">
+            <div class="modal-content settings-modal">
+                <div class="modal-header">
+                    <h3>⚙️ Settings</h3>
+                    <button class="modal-close" id="closeSettings">✕</button>
+                </div>
+                <div class="settings-body">
+                    <div class="settings-section">
+                        <h4>Profile</h4>
+                        <div class="form-group">
+                            <label>Display Name</label>
+                            <input type="text" id="settingsName" value="Demo User">
+                        </div>
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <input type="email" id="settingsEmail" value="demo@example.com" readonly>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-section">
+                        <h4>Appearance</h4>
+                        <div class="theme-buttons">
+                            <button class="theme-btn active" data-theme="dark">
+                                <span class="theme-icon">🌙</span> Dark
+                            </button>
+                            <button class="theme-btn" data-theme="light">
+                                <span class="theme-icon">☀️</span> Light
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-section">
+                        <h4>Notifications</h4>
+                        <label class="switch">
+                            <input type="checkbox" id="notificationsToggle" checked>
+                            <span class="slider"></span>
+                            <span class="switch-label">Enable notifications</span>
+                        </label>
+                    </div>
+                    
+                    <div class="settings-section">
+                        <h4>Language</h4>
+                        <select id="settingsLanguage">
+                            <option value="en">English</option>
+                            <option value="ua">Українська</option>
+                        </select>
+                    </div>
+                    
+                    <div class="settings-footer">
+                        <button class="btn-primary" id="saveSettings">
+                            <span>💾 Save Changes</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -248,7 +672,24 @@
     <!-- Notification Toast -->
     <div class="toast-container" id="toastContainer"></div>
 
-    <!-- Script -->
+    <!-- Scripts -->
+    <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="auth-service.js"></script>
     <script src="app.js"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('Service Worker registered:', registration);
+                    })
+                    .catch(error => {
+                        console.log('Service Worker registration failed:', error);
+                    });
+            });
+        }
+    </script>
 </body>
 </html>
