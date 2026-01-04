@@ -1,0 +1,202 @@
+/* Додамо до існуючого CSS */
+
+/* === HOVER EFFECTS ENHANCEMENT === */
+.compose-btn, .ai-compose-btn {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.compose-btn::after, .ai-compose-btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1, 1) translate(-50%);
+    transform-origin: 50% 50%;
+}
+
+.compose-btn:hover::after, .ai-compose-btn:hover::after {
+    animation: ripple 1s ease-out;
+}
+
+@keyframes ripple {
+    0% {
+        transform: scale(0, 0);
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(20, 20);
+        opacity: 0;
+    }
+}
+
+/* === BUTTON ACTIVE STATES === */
+.toolbar-btn:active, .viewer-action-btn:active, .btn-primary:active {
+    transform: translateY(0) scale(0.98);
+    transition: transform 0.1s;
+}
+
+/* === SEARCH BOX ENHANCEMENT === */
+.search-box input {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.search-box input:focus {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.25);
+}
+
+/* === EMAIL ITEM ENHANCEMENT === */
+.email-item {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.email-item:hover {
+    transform: translateX(4px);
+    background: rgba(59, 130, 246, 0.08) !important;
+    border-left: 3px solid #3b82f6;
+}
+
+.email-item.unread:hover {
+    background: rgba(59, 130, 246, 0.12) !important;
+}
+
+/* === CHECKBOX STYLING === */
+.email-checkbox input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #475569;
+    border-radius: 6px;
+    background: #1e293b;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s;
+}
+
+.email-checkbox input[type="checkbox"]:checked {
+    background: #3b82f6;
+    border-color: #3b82f6;
+}
+
+.email-checkbox input[type="checkbox"]:checked::after {
+    content: '✓';
+    position: absolute;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.light-theme .email-checkbox input[type="checkbox"] {
+    background: white;
+    border-color: #cbd5e1;
+}
+
+/* === TOOLBAR BUTTONS GROUP === */
+.toolbar-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.toolbar-btn {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s;
+}
+
+.toolbar-btn .btn-text {
+    position: relative;
+    z-index: 1;
+}
+
+.toolbar-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.5s;
+}
+
+.toolbar-btn:hover::before {
+    left: 100%;
+}
+
+/* === SORT SELECT STYLING === */
+.sort-select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 40px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.light-theme .sort-select {
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231e293b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+}
+
+.sort-select:hover {
+    border-color: #3b82f6;
+    transform: translateY(-1px);
+}
+
+/* === ACTIVE NAV ITEM INDICATOR === */
+.nav-item.active {
+    position: relative;
+    background: linear-gradient(90deg, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0.1) 100%);
+    border-left: 3px solid #3b82f6;
+}
+
+.nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 2px;
+    background: #3b82f6;
+}
+
+/* === FLOATING ACTION BUTTON FOR MOBILE === */
+@media (max-width: 768px) {
+    .fab {
+        position: fixed;
+        bottom: 100px;
+        right: 24px;
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 24px;
+        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+        cursor: pointer;
+        z-index: 1000;
+        transition: all 0.3s;
+    }
+    
+    .fab:hover {
+        transform: scale(1.1);
+        box-shadow: 0 12px 30px rgba(59, 130, 246, 0.4);
+    }
+}
