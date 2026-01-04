@@ -6,23 +6,17 @@
     <title>Inbox Pro | AI Email Client</title>
     <link rel="stylesheet" href="https://artur667120.github.io/style.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
-    <link rel="manifest" href="https://artur667120.github.io/manifest.json">
-    <style>
-        /* Basic styles to prevent flash */
-        body { margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        .hidden { display: none !important; }
-    </style>
 </head>
 <body class="dark-theme">
-    <!-- Loading -->
+    <!-- Loading Screen -->
     <div class="loading-overlay" id="initialLoading">
         <div class="loading-content">
             <div class="loading-spinner"></div>
-            <div class="loading-text" id="loadingText">Loading Inbox Pro...</div>
+            <div class="loading-text">Loading Inbox Pro...</div>
         </div>
     </div>
 
-    <!-- Login -->
+    <!-- Login Screen -->
     <div class="login-screen" id="loginScreen">
         <div class="login-container">
             <div class="login-header">
@@ -33,97 +27,22 @@
                 <p class="login-subtitle">AI-Powered Smart Email Client</p>
             </div>
             
-            <!-- Login Form -->
-            <div class="login-form active" id="loginForm">
+            <div class="login-form">
                 <h2>🔑 Welcome Back</h2>
                 
                 <div class="form-group">
-                    <label for="loginEmail">📧 Email Address</label>
-                    <input type="email" id="loginEmail" placeholder="demo@example.com" autocomplete="email" value="demo@example.com">
+                    <label>📧 Email Address</label>
+                    <input type="email" id="loginEmail" placeholder="demo@example.com" value="demo@example.com">
                 </div>
                 
                 <div class="form-group">
-                    <label for="loginPassword">🔒 Password</label>
-                    <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password" value="demo123">
-                </div>
-                
-                <div class="form-options">
-                    <label class="checkbox">
-                        <input type="checkbox" id="rememberMe" checked>
-                        <span class="checkmark"></span>
-                        <span id="rememberMeText">Remember me</span>
-                    </label>
-                    <a href="#" id="forgotPasswordBtn" class="forgot-password">Forgot password?</a>
+                    <label>🔒 Password</label>
+                    <input type="password" id="loginPassword" placeholder="••••••••" value="demo123">
                 </div>
                 
                 <button class="btn-primary" id="loginBtn">
-                    <span class="btn-text">Sign In</span>
-                    <span class="btn-icon">→</span>
+                    Sign In →
                 </button>
-                
-                <p class="login-switch">
-                    <span id="newUserText">New user?</span> 
-                    <a href="#" id="showRegister">Create account</a>
-                </p>
-            </div>
-
-            <!-- Register Form -->
-            <div class="login-form" id="registerForm">
-                <h2>👤 Create Account</h2>
-                
-                <div class="form-group">
-                    <label for="registerName">👤 Full Name</label>
-                    <input type="text" id="registerName" placeholder="John Doe" autocomplete="name">
-                </div>
-                
-                <div class="form-group">
-                    <label for="registerEmail">📧 Email Address</label>
-                    <input type="email" id="registerEmail" placeholder="your@email.com" autocomplete="email">
-                </div>
-                
-                <div class="form-group">
-                    <label for="registerPassword">🔒 Password</label>
-                    <input type="password" id="registerPassword" placeholder="••••••••" autocomplete="new-password">
-                    <small class="password-hint">Min. 8 characters with letters & numbers</small>
-                    <div class="password-strength" id="passwordStrength">
-                        <div class="password-strength-meter"></div>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="registerConfirm">🔒 Confirm Password</label>
-                    <input type="password" id="registerConfirm" placeholder="••••••••" autocomplete="new-password">
-                </div>
-                
-                <button class="btn-primary" id="registerBtn">
-                    <span class="btn-text">Create Account</span>
-                    <span class="btn-icon">✓</span>
-                </button>
-                
-                <p class="login-switch">
-                    <span id="haveAccountText">Already have an account?</span> 
-                    <a href="#" id="showLogin">Sign in</a>
-                </p>
-            </div>
-
-            <!-- Reset Password Form -->
-            <div class="login-form" id="resetForm">
-                <h2>🔑 Reset Password</h2>
-                
-                <div class="form-group">
-                    <label for="resetEmail">📧 Email Address</label>
-                    <input type="email" id="resetEmail" placeholder="your@email.com" autocomplete="email">
-                </div>
-                
-                <button class="btn-primary" id="sendResetBtn">
-                    <span class="btn-text">Send Reset Link</span>
-                    <span class="btn-icon">↻</span>
-                </button>
-                
-                <p class="login-switch">
-                    <span id="rememberPasswordText">Remember password?</span> 
-                    <a href="#" id="showLoginFromReset">Sign in</a>
-                </p>
             </div>
 
             <div class="login-features">
@@ -143,189 +62,161 @@
         </div>
     </div>
 
-    <!-- Main App -->
+    <!-- Main App (hidden by default) -->
     <div class="app hidden" id="app">
-        <!-- App content remains the same as before -->
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <button class="menu-toggle">☰</button>
+                <div class="logo">
+                    <div class="logo-icon">📬</div>
+                    <h1>Inbox Pro</h1>
+                    <div class="ai-status">
+                        <span class="ai-dot"></span>
+                        <span class="ai-text">AI Active</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="search-container">
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" placeholder="Search emails, contacts...">
+                </div>
+            </div>
+
+            <div class="header-right">
+                <div class="user-profile">
+                    <div class="user-avatar">JD</div>
+                    <div class="user-info">
+                        <span class="user-name">Demo User</span>
+                        <span class="user-email">demo@example.com</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <button class="compose-btn" id="composeBtn">
+                    <span class="compose-icon">+</span>
+                    <span class="compose-text">Compose</span>
+                </button>
+
+                <!-- Folders -->
+                <nav class="sidebar-nav">
+                    <h3 class="nav-title">FOLDERS</h3>
+                    <div class="nav-items">
+                        <a href="#" class="nav-item active">
+                            <span class="nav-icon">📥</span>
+                            <span class="nav-text">Inbox</span>
+                            <span class="nav-badge">5</span>
+                        </a>
+                        <a href="#" class="nav-item">
+                            <span class="nav-icon">★</span>
+                            <span class="nav-text">Starred</span>
+                            <span class="nav-badge">2</span>
+                        </a>
+                        <a href="#" class="nav-item">
+                            <span class="nav-icon">📤</span>
+                            <span class="nav-text">Sent</span>
+                        </a>
+                    </div>
+                </nav>
+            </aside>
+
+            <!-- Email Content -->
+            <main class="email-content">
+                <!-- Toolbar -->
+                <div class="email-toolbar">
+                    <div class="toolbar-left">
+                        <h2 class="folder-title">
+                            <span class="folder-icon">📥</span>
+                            <span class="folder-name">Inbox</span>
+                            <span class="folder-stats">5 emails • 3 unread</span>
+                        </h2>
+                    </div>
+                </div>
+
+                <!-- Email List -->
+                <div class="email-list">
+                    <!-- Email item 1 -->
+                    <div class="email-item unread">
+                        <div class="email-avatar">JD</div>
+                        <div class="email-details">
+                            <div class="email-header">
+                                <span class="email-sender">John Doe</span>
+                                <span class="email-time">10:30 AM</span>
+                            </div>
+                            <div class="email-subject">Welcome to Inbox Pro!</div>
+                            <div class="email-preview">Thank you for choosing our AI-powered email client...</div>
+                        </div>
+                        <div class="email-actions">
+                            <button class="email-action star-btn">☆</button>
+                        </div>
+                    </div>
+
+                    <!-- Email item 2 -->
+                    <div class="email-item important">
+                        <div class="email-avatar">AS</div>
+                        <div class="email-details">
+                            <div class="email-header">
+                                <span class="email-sender">Alex Smith</span>
+                                <span class="email-time">Yesterday</span>
+                            </div>
+                            <div class="email-subject">Meeting Notes & Project Updates</div>
+                            <div class="email-preview">Here are the meeting notes from our last session...</div>
+                        </div>
+                        <div class="email-actions">
+                            <button class="email-action star-btn">☆</button>
+                        </div>
+                    </div>
+
+                    <!-- Email item 3 -->
+                    <div class="email-item">
+                        <div class="email-avatar">MC</div>
+                        <div class="email-details">
+                            <div class="email-header">
+                                <span class="email-sender">Maria Chen</span>
+                                <span class="email-time">2 days ago</span>
+                            </div>
+                            <div class="email-subject">Travel Plans for Conference</div>
+                            <div class="email-preview">I've booked the flights and hotel for Berlin...</div>
+                        </div>
+                        <div class="email-actions">
+                            <button class="email-action star-btn active">★</button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
     </div>
 
-    <!-- Notification Toast -->
+    <!-- Toast Container -->
     <div class="toast-container" id="toastContainer"></div>
 
-    <!-- SIMPLE APP.JS SCRIPT -->
+    <!-- Script -->
+    <script src="https://artur667120.github.io/app.js"></script>
     <script>
-        // Simple working version
-        console.log('🚀 Inbox Pro starting...');
-        
-        // Hide loading screen after 2 seconds
-        setTimeout(() => {
-            const loading = document.getElementById('initialLoading');
-            if (loading) {
-                loading.style.opacity = '0';
-                setTimeout(() => loading.style.display = 'none', 500);
-            }
+        // Simple auto-login
+        setTimeout(function() {
+            // Hide loading
+            document.getElementById('initialLoading').style.display = 'none';
             
-            // Auto login for demo
-            const loginScreen = document.getElementById('loginScreen');
-            const app = document.getElementById('app');
+            // Auto login
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('app').classList.remove('hidden');
             
-            if (loginScreen && app) {
-                loginScreen.style.display = 'none';
-                app.classList.remove('hidden');
-                
-                // Show success toast
-                showToast('✅ Welcome to Inbox Pro! Demo mode activated.', 'success');
-            }
-        }, 2000);
-        
-        // Simple toast function
-        function showToast(message, type = 'info') {
-            const container = document.getElementById('toastContainer');
-            if (!container) return;
-            
+            // Show toast
             const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.textContent = message;
-            toast.style.cssText = `
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                background: ${type === 'success' ? '#10b981' : '#3b82f6'};
-                color: white;
-                padding: 12px 24px;
-                border-radius: 8px;
-                z-index: 1000;
-                animation: slideIn 0.3s ease;
-            `;
+            toast.className = 'toast success';
+            toast.textContent = '✅ Welcome to Inbox Pro!';
+            document.getElementById('toastContainer').appendChild(toast);
             
-            container.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.style.animation = 'slideOut 0.3s ease';
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-            
-            // Add CSS animation
-            if (!document.getElementById('toast-animations')) {
-                const style = document.createElement('style');
-                style.id = 'toast-animations';
-                style.textContent = `
-                    @keyframes slideIn {
-                        from { transform: translateX(100%); opacity: 0; }
-                        to { transform: translateX(0); opacity: 1; }
-                    }
-                    @keyframes slideOut {
-                        from { transform: translateX(0); opacity: 1; }
-                        to { transform: translateX(100%); opacity: 0; }
-                    }
-                `;
-                document.head.appendChild(style);
-            }
-        }
-        
-        // Setup login button
-        const loginBtn = document.getElementById('loginBtn');
-        if (loginBtn) {
-            loginBtn.addEventListener('click', () => {
-                const email = document.getElementById('loginEmail').value;
-                const password = document.getElementById('loginPassword').value;
-                
-                if (!email || !password) {
-                    showToast('Please fill in all fields', 'error');
-                    return;
-                }
-                
-                loginBtn.disabled = true;
-                loginBtn.innerHTML = '<span class="btn-text">Signing in...</span><span class="btn-icon">⏳</span>';
-                
-                setTimeout(() => {
-                    const loginScreen = document.getElementById('loginScreen');
-                    const app = document.getElementById('app');
-                    
-                    if (loginScreen && app) {
-                        loginScreen.style.display = 'none';
-                        app.classList.remove('hidden');
-                        showToast('✅ Login successful! Welcome to Inbox Pro.', 'success');
-                    }
-                    
-                    loginBtn.disabled = false;
-                    loginBtn.innerHTML = '<span class="btn-text">Sign In</span><span class="btn-icon">→</span>';
-                }, 1000);
-            });
-        }
-        
-        // Setup register button
-        const registerBtn = document.getElementById('registerBtn');
-        if (registerBtn) {
-            registerBtn.addEventListener('click', () => {
-                const name = document.getElementById('registerName').value;
-                const email = document.getElementById('registerEmail').value;
-                const password = document.getElementById('registerPassword').value;
-                
-                if (!name || !email || !password) {
-                    showToast('Please fill in all fields', 'error');
-                    return;
-                }
-                
-                registerBtn.disabled = true;
-                registerBtn.innerHTML = '<span class="btn-text">Creating...</span><span class="btn-icon">⏳</span>';
-                
-                setTimeout(() => {
-                    const loginScreen = document.getElementById('loginScreen');
-                    const app = document.getElementById('app');
-                    
-                    if (loginScreen && app) {
-                        loginScreen.style.display = 'none';
-                        app.classList.remove('hidden');
-                        showToast('✅ Account created successfully!', 'success');
-                    }
-                    
-                    registerBtn.disabled = false;
-                    registerBtn.innerHTML = '<span class="btn-text">Create Account</span><span class="btn-icon">✓</span>';
-                }, 1000);
-            });
-        }
-        
-        // Setup form switching
-        document.getElementById('showRegister')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            document.getElementById('loginForm').classList.remove('active');
-            document.getElementById('registerForm').classList.add('active');
-        });
-        
-        document.getElementById('showLogin')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            document.getElementById('registerForm').classList.remove('active');
-            document.getElementById('loginForm').classList.add('active');
-        });
-        
-        // Add CSS for toasts
-        const toastStyle = document.createElement('style');
-        toastStyle.textContent = `
-            .toast-container {
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                z-index: 9999;
-            }
-            .toast {
-                background: #10b981;
-                color: white;
-                padding: 12px 24px;
-                border-radius: 8px;
-                margin-top: 10px;
-                animation: slideIn 0.3s ease;
-            }
-            .toast.error { background: #ef4444; }
-            .toast.warning { background: #f59e0b; }
-            .toast.info { background: #3b82f6; }
-            @keyframes slideIn {
-                from { transform: translateX(100%); opacity: 0; }
-                to { transform: translateX(0); opacity: 1; }
-            }
-        `;
-        document.head.appendChild(toastStyle);
-        
-        console.log('✅ Simple app initialized');
+            setTimeout(() => toast.remove(), 3000);
+        }, 1500);
     </script>
 </body>
 </html>
