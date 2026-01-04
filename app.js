@@ -1,93 +1,39 @@
-// Simple working app.js with enhanced features
-console.log('✅ Inbox Pro starting...');
+// SIMPLE WORKING APP.JS - NO ERRORS
+console.log('📦 App.js loading...');
 
-// Email data
+// Email data - ONLY ONE DECLARATION
 const emails = [
-    {
-        id: 1,
-        avatar: 'JD',
-        sender: 'John Doe',
-        time: '10:30 AM',
-        subject: 'Welcome to Inbox Pro!',
-        preview: 'Thank you for choosing our AI-powered email client...',
-        unread: true,
-        important: false,
-        starred: false
-    },
-    {
-        id: 2,
-        avatar: 'AS',
-        sender: 'Alex Smith',
-        time: 'Yesterday',
-        subject: 'Meeting Notes & Project Updates',
-        preview: 'Here are the meeting notes from our last session...',
-        unread: false,
-        important: true,
-        starred: false
-    },
-    {
-        id: 3,
-        avatar: 'MC',
-        sender: 'Maria Chen',
-        time: '2 days ago',
-        subject: 'Travel Plans for Conference',
-        preview: 'I\'ve booked the flights and hotel for Berlin...',
-        unread: false,
-        important: false,
-        starred: true
-    },
-    {
-        id: 4,
-        avatar: 'TB',
-        sender: 'Tech Blog',
-        time: '3 days ago',
-        subject: 'Weekly Tech News Digest',
-        preview: 'AI breakthroughs, new frameworks, and industry trends...',
-        unread: true,
-        important: false,
-        starred: false
-    },
-    {
-        id: 5,
-        avatar: 'SC',
-        sender: 'Security Team',
-        time: '1 week ago',
-        subject: 'Security Update Required',
-        preview: 'Please update your password following security guidelines...',
-        unread: true,
-        important: true,
-        starred: true
-    }
+    { id: 1, avatar: 'JD', sender: 'John Doe', time: '10:30 AM', subject: 'Welcome to Inbox Pro!', preview: 'Thank you for choosing our email client...', unread: true, starred: false },
+    { id: 2, avatar: 'AS', sender: 'Alex Smith', time: 'Yesterday', subject: 'Meeting Notes', preview: 'Here are the meeting notes...', unread: false, starred: false },
+    { id: 3, avatar: 'MC', sender: 'Maria Chen', time: '2 days ago', subject: 'Travel Plans', preview: 'Booked flights for Berlin...', unread: false, starred: true }
 ];
 
 // Initialize when page loads
-window.addEventListener('load', function() {
-    console.log('📦 Page loaded, initializing app...');
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('✅ DOM ready');
     
-    // Initialize email list
-    renderEmailList();
+    // Load emails
+    loadEmails();
     
-    // Setup event listeners
-    setupEventListeners();
+    // Setup buttons
+    setupButtons();
     
-    console.log('🎯 App initialized successfully');
+    console.log('🎯 App ready');
 });
 
-// Render email list
-function renderEmailList() {
-    const emailList = document.querySelector('.email-list');
+// Load emails into the list
+function loadEmails() {
+    const emailList = document.getElementById('emailList');
     if (!emailList) return;
     
-    // Clear existing emails
     emailList.innerHTML = '';
     
-    // Add each email
     emails.forEach(email => {
-        const emailItem = document.createElement('div');
-        emailItem.className = `email-item ${email.unread ? 'unread' : ''} ${email.important ? 'important' : ''}`;
-        emailItem.dataset.emailId = email.id;
+        const emailElement = document.createElement('div');
+        emailElement.className = 'email-item' + (email.unread ? ' unread' : '') + (email.starred ? ' starred' : '');
+        emailElement.dataset.id = email.id;
         
-        emailItem.innerHTML = `
+        emailElement.innerHTML = `
             <div class="email-avatar">${email.avatar}</div>
             <div class="email-details">
                 <div class="email-header">
@@ -98,42 +44,21 @@ function renderEmailList() {
                 <div class="email-preview">${email.preview}</div>
             </div>
             <div class="email-actions">
-                <button class="email-action star-btn ${email.starred ? 'active' : ''}">
-                    ${email.starred ? '★' : '☆'}
-                </button>
+                <button class="email-action star-btn">${email.starred ? '★' : '☆'}</button>
             </div>
         `;
         
-        emailList.appendChild(emailItem);
+        emailList.appendChild(emailElement);
     });
 }
 
-// Setup event listeners
-function setupEventListeners() {
-    // Star buttons (delegated event handling)
-    document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('star-btn')) {
-            e.stopPropagation();
-            const isActive = e.target.classList.toggle('active');
-            e.target.textContent = isActive ? '★' : '☆';
-            
-            // Update email data
-            const emailId = parseInt(e.target.closest('.email-item').dataset.emailId);
-            const email = emails.find(e => e.id === emailId);
-            if (email) {
-                email.starred = isActive;
-            }
-            
-            showToast(isActive ? 'Email starred!' : 'Email unstarred', 'info');
-        }
-    });
-    
-    // Email click to open viewer (already handled in main script)
+// Setup all button events
+function setupButtons() {
     // Compose button
     const composeBtn = document.getElementById('composeBtn');
     if (composeBtn) {
         composeBtn.addEventListener('click', function() {
-            showToast('📝 Compose email feature coming soon!', 'info');
+            showMessage('📝 Compose email');
         });
     }
     
@@ -148,13 +73,55 @@ function setupEventListeners() {
         });
     }
     
+    // Email click to open viewer
+    document.addEventListener('click', function(event) {
+        const emailItem = event.target.closest('.email-item');
+        if (emailItem && !event.target.classList.contains('star-btn')) {
+            openEmailViewer(emailItem.dataset.id);
+        }
+    });
+    
+    // Star buttons
+    document.addEventListener('click', function(event) {
+        if (event.target.classList.contains('star-btn')) {
+            event.stopPropagation();
+            const starBtn = event.target;
+            const isStarred = starBtn.textContent === '★';
+            starBtn.textContent = isStarred ? '☆' : '★';
+            
+            // Update email data
+            const emailId = parseInt(event.target.closest('.email-item').dataset.id);
+            const email = emails.find(e => e.id === emailId);
+            if (email) {
+                email.starred = !isStarred;
+            }
+            
+            showMessage(isStarred ? 'Email unstarred' : 'Email starred');
+        }
+    });
+    
+    // Reply button
+    const replyBtn = document.getElementById('replyBtn');
+    if (replyBtn) {
+        replyBtn.addEventListener('click', function() {
+            showMessage('📧 Reply to email');
+        });
+    }
+    
+    // Forward button
+    const forwardBtn = document.getElementById('forwardBtn');
+    if (forwardBtn) {
+        forwardBtn.addEventListener('click', function() {
+            showMessage('📧 Forward email');
+        });
+    }
+    
     // Search input
     const searchInput = document.querySelector('.search-box input');
     if (searchInput) {
         searchInput.addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
-            if (searchTerm.length > 0) {
-                showToast(`Searching for: ${searchTerm}`, 'info');
+            if (e.target.value.length > 2) {
+                showMessage(`Searching: ${e.target.value}`);
             }
         });
     }
@@ -163,41 +130,55 @@ function setupEventListeners() {
     document.querySelectorAll('.nav-item').forEach(item => {
         item.addEventListener('click', function(e) {
             e.preventDefault();
-            
-            // Remove active class from all
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            // Add active to clicked
             this.classList.add('active');
-            
-            const folder = this.querySelector('.nav-text').textContent;
-            showToast(`Switched to: ${folder}`, 'info');
+            showMessage(`Folder: ${this.querySelector('.nav-text').textContent}`);
         });
     });
 }
 
-// Show toast notification
-function showToast(text, type = 'info') {
-    console.log(`💬 ${text}`);
+// Open email in fullscreen viewer
+function openEmailViewer(emailId) {
+    const email = emails.find(e => e.id == emailId);
+    if (!email) return;
+    
+    // Update viewer content
+    document.getElementById('viewerSubject').textContent = email.subject;
+    document.getElementById('senderName').textContent = email.sender;
+    document.getElementById('senderEmail').textContent = email.sender.toLowerCase().replace(' ', '.') + '@example.com';
+    document.getElementById('senderTime').textContent = email.time;
+    document.getElementById('senderAvatar').textContent = email.avatar;
+    
+    // Create email body
+    const body = document.getElementById('viewerBody');
+    body.innerHTML = `
+        <p>Hello,</p>
+        <p>This is the content of the email from ${email.sender} about "${email.subject}".</p>
+        <p>In a real app, this would show the actual email content.</p>
+        <p>Best regards,<br>${email.sender}</p>
+    `;
+    
+    // Show viewer
+    document.getElementById('emailViewer').classList.remove('hidden');
+    
+    showMessage('📨 Email opened');
+}
+
+// Show message/toast
+function showMessage(text) {
+    console.log('💬 ' + text);
     
     const container = document.getElementById('toastContainer');
     if (!container) return;
     
     const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
+    toast.className = 'toast info';
     toast.textContent = text;
     container.appendChild(toast);
     
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        setTimeout(() => toast.remove(), 300);
+    setTimeout(function() {
+        toast.remove();
     }, 2000);
 }
 
-// Export functions for global use
-window.InboxPro = {
-    renderEmailList,
-    showToast,
-    emails
-};
-
-console.log('🚀 app.js loaded with enhanced features');
+console.log('🚀 App.js loaded without errors');
