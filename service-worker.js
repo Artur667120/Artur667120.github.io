@@ -1,50 +1,25 @@
-const CACHE_NAME = 'inbox-pro-v1';
-const urlsToCache = [
-  '/',
-  '/index.html',
-  '/style.css',
-  '/app.js',
-  '/auth-service.js',
-  '/firebase-config.js',
-  'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap'
-];
+const CACHE_NAME = 'inbox-pro-v3';
 
-// Install event
+// Простий Service Worker без складних обробок
 self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
-      })
-  );
+  console.log('Service Worker installing...');
+  self.skipWaiting();
 });
 
-// Activate event
 self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheName !== CACHE_NAME) {
-            console.log('Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
-  );
+  console.log('Service Worker activating...');
+  event.waitUntil(clients.claim());
 });
 
-// Fetch event
 self.addEventListener('fetch', event => {
-  // Skip Firebase URLs and external resources
+  // Дозволяємо всім зовнішнім запитам проходити без кешування
   if (event.request.url.includes('firebase') || 
       event.request.url.includes('gstatic.com') ||
       event.request.url.includes('googleapis.com')) {
-    return;
+    return fetch(event.request);
   }
   
+  // Для локальних файлів пробуємо кеш
   event.respondWith(
     caches.match(event.request)
       .then(response => {
@@ -71,52 +46,27 @@ self.addEventListener('fetch', event => {
             });
             
           return response;
+        }).catch(() => {
+          // Fallback for offline
+          if (event.request.mode === 'navigate') {
+            return caches.match('/index.html');
+          }
+          return new Response('Offline', { status: 503 });
         });
-      })
-      .catch(() => {
-        // Return offline page or fallback
-        if (event.request.mode === 'navigate') {
-          return caches.match('/');
-        }
       })
   );
 });
 
-// Push notifications
+// Push notifications (опціонально)
 self.addEventListener('push', event => {
   const options = {
     body: event.data?.text() || 'New email received!',
-    icon: 'icon-192.png',
-    badge: 'icon-192.png',
-    vibrate: [100, 50, 100],
-    data: {
-      dateOfArrival: Date.now(),
-      primaryKey: 1
-    },
-    actions: [
-      {
-        action: 'open',
-        title: 'Open Inbox Pro'
-      },
-      {
-        action: 'close',
-        title: 'Close'
-      }
-    ]
+    icon: '/icon-192.png',
+    badge: '/icon-192.png',
+    vibrate: [100, 50, 100]
   };
   
   event.waitUntil(
     self.registration.showNotification('Inbox Pro', options)
   );
-});
-
-// Notification click
-self.addEventListener('notificationclick', event => {
-  event.notification.close();
-  
-  if (event.action === 'open') {
-    event.waitUntil(
-      clients.openWindow('/')
-    );
-  }
 });
